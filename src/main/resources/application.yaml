@@ -1,3 +1,11 @@
 spring:
   application:
     name: pickplace-backend
+  flyway:
+    locations: classpath:db/migration
+    clean-disabled: true
+    baseline-on-migrate: false
+    validate-on-migrate: true
+  sql:
+    init:
+      mode: never

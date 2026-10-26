@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PickplaceBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PickplaceBackendApplication.class, args);
+		var context = SpringApplication.run(PickplaceBackendApplication.class, args);
+		if (context.getEnvironment().matchesProfiles("reference-import")) {
+			context.close();
+		}
 	}
 
 }
