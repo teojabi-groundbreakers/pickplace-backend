@@ -43,13 +43,15 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 | 400 | `INVALID_REGION_CODE` | 지역 코드 형식 오류 | 명세 초안 |
 | 404 | `NOT_FOUND` | 존재하지 않는 주소 | **추가안(확정 전)** |
 | 404 | `REGION_NOT_FOUND` | 형식은 맞지만 등록되지 않은 지역 코드 | 명세 초안 |
-| 405 | `METHOD_NOT_ALLOWED` | 지원하지 않는 HTTP 메서드 | **추가안(확정 전)** |
+| 405 | `METHOD_NOT_ALLOWED` | 지원하지 않는 HTTP 메서드 (`Allow` 헤더로 허용 메서드 안내) | **추가안(확정 전)** |
 | 422 | `BUSINESS_TYPE_NOT_SUPPORTED` | 등록됐지만 초기 지원 3업종이 아님 | 명세 초안 |
 | 422 | `QUARTER_NOT_SUPPORTED` | 지원 기간 밖의 분기 | 명세 초안 |
-| 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 | 명세 초안 |
+| 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 (서버 반환값 검증 실패 포함) | 명세 초안 |
 | 503 | `DATA_SERVICE_UNAVAILABLE` | DB 연결·조회 실패 (빈 결과로 위장하지 않음) | 명세 초안 |
 
 그 밖에 Spring이 4xx로 판단한 요청 오류(예: 415 지원하지 않는 Content-Type)는 해당 HTTP 상태와 `INVALID_REQUEST` 코드로 응답한다.
+
+Spring이 오류와 함께 제공하는 안내 헤더(405의 `Allow`, 415의 `Accept` 등)는 공통 오류 형식으로 바꿀 때도 그대로 응답에 포함한다.
 
 ### details.reason 값
 

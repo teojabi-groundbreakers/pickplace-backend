@@ -2,6 +2,7 @@ package com.pickplace.backend.common.error;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import org.junit.jupiter.api.Test;
@@ -9,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,6 +58,19 @@ class GlobalExceptionHandlerTests {
 		// 5자리 숫자만 허용하는 파라미터를 받는다. 검증 실패 확인용이다.
 		@GetMapping("/test/validated")
 		String validated(@RequestParam @Pattern(regexp = "\\d{5}") String districtCode) {
+			return "ok";
+		}
+
+		// 반환값 검증(@NotBlank)에 일부러 실패하는 빈 문자열을 돌려준다. 서버 쪽 잘못 확인용이다.
+		@GetMapping("/test/blank-return")
+		@NotBlank
+		String blankReturn() {
+			return "";
+		}
+
+		// JSON 본문만 받는다. 지원하지 않는 Content-Type(415) 확인용이다.
+		@PostMapping(path = "/test/json-only", consumes = MediaType.APPLICATION_JSON_VALUE)
+		String jsonOnly(@RequestBody String body) {
 			return "ok";
 		}
 
@@ -123,6 +140,17 @@ class GlobalExceptionHandlerTests {
 				.andExpect(jsonPath("$.error.details[0].reason").value("INVALID_VALUE"));
 	}
 
+	// 서버 반환값 검증에 실패하면 사용자 입력 오류(400)가 아니라 500 INTERNAL_ERROR인지 확인한다.
+	@Test
+	void returnValueValidationFailureIsInternalError() throws Exception {
+		mockMvc.perform(get("/test/blank-return").header("X-Request-Id", "return-check"))
+				.andExpect(status().isInternalServerError())
+				.andExpect(jsonPath("$.error.code").value("INTERNAL_ERROR"))
+				.andExpect(jsonPath("$.error.details").isEmpty())
+				.andExpect(jsonPath("$.meta.requestId").value("return-check"))
+				.andExpect(header().string("X-Request-Id", "return-check"));
+	}
+
 	// 없는 주소면 404 NOT_FOUND와 빈 details 배열이 오는지 확인한다.
 	@Test
 	void unknownPathIsNotFound() throws Exception {
@@ -133,12 +161,25 @@ class GlobalExceptionHandlerTests {
 				.andExpect(jsonPath("$.error.details").isEmpty());
 	}
 
-	// GET 전용 주소에 POST로 요청하면 405 METHOD_NOT_ALLOWED가 오는지 확인한다.
+	// GET 전용 주소에 POST로 요청하면 405 METHOD_NOT_ALLOWED와 허용 메서드를 알려주는 Allow 헤더가 오는지 확인한다.
 	@Test
-	void unsupportedMethodIsMethodNotAllowed() throws Exception {
-		mockMvc.perform(post("/test/internal"))
+	void unsupportedMethodIsMethodNotAllowedWithAllowHeader() throws Exception {
+		mockMvc.perform(post("/test/internal").header("X-Request-Id", "allow-check"))
 				.andExpect(status().isMethodNotAllowed())
-				.andExpect(jsonPath("$.error.code").value("METHOD_NOT_ALLOWED"));
+				.andExpect(header().string("Allow", containsString("GET")))
+				.andExpect(header().string("Allow", not(containsString("POST"))))
+				.andExpect(jsonPath("$.error.code").value("METHOD_NOT_ALLOWED"))
+				.andExpect(jsonPath("$.meta.requestId").value("allow-check"));
+	}
+
+	// 지원하지 않는 Content-Type이면 415와 받을 수 있는 형식을 알려주는 Accept 헤더가 오는지 확인한다.
+	@Test
+	void unsupportedMediaTypeKeepsAcceptHeader() throws Exception {
+		mockMvc.perform(post("/test/json-only").contentType(MediaType.TEXT_PLAIN).content("hello"))
+				.andExpect(status().isUnsupportedMediaType())
+				.andExpect(header().string("Accept", containsString(MediaType.APPLICATION_JSON_VALUE)))
+				.andExpect(jsonPath("$.error.code").value("INVALID_REQUEST"))
+				.andExpect(jsonPath("$.meta.requestId").exists());
 	}
 
 	// 예상하지 못한 예외는 500이고, SQL·비밀번호·스택트레이스가 응답에 없는지 확인한다.
