@@ -1,0 +1,1763 @@
+{
+  "version": "seoul-reference-20262-mois-20261012-v1",
+  "statisticsQuarter": "20262",
+  "officialSnapshotOn": "2026-10-12",
+  "snapshotSha256": "da5e5e5aaccc7f6ca0e2706dc925a6076274491211060bd386388759e35ec796",
+  "attribution": "서울 열린데이터광장 / 서울신용보증재단 / 행정안전부",
+  "note": "Frozen verified snapshot, not a claim of latest boundaries. Derived mapping report retained separately.",
+  "sources": [
+    {
+      "file": "2026-10-15/raw/district.json",
+      "sha256": "8f18cb886c8386821543ecb821b58c22267ee6909f0e04d3d11350202808adf2",
+      "url": "https://data.seoul.go.kr/dataList/OA-22161/S/1/datasetView.do",
+      "collectedAt": "2026-10-15T07:08:42.659Z",
+      "parameters": {
+        "srvType": "S",
+        "infId": "OA-22161",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "gridTotalCnt": "25",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "",
+        "filterCol": "",
+        "txtFilter": ""
+      }
+    },
+    {
+      "file": "2026-10-15/raw/dong.json",
+      "sha256": "621c27d01a7915b86b7f6e8486ff53a2d1cc37b004ceabb602fd8b647fc633d0",
+      "url": "https://data.seoul.go.kr/dataList/OA-22160/S/1/datasetView.do",
+      "collectedAt": "2026-10-15T07:08:42.671Z",
+      "parameters": {
+        "srvType": "S",
+        "infId": "OA-22160",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "gridTotalCnt": "425",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "",
+        "filterCol": "",
+        "txtFilter": ""
+      }
+    },
+    {
+      "file": "2026-10-16/sources/jscode20261012.zip",
+      "sha256": "3702ee001f131968983fbba1e08c6bffc89f6ee4377de327e5eff6946b1098d7",
+      "url": "https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_0014963057q_I4g&fileSn=1",
+      "collectedAt": "2026-10-16T03:00:46.033Z"
+    },
+    {
+      "file": "2026-10-16/sources/jscode20261012-history.zip",
+      "sha256": "1594c1da830a75cad9c555492f7b5bb7a362565cf100feca6f2d15dd9a2f51b0",
+      "url": "https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_0014963057q_I4g&fileSn=2",
+      "collectedAt": "2026-10-16T03:03:05.335Z"
+    },
+    {
+      "file": "2026-10-16/region-report.json",
+      "sha256": "65b4e5cf58d9712e106374a1e91bffb60f76f5a4032a4c7417ca428df943014d",
+      "kind": "derived-code-cross-check"
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100001.json",
+      "sha256": "8a99b6b1932296c2e3893c07c1b9f4ce24d0512c1be9291d908908664cdfa425",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:28.851Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100001"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100002.json",
+      "sha256": "532f47b45b3db5e65eb55d9ed5ad99e15a3529a092252e7f959aaf22a14916af",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:28.817Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100002"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100003.json",
+      "sha256": "c7eea2e4748c10b56308cf747d85feab982fc073eef8b111324e4fc24f32d860",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:28.812Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100003"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100004.json",
+      "sha256": "66df0b6bfe8b9bee4e2cd50cf92bd949472bd60e99f7c7ded83f573ced2f3241",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:30.568Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100004"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100005.json",
+      "sha256": "a1707ab683d5be103d3424b10847b24b8418d8ef754036eb75fd030cb2e881ca",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:30.578Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100005"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100006.json",
+      "sha256": "0dc94c3591ac3f351ad940e0d945a61d36c140db26e6639f3a50e4bb125f07d6",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:30.569Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100006"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100007.json",
+      "sha256": "68aa5efa7efe632025c8c9d629e7341dc4c2eeba094c81acce440ac856d6d82d",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:32.355Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100007"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100008.json",
+      "sha256": "776f0ca21e37a353782c41beb790d0de721ce4354b8498ff8fa7d4bbf71b3e00",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:32.270Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100008"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100009.json",
+      "sha256": "e12809da996475ff8b0ed380a339e70eb9ab8c2c9d153d1ddc7ff0ba96cf74ef",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:32.275Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100009"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS100010.json",
+      "sha256": "ac1ddc4bb296fcbaa18e24b83623d22db689d040128d9ae61d950907c80f23f8",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:34.050Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS100010"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200001.json",
+      "sha256": "c0c0372e4700df67c8de026f67319706cf98db6c071df6f3a5a9cab4da0e441b",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:34.048Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200001"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200002.json",
+      "sha256": "53222dbf598382664156275fb21a0bf8c772188f6d1827f0f4e0103245ed8085",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:34.083Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200002"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200003.json",
+      "sha256": "79866ba93c0173ea0757fbd83e2bdff5c8eaf1c8218a2004b3b12e199c18c921",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:35.768Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200003"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200004.json",
+      "sha256": "20965cf6db5b437cd51d4df8a7763441d737584282489dd48d43e6f38d8d46cd",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:35.781Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200004"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200005.json",
+      "sha256": "4674894adf69b303aae89b4dad9eaed6f6953c7e786fe683ac17c9c1ba11f2f1",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:35.750Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200005"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200006.json",
+      "sha256": "dc73c97316df9587e944d1e98a86b4f690318680e70bb61e7213ced2486d35df",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:37.477Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200006"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200007.json",
+      "sha256": "69797ae6ebb0cba283bc108f82e8faf838dba842bdfd7fb2f4bb4a935db4e451",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:37.505Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200007"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200008.json",
+      "sha256": "b8ae0e62a3c6cbd6eb895900d4f87471f8ec46cbea3c8ea3288a52ac531c1e63",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:37.504Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200008"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200009.json",
+      "sha256": "9dde4642108dff02a0724e1e436c14dcf9fefbefde547356d3be5f3f02850fc5",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:39.158Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200009"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200010.json",
+      "sha256": "f864eed27ca4ab124d897cb2dd8cc24ddd0cb4e8addbf8adb3e783831c1417a2",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:39.198Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200010"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200011.json",
+      "sha256": "05a99a1dfb337ece7d552a4afa5d7b508d41123288e43deff69907f767acbb72",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:39.160Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200011"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200012.json",
+      "sha256": "90be72a05b52527c1d7d311c4c07f6015cac8093c416a7380f7897008fd4d4fd",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:40.853Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200012"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200013.json",
+      "sha256": "360c19d9c4edd74cc04b38deea37f198a232e54b9f5d126e4e0272ceda63c06e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:40.852Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200013"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200014.json",
+      "sha256": "b77bfad11e617b2948557893b3972a96f40e18c9a0d9a80f706e497cb6786866",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:40.878Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200014"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200015.json",
+      "sha256": "c1922602c1eafce24035430f7b9c3c75ddda1139d49208973fe7fde065b961bc",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:42.621Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200015"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200016.json",
+      "sha256": "99310415f0bc091a879eceaf32b09f595f7fdc29baa350a0abe3af63f11c3de8",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:42.591Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200016"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200017.json",
+      "sha256": "824f19492cedaa9b315ecf02bd707dffef125bde962272d6fd558cbadabbea83",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:42.624Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200017"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200018.json",
+      "sha256": "9ba109d696f5023438bb41c6fae8e681482e7ab8ee40d6f0541e41a0caf2744b",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:44.326Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200018"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200019.json",
+      "sha256": "173dac8762d290f0d560243d37d6686ec41de57c8fba06a6b14b3d03fd1d9ad0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:44.312Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200019"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200020.json",
+      "sha256": "2adb8df9e72caf7d9f676a2b1fb66a9634d31136e58eee321b37a77d12eddd9b",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:44.290Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200020"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200021.json",
+      "sha256": "85933faf8b6278fa50bb30f9e0a32d0d57cc6b1ab03b24b313f2d59d7ca48d38",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:46.007Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200021"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200022.json",
+      "sha256": "3835e3e60068662186d11eafdea0d34700c22c3cbcc39eb921b08ba168485189",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:46.005Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200022"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200023.json",
+      "sha256": "e6bf2c3e25297d27a70152bf27f363e636f88aa9b0cc5bad626ee839bab65fa5",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:45.981Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200023"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200024.json",
+      "sha256": "8ff5b7c50409fde4668fe550b96e3a5827e7b06061691d4a2e1768901098568e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:47.713Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200024"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200025.json",
+      "sha256": "de50b49ad7c28e7d91bc557f93010fe58022f187d0ba12a712555717d7d26f8e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:47.684Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200025"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200026.json",
+      "sha256": "42a8e83ca5ac935d45276308e607a0944fade5bbec1cb44c5d6309928e8b9d27",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:47.714Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200026"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200027.json",
+      "sha256": "75776c835d547a857914c96202bbf48c350928f8160ecc3a5a4c649b43c63161",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:49.370Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200027"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200028.json",
+      "sha256": "8e85aae5801ebb9cb6ca5dc94389be0ec9be28ce54c47d72f74f07d28f06cb4d",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:49.444Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200028"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200029.json",
+      "sha256": "f906e37a9943f1fc98f2c813bd70c5dc6943941c089c841519220a39ada54411",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:49.398Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200029"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200030.json",
+      "sha256": "75b00daf019d53a9932a376a5327847070653f4b9432324d4ac998a75ef5a3de",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:51.132Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200030"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200031.json",
+      "sha256": "41d0f1df43c131dc6b7e7b019666ba5eaf9a56f7be116725928ba6925d79d1c5",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:51.182Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200031"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200032.json",
+      "sha256": "0d2aff4485de151afeb3cc1046ad5b1dffa95320cefe81403ffa49d61ab845db",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:51.119Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200032"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200033.json",
+      "sha256": "a4ec66b4ec266e083d16979400424302a279b170385ba7a4c7994117881ebf1a",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:52.961Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200033"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200034.json",
+      "sha256": "75fbd79a30bdcc95c24f2ac5b5bb58282a38f9a9e9d116b461c6eaf8b17784c2",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:52.907Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200034"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200035.json",
+      "sha256": "8e744e0471303dbe08f95b5e8471539b67e68b8be7cc7e2fdf889631b9ac3169",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:52.928Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200035"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200036.json",
+      "sha256": "30565b2bac1769f8015782c22b65e16525d38516584baa3d5dc94076d9f69364",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:54.641Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200036"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200037.json",
+      "sha256": "6e42940bba74b71889e0ae0459cb8170b478868a3accd744f2e8f64f0864fcdf",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:54.659Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200037"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200038.json",
+      "sha256": "cc14941a41909a39bc4d57b25ce0c878f3011e0252048d3910e8b851b814b70f",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:54.640Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200038"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200039.json",
+      "sha256": "f98e1d4d782a6a6326b9d9edd88c10435a4f7b8dc5209768eefee97d1cc3e881",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:56.323Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200039"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200040.json",
+      "sha256": "7bc9f5d0e3af80afceed7f163913a78c88f341919012ef289c4e581fcab9db79",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:56.323Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200040"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200041.json",
+      "sha256": "2ef23956455e36d82d8f08bbdd8ecc750391999027129c4586354b9f26ba167b",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:56.324Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200041"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200042.json",
+      "sha256": "f5b545fb22f0da4678d879903febc7f6d85b6fbf9c0b5787d689ab650dd63ef0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:58.003Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200042"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200043.json",
+      "sha256": "873ab27610dd22326b3c79094b672b51922f3498197ed9170f3c156832b531b8",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:58.019Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200043"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200044.json",
+      "sha256": "6aa19eeb28f057b1cb54ee89494012d85ebff6fecd8b8890cfb8ce512375e3ed",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:58.031Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200044"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200045.json",
+      "sha256": "c04b4a2aa68d125eb0eedce1f6056ca172dd056f50fbdf1e5eca7903d2fce8b9",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:59.682Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200045"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200046.json",
+      "sha256": "99d5c02c2548cfdbe9ae3df342ac8389917c2b2db05e16ae84f983498e2c2886",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:59.683Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200046"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS200047.json",
+      "sha256": "594ceaf9c1d4014cd832621336bed18e37db4d9ad96d98d3ecc437474c6def5e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:12:59.699Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS200047"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300001.json",
+      "sha256": "bc084df8291a3c876bd55e4b9ea10f2a946269ae12ad5ac515f40633e63b3897",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:01.402Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300001"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300002.json",
+      "sha256": "2d11a2df1cb6fcc5dd7ad3bf12ca232a95f74ad24226de65918fddebac7765b0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:01.409Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300002"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300003.json",
+      "sha256": "ccbe0679742454bfa1f2a687e9bc092581c76efa073805b5d2286e29748fbe25",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:01.401Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300003"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300004.json",
+      "sha256": "67b0cc8f81a34df0d1d7a47e93f742e16065f48c7d82a39e8588410329d00ed6",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:03.116Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300004"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300005.json",
+      "sha256": "f0929b5138f1508e3a502373e1b9141995d9525293ea7a8932a4675180c614e0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:03.115Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300005"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300006.json",
+      "sha256": "fb1574ca4da79b883322477adcd53c7995ac9889ef9a5c31021242d6921b543f",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:03.206Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300006"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300007.json",
+      "sha256": "8d240e60ecd6f764c6ae8eef8a8893dbc410d6ca77dce32952c461c5ff4960e9",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:04.916Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300007"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300008.json",
+      "sha256": "fbf3364eed416e98102432beeccd91ba31b80b1cae8b6fbbdf4dfb572ee51f28",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:04.845Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300008"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300009.json",
+      "sha256": "2973bb4b025eece2628006f1b4584c00ffd46711189da6cba59688f28ae2b740",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:04.915Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300009"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300010.json",
+      "sha256": "ca88d594f3a6e749b29515114bbae7b13f077aa5cd925736e6769d640870828e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:06.697Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300010"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300011.json",
+      "sha256": "8c133f9b554a650dbc0754e955fc1c16e6298d1102d85c92f43259cf93b6f8ce",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:06.645Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300011"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300012.json",
+      "sha256": "8b4ad8302b6fdc5d87b67fe661375fe4213b3b214a308b56aca1eea23a04f15b",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:06.592Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300012"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300013.json",
+      "sha256": "19caa9320f48d5ab32ef13dc6db1efe68eb259b5ea9b52145f5b3e088e7e0adc",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:08.400Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300013"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300014.json",
+      "sha256": "ad8db854a768302f8c20936a80d9a94053b7b85d58bc0e9dcf0ba22690385a33",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:08.411Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300014"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300015.json",
+      "sha256": "cd45968c4eb9ae76e1b93218f5e7536f6c903fcb69bcd692edf3fef0be9b7aee",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:08.396Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300015"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300016.json",
+      "sha256": "a320d33ebb56489c7c5d2bcd0e83bfcc39bf5760f890f2c477a1ffc91b9c5304",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:10.092Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300016"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300017.json",
+      "sha256": "d325822d97f22ada424c2736589dff37f1782bccaa84ccb529903eb22c46c050",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:10.155Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300017"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300018.json",
+      "sha256": "b660686b9bb092c252b53d8db250a9c4150b0ff02f156c5546788ab89dbddbe9",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:10.088Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300018"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300019.json",
+      "sha256": "1e7b8d9a525caa726980ef9fe9810af2b8c90d63bef8e5d590da1f7a96ebfdab",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:11.834Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300019"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300020.json",
+      "sha256": "77c62a3b00c6764b2302edb5021d883227164aed496f6f580116dd11d0b9da91",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:11.833Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300020"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300021.json",
+      "sha256": "d139ec56c23fb21fb7b0e209606d9cbc73a37e56e086469cb24253f00039065c",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:11.832Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300021"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300022.json",
+      "sha256": "7ddc16b668cec8fd8076262146096f482cd3028a3679e181a15b97075a656b2a",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:13.608Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300022"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300023.json",
+      "sha256": "7d4a707a46f24c24a3e6b492f5720a020fe801d902cdb3bc3fc8339301afbe8e",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:13.797Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300023"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300024.json",
+      "sha256": "974841a92e942687bba7a534ddcd5fa57c367a9d74d2902d19a3597d9625fe6c",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:13.704Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300024"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300025.json",
+      "sha256": "d31c372deb449511ee2090eb5b3ca390f1594f08a23f049e96bdab7b065e1eee",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:15.462Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300025"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300026.json",
+      "sha256": "c4ae31ae5d1768b7cefedc073eef7bbd3f2c5b092eebb4b53c3d2f588d2d2b57",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:15.461Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300026"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300027.json",
+      "sha256": "a5a0773bdc10a5e4ea6449d01c0d9071acd587997be6310f898c475196101bb1",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:15.526Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300027"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300028.json",
+      "sha256": "4f486a521a0eba06c748f2ef1fe8f17624c03473fa534d6f32a81c4fc5dce267",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:17.240Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300028"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300029.json",
+      "sha256": "1c5f57e31f23bc0bf37e1aeb70e907e3bce08cadbbc933cc81fbf484ae440ab1",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:17.217Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300029"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300030.json",
+      "sha256": "962ddd69c1b8c2292b798491a821caff558d1fca33be10ef057c10777ded0687",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:17.264Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300030"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300031.json",
+      "sha256": "4f5492b6d7dcb6569b51a20b0d6d1f80e7e4260e6193cd78fa5011f5d264e74f",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:18.979Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300031"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300032.json",
+      "sha256": "35a74449868f4bbe33319a04937b932209cb37ca5da12e429e646575ca308752",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:18.943Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300032"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300033.json",
+      "sha256": "98e56390202d79bc676bec5cbf4add9ef4d4ee3c8e6d44e2a9decbdd5fddf7be",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:18.944Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300033"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300034.json",
+      "sha256": "e6e991b694c433b2bcc52e406a871c1708daff48910e294ebb67cc248382abb0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:20.723Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300034"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300035.json",
+      "sha256": "1c88842559230d573646084964e7c49f57cd1d22e8fbe274838861c1c8ae6b54",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:20.678Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300035"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300036.json",
+      "sha256": "70ab7adb7030e8258882c20dbfb9488254788c58c5322630273a744fffa47380",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:20.655Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300036"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300037.json",
+      "sha256": "25226c1fda0d07d02f691dc7ff160e515bce53de3e71b1e6248fb5649ece13bc",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:22.408Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300037"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300038.json",
+      "sha256": "60aa0d764717f9ec7d05328e2130bf475dbb91b34d132e58848d5e9df1027dac",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:22.436Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300038"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300039.json",
+      "sha256": "f5e433014cd05cb19959e0f36080d7c8661ddc9bac4286899ee7731ec0f0e0c8",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:22.434Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300039"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300040.json",
+      "sha256": "2e6934a2e5b059b2744d970357a71c8b7fcdfb292f0752a488083a54e376c840",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:24.156Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300040"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300041.json",
+      "sha256": "7d714f41a597c798f5220e90eded3aa9b4f93535647f4bd448897afc2a89fdd0",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:24.100Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300041"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300042.json",
+      "sha256": "2328dd0da64f14d999f6d63da78748fd88016839352f057e228ec236fb25ba5d",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:24.096Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300042"
+      }
+    },
+    {
+      "file": "2026-10-15/store-partitions/CS300043.json",
+      "sha256": "b7244d7b97ba4d597efd6925fdc5115886408118df879586734463bf569d5ce7",
+      "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+      "collectedAt": "2026-10-15T07:13:25.901Z",
+      "parameters": {
+        "infId": "OA-22172",
+        "srvType": "S",
+        "serviceKind": "0",
+        "pageNo": "1",
+        "ssUserId": "SAMPLE_VIEW",
+        "strWhere": "",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "CS300043"
+      }
+    }
+  ]
+}
