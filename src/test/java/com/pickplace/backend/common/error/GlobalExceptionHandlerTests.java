@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -84,6 +85,12 @@ class GlobalExceptionHandlerTests {
 		@GetMapping("/test/data-access")
 		String dataAccess() {
 			throw new DataRetrievalFailureException("jdbc:mysql://secret-host:3307/pickplace " + SECRET);
+		}
+
+		// DB에 연결하지 못해 트랜잭션을 시작하지 못한 상황을 만든다.
+		@GetMapping("/test/transaction-unavailable")
+		String transactionUnavailable() {
+			throw new CannotCreateTransactionException("Could not open JPA EntityManager for transaction: jdbc:mysql://secret-host:3307");
 		}
 
 	}
@@ -193,6 +200,16 @@ class GlobalExceptionHandlerTests {
 				.andExpect(content().string(not(containsString("hunter2"))))
 				.andExpect(content().string(not(containsString("Exception"))))
 				.andExpect(content().string(not(containsString("at com."))));
+	}
+
+	// DB 연결 실패로 트랜잭션을 시작하지 못해도 500이 아니라 503이고, DB 주소가 응답에 없는지 확인한다.
+	@Test
+	void transactionStartFailureIsServiceUnavailableWithoutDbDetails() throws Exception {
+		mockMvc.perform(get("/test/transaction-unavailable"))
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(jsonPath("$.error.code").value("DATA_SERVICE_UNAVAILABLE"))
+				.andExpect(content().string(not(containsString("jdbc"))))
+				.andExpect(content().string(not(containsString("secret-host"))));
 	}
 
 	// DB 접근 실패는 503이고, DB 주소·SQL이 응답에 없는지 확인한다.
