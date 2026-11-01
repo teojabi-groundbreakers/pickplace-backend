@@ -60,6 +60,7 @@ Spring이 오류와 함께 제공하는 안내 헤더(405의 `Allow`, 415의 `Ac
 | `REQUIRED` | 필수 파라미터가 없음 |
 | `INVALID_FORMAT` | 타입이 맞지 않음 (예: 숫자 자리에 문자) |
 | `INVALID_VALUE` | 검증 규칙 위반 (예: 자릿수·패턴 불일치) |
+| `NOT_FOUND` | 형식은 맞지만 등록되지 않은 값 (예: 없는 자치구 코드) |
 
 ## 3. 요청 ID (`X-Request-Id`)
 

@@ -1,6 +1,7 @@
 package com.pickplace.backend.region;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +22,12 @@ public class DistrictController {
 	@GetMapping
 	public ApiResponse<ListResponse<DistrictItem>> getDistricts() {
 		return ApiResponse.ok(ListResponse.of(districtService.getDistricts()));
+	}
+
+	// GET /api/districts/{districtCode}/administrative-dongs: 자치구에 속한 행정동 목록을 이름순으로 돌려준다.
+	@GetMapping("/{districtCode}/administrative-dongs")
+	public ApiResponse<ListResponse<AdministrativeDongItem>> getAdministrativeDongs(@PathVariable String districtCode) {
+		return ApiResponse.ok(ListResponse.of(districtService.getAdministrativeDongs(districtCode)));
 	}
 
 }

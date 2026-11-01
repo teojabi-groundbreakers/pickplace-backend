@@ -2,7 +2,7 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API와 통합 테스트입니다. 행정동·업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동 목록 API와 통합 테스트입니다. 업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 설계 문서
 
@@ -12,7 +12,7 @@
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
-- [기준정보 조회 API](docs/api/reference-api.md): 자치구 목록 API의 요청·응답·오류 예시.
+- [기준정보 조회 API](docs/api/reference-api.md): 자치구·행정동 목록 API의 요청·응답·오류 예시.
 
 ## 개발 환경
 
@@ -119,9 +119,10 @@ curl http://localhost:8080/actuator/health
 curl http://localhost:8080/api/health
 curl http://localhost:8080/api/health/ready
 curl http://localhost:8080/api/districts
+curl http://localhost:8080/api/districts/11110/administrative-dongs
 ```
 
-`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 자치구 목록은 기준정보를 적재하기 전에는 빈 목록입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
+`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 기준정보를 적재하기 전에는 자치구 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 
 ### 4. 개발용 DB 종료
 
