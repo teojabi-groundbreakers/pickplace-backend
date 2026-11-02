@@ -3,17 +3,32 @@
 > 현재 상태: Flyway V1·수동 기준정보 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API 구현.  
 > 행정동·지원 업종 목록 API는 아직 진행하지 않았다.
 
-## 문서 바로가기
+<a id="문서-바로가기"></a>
+
+## 처음 실행 · FE 연동
 
 | 문서 | 확인할 내용 |
-|---|---|
+| --- | --- |
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
+| [FE 인계 · 현재 지원 API 안내](api/frontend-api-guide.md) | 실제 호출 가능한 API·main/develop 차이·응답·접속·오류·미구현 목록 |
+
+## 설계 · API 계약
+
+| 문서 | 확인할 내용 |
+| --- | --- |
 | [기준정보 DB 설계](database/reference-schema-design.md) | ERD·컬럼·PK/FK·인덱스·이력 정책 |
-| [Flyway 마이그레이션 검증](database/migration-validation.md) | V1 단계의 23건 검증과 DB 적용 주의사항 |
-| [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·최신 34건 검증 |
-| [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 | [공통 응답 형식](api/common-response.md) | 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API |
+| [FE·BE 통합 API 명세 v0.2](api/fe-be-contract.md) | 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안 |
+| [분기별 기본 현황 API·표시 규칙 v0.1](api/quarterly-summary-contract.md) | 핵심 지표·분기 선택·0/null·품질 상태·현황 응답과 화면 표시. 구현 전 초안 |
 | [기준정보 조회 API](api/reference-api.md) | 자치구 목록 API의 요청·응답·오류 예시 |
+
+## 적재 · 원천 · 검증
+
+| 문서 | 확인할 내용 |
+| --- | --- |
+| [Flyway 마이그레이션 검증](database/migration-validation.md) | V1 단계의 23건 검증과 DB 적용 주의사항 |
+| [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·T07 단계 34건 검증 |
+| [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 
 ## 실제 실행 기준과 설계 이력
 

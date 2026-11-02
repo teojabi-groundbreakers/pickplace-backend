@@ -13,6 +13,9 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
 
 ### 정상 응답 — 200
 
+<details>
+<summary>응답 JSON 예시 1</summary>
+
 ```json
 {
   "data": {
@@ -24,6 +27,8 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
   "meta": { "requestId": "3f2a9c1e-8b4d-4e2f-9a1b-7c6d5e4f3a2b" }
 }
 ```
+
+</details>
 
 | 필드 | 형식 | 설명 |
 |---|---|---|
@@ -38,13 +43,21 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
 
 기준정보를 아직 적재하지 않은 DB에서는 오류가 아니라 빈 목록을 돌려준다.
 
+<details>
+<summary>응답 JSON 예시 2</summary>
+
 ```json
 { "data": { "items": [] }, "meta": { "requestId": "..." } }
 ```
 
+</details>
+
 ### DB 장애 — 503
 
 DB에 연결하거나 조회하지 못하면 빈 목록으로 위장하지 않고 503을 돌려준다. DB 주소·SQL은 응답에 넣지 않는다.
+
+<details>
+<summary>응답 JSON 예시 3</summary>
 
 ```json
 {
@@ -57,6 +70,8 @@ DB에 연결하거나 조회하지 못하면 빈 목록으로 위장하지 않�
 }
 ```
 
+</details>
+
 ### 프론트엔드 참고
 
-FE 연동 초안은 지역·업종을 `GET /catalog` 하나로 받는 구조라 이 API와 경로·필드 이름이 다르다. 이 API는 팀 API 명세 초안(A2)을 따랐으며, FE와의 형식 통일은 명세 검토 때 정리한다.
+FE 연동 초안은 기준 URL `/api`에 `/catalog`를 붙여 지역·업종을 한 번에 받으므로 이 API와 경로·필드 이름이 다르다. 개별 조회와 공통 응답으로 전환하는 안은 [FE·BE 통합 API 명세 v0.2](fe-be-contract.md)에 정리했다. FE 공동 검토 전 초안이며 이 문서는 현재 구현된 자치구 API를 설명한다.
