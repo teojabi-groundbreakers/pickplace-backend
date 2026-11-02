@@ -1,7 +1,7 @@
 # Flyway 마이그레이션 검증
 
 > 검증일: 2026-10-26 · 대상: T06 기준정보 테이블 생성  
-> 이 문서는 V1 단계의 검증 기록이다. 후속 적재까지 포함한 최신 결과는 [T07 문서](../data/reference-import.md#6-검증-결과)를 참고한다.
+> 이 문서는 V1 단계의 검증 기록이다. 후속 적재 검증은 [T07 문서](../data/reference-import.md#6-검증-결과), V2 스키마·업그레이드 검증은 [T11 문서](statistics-schema-design.md#격리-테스트)를 참고한다.
 
 [문서 목록](../README.md) · [DB 설계](reference-schema-design.md) · [수동 적재](../data/reference-import.md)
 

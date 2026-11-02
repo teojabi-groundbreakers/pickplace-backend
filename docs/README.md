@@ -1,6 +1,7 @@
 # 백엔드 개발 문서
 
-> 현재 상태: Flyway V1·수동 기준정보 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API 구현.  
+> 현재 상태: Flyway V1 기준정보·V2 통계 및 적재 이력 스키마, 수동 기준정보 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API 구현.
+>
 > 행정동·지원 업종 목록 API는 아직 진행하지 않았다.
 
 ## 문서 바로가기
@@ -9,8 +10,9 @@
 |---|---|
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
 | [기준정보 DB 설계](database/reference-schema-design.md) | ERD·컬럼·PK/FK·인덱스·이력 정책 |
+| [상권 통계·적재 이력 DB 설계](database/statistics-schema-design.md) | T11 통계 6종·배치·게시·품질 이슈, V2 적용 방법 |
 | [Flyway 마이그레이션 검증](database/migration-validation.md) | V1 단계의 23건 검증과 DB 적용 주의사항 |
-| [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·최신 34건 검증 |
+| [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·T07 단계 검증 기록 |
 | [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 | [공통 응답 형식](api/common-response.md) | 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API |
 | [기준정보 조회 API](api/reference-api.md) | 자치구 목록 API의 요청·응답·오류 예시 |
@@ -20,6 +22,7 @@
 | 파일 | 구분 |
 |---|---|
 | [V1 마이그레이션](../src/main/resources/db/migration/V1__create_reference_tables.sql) | 실제 테이블 생성 기준 |
+| [V2 마이그레이션](../src/main/resources/db/migration/V2__create_statistics_tables.sql) | 통계·적재 이력 테이블 생성 기준 |
 | [적재 스냅샷](../src/main/resources/reference-data/seoul-reference.json) | 실제 적재기의 고정 입력 |
 | [최초 검토용 SQL](database/reference-schema-draft.sql) | 설계 이력, 별도 실행하지 않음 |
 

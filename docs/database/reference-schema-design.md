@@ -22,7 +22,7 @@
 | 스키마 | Flyway V1·PK/FK/CHECK | 변경 시 V2 이상 추가 |
 | 초기 적재 | 고정 스냅샷·수동 명령·재적재 검증 | 개발 DB 실제 반영 |
 | 조회 | 아직 구현하지 않음 | Entity·Repository·목록 API |
-| 통계·지도 | 이번 범위 아님 | 인구·점포·매출·시설 통계, 좌표·경계 |
+| 통계·지도 | 통계는 [T11 별도 설계](statistics-schema-design.md)에서 V2로 구현 | 실제 통계 적재·조회 API, 좌표·경계 |
 
 설계 근거: [데이터 정의서](https://app.notion.com/p/3fa2114f823a818c9bd8e2664cbcd618) · [T06 테이블 생성](https://app.notion.com/p/3f42114f823a813d83c9ce5714ddf36a) · [T07 초기 적재](https://app.notion.com/p/3f42114f823a8144b85ae2859153c767)
 

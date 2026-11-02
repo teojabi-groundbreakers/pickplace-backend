@@ -2,12 +2,13 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API와 통합 테스트입니다. 행정동·업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API와 통합 테스트입니다. 통계 원본 적재·현황 API, 행정동·업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 설계 문서
 
 - [처음 실행부터 DB 적재까지](docs/getting-started.md): Windows CMD·IntelliJ 기준의 통합 실행 안내. 명령어 의미·정상 결과·오류 대응 포함.
 - [기준정보 DB 설계](docs/database/reference-schema-design.md): 자치구·행정동·업종 ERD, 컬럼, 제약조건, 검수 기준.
+- [상권 통계·적재 이력 DB 설계](docs/database/statistics-schema-design.md): T11 통계 6종·배치 이력·게시 버전·품질 이슈, V2 적용·검증 방법.
 - [V1 마이그레이션](src/main/resources/db/migration/V1__create_reference_tables.sql): 실제 테이블 생성의 기준입니다.
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
@@ -85,7 +86,7 @@ SHOW TABLES;
 exit;
 ```
 
-DB 최초 초기화 직후에는 테이블이 비어 있습니다. 아래 단계에서 Spring Boot가 실행되면 Flyway가 기준정보 테이블 3개와 `flyway_schema_history`를 생성합니다. 행정동·업종 데이터는 아직 적재하지 않습니다.
+DB 최초 초기화 직후에는 테이블이 비어 있습니다. 아래 단계에서 Spring Boot가 실행되면 Flyway가 V1 기준정보 3개·V2 통계 및 이력 9개 테이블과 `flyway_schema_history`를 생성합니다. 기준정보·통계 원본 데이터는 아직 적재하지 않습니다.
 
 ### 3. IntelliJ IDEA에서 서버 실행
 
@@ -188,7 +189,7 @@ GitHub의 **Actions** 또는 PR의 **Checks**에서 결과를 확인합니다. �
 | `compose.yaml` | 개발용 MySQL 컨테이너 |
 | `.env.example` | 비밀값 없는 환경변수 양식 |
 
-현재 `ddl-auto: none`이므로 Hibernate는 테이블을 생성·변경하지 않습니다. **서버 시작 시 Flyway가 연결된 DB에 미적용 마이그레이션을 자동 적용합니다.** 로컬 서버를 실행하면 개발 DB에도 V1이 적용됩니다. 이번 테스트 실행은 별도 임시 DB만 사용합니다.
+현재 `ddl-auto: none`이므로 Hibernate는 테이블을 생성·변경하지 않습니다. **서버 시작 시 Flyway가 연결된 DB에 미적용 마이그레이션을 자동 적용합니다.** 로컬 서버를 실행하면 개발 DB에도 미적용 V1·V2가 적용됩니다. 테스트 실행은 별도 임시 DB만 사용합니다.
 
 ## 기준정보 수동 초기 적재
 
@@ -204,7 +205,8 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 
 - 위치: `src/main/resources/db/migration/`
 - V1: `district`, `administrative_dong`, `business_type` 생성. 초기 데이터는 별도 적재 작업입니다.
-- 이미 적용한 SQL은 수정하지 않고 `V2__설명.sql`처럼 새 버전을 추가합니다. Flyway가 체크섬·적용 이력을 검사합니다.
+- V2: 통계 6종과 적재 배치·게시 포인터·품질 이슈 3개 테이블 생성. 실제 통계 적재·게시 코드는 후속 작업입니다.
+- 이미 적용한 SQL은 수정하지 않고 다음 버전의 마이그레이션을 추가합니다. Flyway가 체크섬·적용 이력을 검사합니다.
 - `clean-disabled: true`로 Flyway 전체 초기화를 금지하고, `baseline-on-migrate: false`로 이력이 없는 기존 비어 있지 않은 DB를 자동 승인하지 않습니다.
 - 기존 테이블이 있어 첫 적용이 거부되면 DB/이력을 먼저 확인합니다. `baseline`, `repair`, 테이블/볼륨 삭제로 오류를 무시하지 않습니다.
 - `schema.sql`/`data.sql` 초기화는 비활성화하고 스키마 변경은 Flyway 한 가지로 관리합니다.

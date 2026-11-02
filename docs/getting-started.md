@@ -17,7 +17,7 @@
 | 2 | 비밀번호 설정 | Docker와 Spring의 환경변수 준비 |
 | 3 | MySQL 실행 | DB 접속 가능 |
 | 4 | Spring Boot 실행 | Flyway 테이블 생성, health 응답 UP |
-| 5 | 테이블 확인 | 업무 테이블 3개·V1 성공 이력 |
+| 5 | 테이블 확인 | 업무 테이블 12개·V1/V2 성공 이력 |
 | 6 | 자동 테스트 | 임시 DB 검증 성공 |
 | 7 | 개발 DB에 수동 적재 | 신규 25개 구·425개 동·100개 업종 |
 | 8 | SQL로 결과 확인 | 건수·지원 업종·공식 코드 상태 확인 |
@@ -160,11 +160,11 @@ docker compose logs --tail 100 mysql
 ### 실행하면서 자동으로 일어나는 일
 
 1. Spring Boot가 개발용 MySQL에 연결한다.
-2. Flyway가 미적용 V1을 실행한다.
-3. 기준정보 테이블과 적용 이력이 생성된다.
+2. Flyway가 미적용 V1·V2를 순서대로 실행한다.
+3. 기준정보 3개·통계 및 이력 9개 테이블과 적용 이력이 생성된다.
 4. 웹 서버가 8080 포트로 실행된다.
 
-**Flyway는 테이블 구조를 만들 뿐 기준정보 행을 넣지는 않는다.** 이미 적용된 V1은 중복 실행하지 않는다.
+**Flyway는 테이블 구조를 만들 뿐 기준정보·통계 원본 행을 넣지는 않는다.** 이미 적용된 버전은 중복 실행하지 않는다.
 
 ### 서버 상태 확인
 
@@ -180,7 +180,7 @@ curl http://localhost:8080/actuator/health
 {"status":"UP"}
 ```
 
-현재 기능 API는 아직 없으므로 `/`에서 404가 나오는 것은 서버 실행 실패가 아니다.
+기능 API는 [기준정보 조회 문서](api/reference-api.md)에서 확인한다. 루트 `/`에 별도 화면이 없으므로 404가 나오는 것은 서버 실행 실패가 아니다.
 
 ## 5. 테이블 생성 확인
 
@@ -206,7 +206,8 @@ ORDER BY installed_rank;
 
 - 선택된 DB가 `pickplace`다.
 - `district`, `administrative_dong`, `business_type`, `flyway_schema_history`가 보인다.
-- Flyway 이력에 V1이 있고 `success`는 `1`이다.
+- V2의 통계 6종·적재 배치·게시 포인터·품질 이슈도 보인다. [전체 목록](database/statistics-schema-design.md#테이블-목록과-유일성)을 참고한다.
+- Flyway 이력에 V1·V2가 있고 각각 `success`는 `1`이다.
 
 미적재 상태의 건수도 확인할 수 있다.
 
@@ -420,7 +421,7 @@ docker compose down
 - [ ] `.env`와 Spring 실행 환경변수 준비
 - [ ] MySQL healthy·DB 접속 확인
 - [ ] 일반 서버 health 응답 UP
-- [ ] 업무 테이블 3개·V1 성공 이력 확인
+- [ ] 업무 테이블 12개·V1/V2 성공 이력 확인
 - [ ] 자동 테스트 BUILD SUCCESSFUL
 - [ ] 수동 적재 완료 로그 확인
 - [ ] 개발 DB의 25 / 425 / 100건 확인
