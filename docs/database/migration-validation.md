@@ -14,9 +14,12 @@
 | 구성 | 서버·연결·health 3건 + 마이그레이션 20건 |
 | 당시 최종 실행 시간 | 41초 |
 | 개발 DB | 변경하지 않음 |
-| 후속 T07 포함 최신 결과 | **34건 성공**, 별도 문서에 기록 |
+| 후속 T07 단계 결과 | **34건 성공**, 별도 문서에 기록 |
 
-## 2. 구현 범위와 환경
+<a id="2-구현-범위와-환경"></a>
+
+<details>
+<summary>2. 구현 범위와 환경</summary>
 
 ### 구현 범위
 
@@ -37,7 +40,12 @@
 
 개발용 Compose DB·기존 데이터 볼륨은 사용하지 않았다. 가상 테스트 행은 트랜잭션 롤백으로 제거하고 임시 DB는 테스트 종료 후 정리한다.
 
-## 3. 검증 항목
+</details>
+
+<a id="3-검증-항목"></a>
+
+<details>
+<summary>3. 검증 항목</summary>
 
 | 구분 | 확인 내용 |
 |---|---|
@@ -58,6 +66,8 @@ MySQL CHECK 위반은 JDBC에서 `UncategorizedSQLException`과 오류 코드 `3
 
 단순히 예외가 발생하면 통과하는 검사는 사용하지 않는다.
 
+</details>
+
 ## 4. 재실행 방법
 
 저장소 루트에서 실행한다. JDK 25와 실행 중인 Docker Desktop이 필요하다.
@@ -76,7 +86,10 @@ gradlew.bat test --tests "*ReferenceSchemaMigrationTests"
 
 IntelliJ의 Project SDK·Gradle JVM은 JDK 25로 지정한다. CMD에서 다른 Java가 잡히면 해당 세션의 `JAVA_HOME`을 설치된 JDK 25 경로로 설정한다. 비밀번호·개인별 절대 경로를 공유 설정에 넣지 않는다.
 
-## 5. 근거 파일
+<a id="5-근거-파일"></a>
+
+<details>
+<summary>5. 근거 파일</summary>
 
 | 자료 | 위치 |
 |---|---|
@@ -94,6 +107,8 @@ B0819E615ADD4BCF8C1E97FABDFFAEF20FBD19F9BC68DA9A2BBFC5396BCADC00
 ```
 
 이 단계에서 `git diff --check`를 통과했고 커밋·푸시는 하지 않았다.
+
+</details>
 
 ## 6. DB 적용 시 주의사항
 

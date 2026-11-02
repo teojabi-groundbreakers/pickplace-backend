@@ -4,8 +4,20 @@
 
 현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API와 통합 테스트입니다. 통계 원본 적재·현황 API, 행정동·업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
-## 설계 문서
+## 빠른 시작 · 문서 선택
 
+| 하려는 일 | 바로가기 |
+| --- | --- |
+| 처음 서버·DB 실행 | [단계별 실행 안내](docs/getting-started.md) |
+| FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
+| 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
+
+<a id="설계-문서"></a>
+
+<details>
+<summary>설계 문서</summary>
+
+- [FE 인계 · 현재 지원 API 안내](docs/api/frontend-api-guide.md): 현재 호출 가능한 API, main/develop 차이, 요청·응답·오류와 FE 연동 순서.
 - [처음 실행부터 DB 적재까지](docs/getting-started.md): Windows CMD·IntelliJ 기준의 통합 실행 안내. 명령어 의미·정상 결과·오류 대응 포함.
 - [기준정보 DB 설계](docs/database/reference-schema-design.md): 자치구·행정동·업종 ERD, 컬럼, 제약조건, 검수 기준.
 - [상권 통계·적재 이력 DB 설계](docs/database/statistics-schema-design.md): T11 통계 6종·배치 이력·게시 버전·품질 이슈, V2 적용·검증 방법.
@@ -13,7 +25,11 @@
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
+- [FE·BE 통합 API 명세 v0.2](docs/api/fe-be-contract.md): 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안.
+- [분기별 기본 현황 API·표시 규칙 v0.1](docs/api/quarterly-summary-contract.md): 핵심 지표·분기 선택·누락·품질 상태·현황 응답과 화면 표시. 구현 전 초안.
 - [기준정보 조회 API](docs/api/reference-api.md): 자치구 목록 API의 요청·응답·오류 예시.
+
+</details>
 
 ## 개발 환경
 
@@ -36,7 +52,10 @@ docker compose version
 
 `java`가 25인지, `docker version`에 Client와 Server가 모두 표시되는지 확인합니다.
 
-## 로컬 실행
+<a id="로컬-실행"></a>
+
+<details>
+<summary>로컬 실행</summary>
 
 아래 명령은 저장소 루트에서 실행합니다. Windows 예시는 CMD 기준입니다.
 
@@ -132,7 +151,12 @@ docker compose down
 
 일반 `down`은 데이터를 유지합니다. **`down -v`는 데이터 볼륨을 삭제하므로 데이터 초기화가 목적일 때만 사용합니다.**
 
-## 자동 테스트
+</details>
+
+<a id="자동-테스트"></a>
+
+<details>
+<summary>자동 테스트</summary>
 
 Docker Desktop을 실행한 뒤 저장소 루트에서 실행합니다.
 
@@ -178,7 +202,12 @@ gradlew.bat test --tests "*ReferenceSchemaMigrationTests"
 
 GitHub의 **Actions** 또는 PR의 **Checks**에서 결과를 확인합니다. 이 워크플로는 검증만 수행하며 자동 병합·배포는 하지 않습니다. 실패 시 병합을 막으려면 팀이 브랜치 보호 규칙에 `build-and-test` 검사를 별도로 등록해야 합니다.
 
-## 설정 파일
+</details>
+
+<a id="설정-파일"></a>
+
+<details>
+<summary>설정 파일</summary>
 
 | 파일 | 역할 |
 |---|---|
@@ -191,7 +220,12 @@ GitHub의 **Actions** 또는 PR의 **Checks**에서 결과를 확인합니다. �
 
 현재 `ddl-auto: none`이므로 Hibernate는 테이블을 생성·변경하지 않습니다. **서버 시작 시 Flyway가 연결된 DB에 미적용 마이그레이션을 자동 적용합니다.** 로컬 서버를 실행하면 개발 DB에도 미적용 V1·V2가 적용됩니다. 테스트 실행은 별도 임시 DB만 사용합니다.
 
-## 기준정보 수동 초기 적재
+</details>
+
+<a id="기준정보-수동-초기-적재"></a>
+
+<details>
+<summary>기준정보 수동 초기 적재</summary>
 
 일반 서버 실행은 기준정보 행을 자동으로 넣지 않습니다. 명령 실행 전 DB 대상과 `MYSQL_PASSWORD` 환경변수를 확인합니다. **다음 명령은 개발 DB에 실제로 저장합니다.**
 
@@ -201,7 +235,12 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 
 웹 서버 없이 적재 후 종료합니다. 최초 신규 건수는 25/425/100, 같은 원본 재실행은 0/0/0입니다. 원천 코드·관계가 다르면 덮어쓰지 않고 중단하며, 팀에서 수정한 업종 표시명·지원 여부는 보존합니다. 자세한 원천·검수·실패 처리 규칙은 [수동 적재 문서](docs/data/reference-import.md)를 참고합니다.
 
-## DB 마이그레이션 관리
+</details>
+
+<a id="db-마이그레이션-관리"></a>
+
+<details>
+<summary>DB 마이그레이션 관리</summary>
 
 - 위치: `src/main/resources/db/migration/`
 - V1: `district`, `administrative_dong`, `business_type` 생성. 초기 데이터는 별도 적재 작업입니다.
@@ -214,7 +253,12 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 
 로컬 JDBC의 SSL 비활성화 및 공개키 조회 허용 설정은 운영 환경에 그대로 사용하지 않습니다.
 
-## 문제 해결
+</details>
+
+<a id="문제-해결"></a>
+
+<details>
+<summary>문제 해결</summary>
 
 | 증상 | 확인할 사항 |
 |---|---|
@@ -235,3 +279,5 @@ docker compose logs --tail 100 mysql
 ```
 
 로그·스크린샷 공유 시 비밀번호와 개인 정보는 가립니다. `.env`, IDE 개인 설정, 빌드 결과물은 커밋하지 않습니다. `gradle-wrapper.jar`와 Wrapper 스크립트는 재현 가능한 빌드를 위해 커밋합니다.
+
+</details>

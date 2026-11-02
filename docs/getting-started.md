@@ -7,7 +7,7 @@
 
 **이 문서는 실행 안내서다. 작성하면서 개발 DB에 적재한 것은 아니다.** 아래 적재 명령을 직접 실행하면 연결된 개발 DB에 실제 데이터가 저장된다.
 
-현재 로컬 작업에는 미커밋 구현이 포함되어 있다. 새로 클론한 팀원은 Flyway·수동 적재 코드가 반영된 브랜치를 받아야 한다. 파일이 없다면 DB 설정 전에 코드 반영 상태부터 확인한다.
+Flyway·수동 적재 코드는 저장소에 반영됐다. 새로 클론한 팀원은 실행하려는 브랜치의 구현 범위를 [현재 지원 API 안내](api/frontend-api-guide.md)에서 확인한다. 파일이 없다면 DB 설정 전에 코드 반영 상태부터 확인한다.
 
 ## 전체 흐름
 
@@ -66,7 +66,10 @@ docker compose version
 
 Java는 25여야 하며, Docker는 Client뿐 아니라 **Server 정보도 보여야 한다.**
 
-### CMD에서 다른 Java가 선택될 때
+<a id="cmd에서-다른-java가-선택될-때"></a>
+
+<details>
+<summary>CMD에서 다른 Java가 선택될 때</summary>
 
 현재 PC에 설치된 JDK 경로 예시다. 다른 PC에서는 실제 JDK 25 경로로 바꾼다.
 
@@ -78,6 +81,8 @@ gradlew.bat --version
 ```
 
 `set`은 현재 CMD 창의 환경변수를 설정한다. 위 명령은 Windows 전체 설정을 변경하지 않으며 새 CMD에서는 다시 설정해야 할 수 있다.
+
+</details>
 
 ## 2. 비밀번호 준비
 
@@ -104,7 +109,10 @@ MYSQL_ROOT_PASSWORD=
 
 빈칸을 그대로 두면 Compose가 실행되지 않는다. 실제 비밀번호는 문서·Git에 넣지 않는다.
 
-### 같은 값을 두 곳에 설정하는 이유
+<a id="같은-값을-두-곳에-설정하는-이유"></a>
+
+<details>
+<summary>같은 값을 두 곳에 설정하는 이유</summary>
 
 | 실행 대상 | 비밀번호를 읽는 곳 |
 |---|---|
@@ -115,6 +123,8 @@ MYSQL_ROOT_PASSWORD=
 **Spring Boot는 기본적으로 `.env`를 자동으로 읽지 않는다.** IntelliJ·CMD의 `MYSQL_PASSWORD`는 `.env`와 같은 값이어야 한다.
 
 이미 초기화된 DB는 `.env`를 수정해도 계정 비밀번호가 자동 변경되지 않는다. 비밀번호 오류 때문에 기존 볼륨을 삭제하지 않는다.
+
+</details>
 
 ## 3. Docker로 MySQL 실행
 
@@ -241,7 +251,10 @@ gradlew.bat build --no-daemon
 
 정상 결과는 **`BUILD SUCCESSFUL`**이다. 작성 시점에는 34건이 통과했으며 이후 테스트 추가에 따라 건수는 달라질 수 있다.
 
-### 테스트 성공과 개발 DB 적재는 다르다
+<a id="테스트-성공과-개발-db-적재는-다르다"></a>
+
+<details>
+<summary>테스트 성공과 개발 DB 적재는 다르다</summary>
 
 | 구분 | 개발용 DB | 자동 테스트 DB |
 |---|---|---|
@@ -253,6 +266,8 @@ gradlew.bat build --no-daemon
 테스트는 개발 DB에 기준정보를 넣지 않는다. 일반 Spring 서버나 IDE 비밀번호 설정도 테스트 실행에 필요하지 않다.
 
 종료 시 `Shutdown` 로그는 테스트용 서버·DB 연결을 정리하는 정상 과정일 수 있다. 성공 여부는 빌드 결과와 `build/reports/tests/test/index.html`로 판단한다.
+
+</details>
 
 ## 7. 개발 DB에 기준정보 적재
 
@@ -290,7 +305,10 @@ Reference import committed: version=seoul-reference-20262-mois-20261012-v1, inse
 
 `committed`는 **DB 트랜잭션 저장**을 뜻하며 Git 커밋이 아니다. 적재 명령은 Git 커밋·푸시를 하지 않는다.
 
-### 재실행·실패 시 동작
+<a id="재실행실패-시-동작"></a>
+
+<details>
+<summary>재실행·실패 시 동작</summary>
 
 - 같은 원본이면 신규 건수는 **0 / 0 / 0**이며 기존 값·수집/저장 시각을 유지한다.
 - 팀에서 바꾼 업종 표시명·지원 여부·정렬순서도 유지한다.
@@ -305,6 +323,8 @@ Reference import committed: version=seoul-reference-20262-mois-20261012-v1, inse
 ```cmd
 set "MYSQL_PASSWORD="
 ```
+
+</details>
 
 ## 8. SQL로 최종 확인
 
@@ -396,7 +416,10 @@ docker compose down
 
 **`docker compose down -v`는 데이터 볼륨을 삭제한다.** 비밀번호·Flyway 오류 해결을 위해 실행하지 않는다. 다음 날은 MySQL과 일반 서버를 켜면 되며, 정상 적재된 기준정보를 매번 넣을 필요는 없다.
 
-## 10. 자주 막히는 부분
+<a id="10-자주-막히는-부분"></a>
+
+<details>
+<summary>10. 자주 막히는 부분</summary>
 
 | 증상 | 먼저 확인할 내용 |
 |---|---|
@@ -414,6 +437,8 @@ docker compose down
 | 클론한 코드에 적재 파일 없음 | 구현이 반영된 브랜치인지 확인. 미커밋 파일은 클론되지 않음 |
 
 비밀번호를 바꿔도 기존 DB 계정은 자동 변경되지 않는다. 실제 비밀값이 담길 수 있는 `docker compose config` 전체 출력이나 IDE 실행 설정을 그대로 공유하지 않는다.
+
+</details>
 
 ## 완료 체크리스트
 
