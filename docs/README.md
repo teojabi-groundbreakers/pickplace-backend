@@ -1,7 +1,7 @@
 # 백엔드 개발 문서
 
-> 현재 상태: Flyway V1·수동 기준정보 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API 구현.  
-> 행정동·지원 업종 목록 API는 아직 진행하지 않았다.
+> 현재 상태: Flyway V1·수동 기준정보 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동 목록 API 구현.  
+> 지원 업종 목록 API는 아직 진행하지 않았다.
 
 ## 문서 바로가기
 
@@ -13,7 +13,7 @@
 | [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·최신 34건 검증 |
 | [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 | [공통 응답 형식](api/common-response.md) | 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API |
-| [기준정보 조회 API](api/reference-api.md) | 자치구 목록 API의 요청·응답·오류 예시 |
+| [기준정보 조회 API](api/reference-api.md) | 자치구·행정동 목록 API의 요청·응답·오류 예시 |
 
 ## 실제 실행 기준과 설계 이력
 
