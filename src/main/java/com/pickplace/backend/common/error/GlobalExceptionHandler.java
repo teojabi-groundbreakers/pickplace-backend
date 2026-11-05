@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -91,8 +92,9 @@ public class GlobalExceptionHandler {
 	}
 
 	// DB 연결·조회 실패를 503으로 응답한다. 빈 결과로 위장하지 않는다.
-	@ExceptionHandler(DataAccessException.class)
-	public ResponseEntity<ApiErrorResponse> handleDataAccess(DataAccessException ex) {
+	// JPA 조회는 DB 연결 실패를 트랜잭션 시작 단계의 CannotCreateTransactionException으로 알리므로 함께 처리한다.
+	@ExceptionHandler({DataAccessException.class, CannotCreateTransactionException.class})
+	public ResponseEntity<ApiErrorResponse> handleDataAccess(Exception ex) {
 		return respond(ErrorCode.DATA_SERVICE_UNAVAILABLE, List.of(), ex);
 	}
 
