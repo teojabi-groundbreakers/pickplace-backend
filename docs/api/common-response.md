@@ -6,6 +6,9 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 
 ## 1. 성공 응답
 
+<details>
+<summary>응답 JSON 예시 1</summary>
+
 ```json
 {
   "data": { "status": "UP" },
@@ -13,10 +16,15 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 }
 ```
 
+</details>
+
 - `data`: API마다 내용이 다르다. 목록 API는 `data.items` 배열을 쓰고, 결과가 없으면 `"items": []`이다.
 - `meta.requestId`: 요청 추적용 ID. 아래 3절 참고.
 
 ## 2. 오류 응답
+
+<details>
+<summary>응답 JSON 예시 2</summary>
 
 ```json
 {
@@ -28,6 +36,8 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
   "meta": { "requestId": "3f2a9c1e-8b4d-4e2f-9a1b-7c6d5e4f3a2b" }
 }
 ```
+
+</details>
 
 - `code`: FE가 분기할 때 쓰는 고정 코드.
 - `message`: 화면에 그대로 보여줄 수 있는 한국어 문구.
@@ -85,11 +95,19 @@ requestId=3f2a9c1e-... method=GET path=/api/health status=200 durationMs=3
 
 정상 응답(두 경로 공통):
 
+<details>
+<summary>응답 JSON 예시 3</summary>
+
 ```json
 { "data": { "status": "UP" }, "meta": { "requestId": "..." } }
 ```
 
+</details>
+
 DB 장애 시 `/api/health/ready`:
+
+<details>
+<summary>응답 JSON 예시 4</summary>
 
 ```json
 {
@@ -101,6 +119,8 @@ DB 장애 시 `/api/health/ready`:
   "meta": { "requestId": "..." }
 }
 ```
+
+</details>
 
 DB가 멈춰도 `/api/health`는 200이다. 서버 프로세스 자체는 살아 있기 때문이다.
 

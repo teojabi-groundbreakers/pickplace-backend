@@ -1,9 +1,11 @@
 # 기준정보 DB 설계
 
-> 검증 기준: 2026-10-26 · MySQL 8.4.11 · Spring Data JPA  
+> 기준정보 검증 기록: 2026-10-26 · MySQL 8.4.11 · Spring Data JPA
 > 테이블 생성과 수동 적재를 임시 MySQL에서 검증했다. 개발 DB에는 적용하지 않았다.
 
 [문서 목록](../README.md) · [마이그레이션 검증](migration-validation.md) · [수동 적재 방법](../data/reference-import.md)
+
+> 현재 상태 보완: 자치구·행정동·지원 업종 조회용 Entity·Repository·API는 PR #9·#10·#11에 반영됐다. 개발 DB 실제 상태는 별도 확인하며, 23건/34건은 해당 단계의 검증 이력이다. [현재 지원 API](../api/frontend-api-guide.md)를 함께 본다.
 
 ## 1. 설계 범위
 
@@ -21,8 +23,8 @@
 |---|---|---|
 | 스키마 | Flyway V1·PK/FK/CHECK | 변경 시 V2 이상 추가 |
 | 초기 적재 | 고정 스냅샷·수동 명령·재적재 검증 | 개발 DB 실제 반영 |
-| 조회 | 아직 구현하지 않음 | Entity·Repository·목록 API |
-| 통계·지도 | 이번 범위 아님 | 인구·점포·매출·시설 통계, 좌표·경계 |
+| 조회 | 자치구·행정동·지원 업종 Entity·Repository·목록 API 구현 | FE 연결·공동 검수 |
+| 통계·지도 | 통계는 [T11 별도 설계](statistics-schema-design.md)에서 V2로 구현 | 실제 통계 적재·조회 API, 좌표·경계 |
 
 설계 근거: [데이터 정의서](https://app.notion.com/p/3fa2114f823a818c9bd8e2664cbcd618) · [T06 테이블 생성](https://app.notion.com/p/3f42114f823a813d83c9ce5714ddf36a) · [T07 초기 적재](https://app.notion.com/p/3f42114f823a8144b85ae2859153c767)
 
@@ -59,9 +61,16 @@ erDiagram
 - 지역·업종 조합은 후속 점포·매출 통계 테이블에서 연결한다.
 - 자치구마다 최소 한 동이 존재하는지는 FK가 아닌 적재 검증에서 확인한다.
 
-## 3. 테이블 명세
+<a id="3-테이블-명세"></a>
 
-### 3.1 자치구 — `district`
+## 테이블 명세
+
+
+
+<a id="31-자치구--district"></a>
+
+<details>
+<summary>3.1 자치구 — `district`</summary>
 
 | 컬럼 | 타입 | 제약 | 설명 |
 |---|---|---|---|
@@ -74,7 +83,12 @@ erDiagram
 
 이름에 UNIQUE를 걸지 않는다. 이름은 표시용이며 연결에는 코드를 사용한다.
 
-### 3.2 행정동 — `administrative_dong`
+</details>
+
+<a id="32-행정동--administrative_dong"></a>
+
+<details>
+<summary>3.2 행정동 — `administrative_dong`</summary>
 
 | 컬럼 | 타입 | 제약 | 설명 |
 |---|---|---|---|
@@ -108,7 +122,12 @@ erDiagram
 - CURRENT 여부와 실제 통계 경계의 현행 일치는 별개다. `region_version`도 실제 경계 버전의 확인을 보증하지 않는다.
 - 공식 코드에는 UNIQUE를 두지 않는다. 복수 원천 코드의 대응 가능성은 별도 검수한다.
 
-### 3.3 업종 — `business_type`
+</details>
+
+<a id="33-업종--business_type"></a>
+
+<details>
+<summary>3.3 업종 — `business_type`</summary>
 
 | 컬럼 | 타입 | 제약·기본값 | 설명 |
 |---|---|---|---|
@@ -132,7 +151,12 @@ erDiagram
 
 다른 업종은 원천명을 초기 표시명으로 사용하고 지원 여부를 FALSE로 둔다. 재적재 시 기존 표시명·지원 여부·정렬순서를 유지한다.
 
-## 4. 키·인덱스·조회
+</details>
+
+<a id="4-키인덱스조회"></a>
+
+<details>
+<summary>4. 키·인덱스·조회</summary>
 
 ### 키와 코드
 
@@ -154,7 +178,12 @@ erDiagram
 
 DB의 `snake_case`와 API 응답 필드명은 DTO에서 분리한다.
 
-## 5. 변경·삭제·이력 정책
+</details>
+
+<a id="5-변경삭제이력-정책"></a>
+
+<details>
+<summary>5. 변경·삭제·이력 정책</summary>
 
 ### 삭제와 부모 관계
 
@@ -182,15 +211,27 @@ DB의 `snake_case`와 API 응답 필드명은 DTO에서 분리한다.
 
 수집 시각은 실제 원천 metadata의 `downloadedAt` / `fetchedAt`을 사용한다. 공식 코드표 기준일·수집 시각·DB 저장 시각을 구분한다.
 
-## 6. JPA 구현 원칙 — 아직 미구현
+</details>
+
+<a id="6-jpa-구현-원칙--아직-미구현"></a>
+
+<details>
+<summary>6. JPA 구현 원칙</summary>
+
+District·AdministrativeDong·BusinessType 조회는 구현됐다. 아래는 Entity 추가·확장 시 참고할 설계 원칙이다.
 
 - ID는 `String`으로 직접 할당하고 `@GeneratedValue`를 사용하지 않는다.
-- 행정동 → 자치구 단방향 LAZY 관계를 제안한다.
+- 행정동 → 자치구는 단방향 LAZY 관계로 구현했다.
 - 목록은 DTO 조회 등으로 N+1을 방지하고 Entity를 API 응답으로 직접 노출하지 않는다.
 - 직접 할당 ID의 신규 판정과 `save` / `merge` 동작은 Entity 구현 때 검토한다.
 - 현재 기준정보 배치 적재에는 JDBC를 사용한다. 향후 조회 API의 JPA 선택을 변경한 것은 아니다.
 
-## 7. 실제 DDL과 검증 기록
+</details>
+
+<a id="7-실제-ddl과-검증-기록"></a>
+
+<details>
+<summary>7. 실제 DDL과 검증 기록</summary>
 
 SQL 본문은 문서에 중복 복사하지 않고 실행 파일을 기준으로 확인한다.
 
@@ -208,7 +249,12 @@ CHECK는 NULL에서 UNKNOWN으로 통과할 수 있으므로 필수 조건에 `I
 
 참고: [MySQL 8.4 CHECK](https://dev.mysql.com/doc/refman/8.4/en/create-table-check-constraints.html) · [외래 키](https://dev.mysql.com/doc/refman/8.4/en/create-table-foreign-keys.html)
 
-## 8. 검증 완료와 남은 작업
+</details>
+
+<a id="8-검증-완료와-남은-작업"></a>
+
+<details>
+<summary>8. 검증 완료와 남은 작업</summary>
 
 ### 검증 완료 — 임시 MySQL
 
@@ -219,14 +265,18 @@ CHECK는 NULL에서 UNKNOWN으로 통과할 수 있으므로 필수 조건에 `I
 - [x] 전체 행정동의 부모·공식 코드·명칭 대응
 - [x] 재적재 시 전체 값·시각·서비스 설정 유지, 충돌 시 롤백
 
-최신 전체 빌드는 **34건 성공**이다. 최초 V1 단계의 23건과 T07 후속 검증 11건을 구분해 각 검증 문서에 기록했다.
+T07 단계(2026-10-26)의 전체 빌드는 **34건 성공**이었다. 최초 V1 단계의 23건과 T07 후속 검증 11건을 구분해 각 검증 문서에 기록했다.
 
 ### 남은 작업
 
 - [ ] 개발 DB 실제 적재 및 팀 검토
-- [ ] Entity·Repository·목록 API 구현과 응답 검수
+- [x] District Entity·Repository·자치구 목록 API 구현 — PR #9
+- [x] 행정동·지원 업종 Entity·Repository·목록 API 구현 — PR #10·#11
+- [ ] FE 응답 공동 검수
 - [ ] FE와 원천/현재 지역 선택·LEGACY 안내 정책 확정
 - [ ] 지도 좌표·면적·경계 및 통계 테이블 설계·검수
 
-시설 응답의 `attractingFacilityCount` / `totalFacilityCount` 명칭 차이는 T02에서 통일한다. 이번 기준정보 테이블에는 해당 시설 컬럼을 추가하지 않는다.
+시설 응답은 [분기별 현황 초안](../api/quarterly-summary-contract.md)에서 `totalFacilityCount`를 원천 `VIATR_FCLTY_CO`의 공개 이름으로 제안했다. FE 공동 검토 전이며 저장 필드 제안 `attractingFacilityCount`와 구분한다. 이번 기준정보 테이블에는 해당 시설 컬럼을 추가하지 않는다.
+
+</details>
 

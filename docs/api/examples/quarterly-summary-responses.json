@@ -1,0 +1,508 @@
+{
+  "description": "Synthetic documentation fixtures; not actual statistics or the API response wrapper.",
+  "fixtures": {
+    "available": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "AVAILABLE",
+          "metrics": {
+            "residentPopulation": {
+              "value": 10000,
+              "unit": "PERSON",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22183",
+              "dataVersion": "example-resident-v1"
+            },
+            "workerPopulation": {
+              "value": 20000,
+              "unit": "PERSON",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22184",
+              "dataVersion": "example-worker-v1"
+            },
+            "totalStoreCount": {
+              "value": 50,
+              "unit": "STORE",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22172",
+              "dataVersion": "example-store-v1"
+            },
+            "totalFacilityCount": {
+              "value": 0,
+              "unit": "FACILITY",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22169",
+              "dataVersion": "example-facility-v1"
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": null,
+          "appliedQuarter": "20262",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262",
+            "20261"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "partialMissing": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "PARTIAL",
+          "metrics": {
+            "residentPopulation": {
+              "value": 10000,
+              "unit": "PERSON",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22183",
+              "dataVersion": "example-resident-v1"
+            },
+            "workerPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22184",
+              "dataVersion": "example-worker-v1"
+            },
+            "totalStoreCount": {
+              "value": 50,
+              "unit": "STORE",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22172",
+              "dataVersion": "example-store-v1"
+            },
+            "totalFacilityCount": {
+              "value": 0,
+              "unit": "FACILITY",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22169",
+              "dataVersion": "example-facility-v1"
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": null,
+          "appliedQuarter": "20262",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262",
+            "20261"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "allNoData": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "NO_DATA",
+          "metrics": {
+            "residentPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22183",
+              "dataVersion": "example-resident-v1"
+            },
+            "workerPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22184",
+              "dataVersion": "example-worker-v1"
+            },
+            "totalStoreCount": {
+              "value": null,
+              "unit": "STORE",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22172",
+              "dataVersion": "example-store-v1"
+            },
+            "totalFacilityCount": {
+              "value": null,
+              "unit": "FACILITY",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22169",
+              "dataVersion": "example-facility-v1"
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": null,
+          "appliedQuarter": "20262",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262",
+            "20261"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "noDefaultQuarter": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "NOT_LOADED",
+          "metrics": {
+            "residentPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NOT_LOADED",
+              "reasonCode": "DEFAULT_QUARTER_UNAVAILABLE",
+              "quarterCode": null,
+              "collectedAt": null,
+              "sourceDataset": "OA-22183",
+              "dataVersion": null
+            },
+            "workerPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NOT_LOADED",
+              "reasonCode": "DEFAULT_QUARTER_UNAVAILABLE",
+              "quarterCode": null,
+              "collectedAt": null,
+              "sourceDataset": "OA-22184",
+              "dataVersion": null
+            },
+            "totalStoreCount": {
+              "value": null,
+              "unit": "STORE",
+              "status": "NOT_LOADED",
+              "reasonCode": "DEFAULT_QUARTER_UNAVAILABLE",
+              "quarterCode": null,
+              "collectedAt": null,
+              "sourceDataset": "OA-22172",
+              "dataVersion": null
+            },
+            "totalFacilityCount": {
+              "value": null,
+              "unit": "FACILITY",
+              "status": "NOT_LOADED",
+              "reasonCode": "DEFAULT_QUARTER_UNAVAILABLE",
+              "quarterCode": null,
+              "collectedAt": null,
+              "sourceDataset": "OA-22169",
+              "dataVersion": null
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-no-default",
+          "requestedQuarter": null,
+          "appliedQuarter": null,
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": null,
+          "defaultQuarter": null,
+          "availableQuarters": []
+        }
+      },
+      "httpStatus": 200
+    },
+    "explicitUnloadedQuarter": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "NOT_LOADED",
+          "metrics": {
+            "residentPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22183",
+              "dataVersion": null
+            },
+            "workerPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22184",
+              "dataVersion": null
+            },
+            "totalStoreCount": {
+              "value": null,
+              "unit": "STORE",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22172",
+              "dataVersion": null
+            },
+            "totalFacilityCount": {
+              "value": null,
+              "unit": "FACILITY",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22169",
+              "dataVersion": null
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": "20261",
+          "appliedQuarter": "20261",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "qualityError": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "PARTIAL",
+          "metrics": {
+            "residentPopulation": {
+              "value": 10000,
+              "unit": "PERSON",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22183",
+              "dataVersion": "example-resident-v1"
+            },
+            "workerPopulation": {
+              "value": 20000,
+              "unit": "PERSON",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22184",
+              "dataVersion": "example-worker-v1"
+            },
+            "totalStoreCount": {
+              "value": null,
+              "unit": "STORE",
+              "status": "INVALID",
+              "reasonCode": "QUALITY_CHECK_FAILED",
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22172",
+              "dataVersion": "example-store-v1"
+            },
+            "totalFacilityCount": {
+              "value": 0,
+              "unit": "FACILITY",
+              "status": "AVAILABLE",
+              "reasonCode": null,
+              "quarterCode": "20262",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22169",
+              "dataVersion": "example-facility-v1"
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": null,
+          "appliedQuarter": "20262",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262",
+            "20261"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "mixedWithoutAvailableValues": {
+      "body": {
+        "data": {
+          "region": {
+            "dongCode": "11110515",
+            "dongName": "청운효자동",
+            "officialDongCode": "1111051500",
+            "officialCodeStatus": "CURRENT",
+            "regionVersion": "seoul-reference-20262-mois-20261012-v1"
+          },
+          "businessTypeCode": "CS100010",
+          "status": "PARTIAL",
+          "metrics": {
+            "residentPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20261",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22183",
+              "dataVersion": "example-no-data-v1"
+            },
+            "workerPopulation": {
+              "value": null,
+              "unit": "PERSON",
+              "status": "NO_DATA",
+              "reasonCode": "SOURCE_ROW_ABSENT",
+              "quarterCode": "20261",
+              "collectedAt": "2026-10-16T00:00:00Z",
+              "sourceDataset": "OA-22184",
+              "dataVersion": "example-no-data-v1"
+            },
+            "totalStoreCount": {
+              "value": null,
+              "unit": "STORE",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22172",
+              "dataVersion": null
+            },
+            "totalFacilityCount": {
+              "value": null,
+              "unit": "FACILITY",
+              "status": "NOT_LOADED",
+              "reasonCode": "NOT_INGESTED",
+              "quarterCode": "20261",
+              "collectedAt": null,
+              "sourceDataset": "OA-22169",
+              "dataVersion": null
+            }
+          }
+        },
+        "meta": {
+          "requestId": "example-summary",
+          "requestedQuarter": "20261",
+          "appliedQuarter": "20261",
+          "latestPublishedQuarter": "20262",
+          "latestLoadedQuarter": "20262",
+          "defaultQuarter": "20262",
+          "availableQuarters": [
+            "20262"
+          ]
+        }
+      },
+      "httpStatus": 200
+    },
+    "invalidQuarter": {
+      "body": {
+        "error": {
+          "code": "INVALID_QUARTER",
+          "message": "분기는 YYYYQ 형식이며 Q는 1~4여야 합니다.",
+          "details": [
+            {
+              "field": "quarter",
+              "reason": "INVALID_FORMAT"
+            }
+          ]
+        },
+        "meta": {
+          "requestId": "example-invalid-quarter"
+        }
+      },
+      "httpStatus": 400
+    }
+  }
+}
