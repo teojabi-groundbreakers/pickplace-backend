@@ -2,7 +2,7 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구 목록 API와 통합 테스트입니다. 통계 원본 적재·현황 API, 행정동·업종 목록 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동·지원 업종 목록 API와 통합 테스트입니다. 통계 원본 적재·현황 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 빠른 시작 · 문서 선택
 
@@ -27,7 +27,7 @@
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
 - [FE·BE 통합 API 명세 v0.2](docs/api/fe-be-contract.md): 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안.
 - [분기별 기본 현황 API·표시 규칙 v0.1](docs/api/quarterly-summary-contract.md): 핵심 지표·분기 선택·누락·품질 상태·현황 응답과 화면 표시. 구현 전 초안.
-- [기준정보 조회 API](docs/api/reference-api.md): 자치구 목록 API의 요청·응답·오류 예시.
+- [기준정보 조회 API](docs/api/reference-api.md): 자치구·행정동·지원 업종 목록 API의 요청·응답·오류 예시.
 
 </details>
 
@@ -133,15 +133,17 @@ curl http://localhost:8080/actuator/health
 {"status":"UP"}
 ```
 
-공통 응답 형식의 서버 상태 API와 자치구 목록 API도 확인할 수 있습니다.
+공통 응답 형식의 서버 상태 API와 기준정보 목록 API도 확인할 수 있습니다.
 
 ```cmd
 curl http://localhost:8080/api/health
 curl http://localhost:8080/api/health/ready
 curl http://localhost:8080/api/districts
+curl http://localhost:8080/api/districts/11110/administrative-dongs
+curl http://localhost:8080/api/business-types
 ```
 
-`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 자치구 목록은 기준정보를 적재하기 전에는 빈 목록입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
+`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 기준정보를 적재하기 전에는 자치구·지원 업종 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 
 ### 4. 개발용 DB 종료
 

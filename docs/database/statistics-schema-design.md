@@ -275,3 +275,16 @@ gradlew.bat clean build
 | 환경 보정 | 이 PC의 한글 임시 경로 문제를 피하도록 외부 Gradle init script로 테스트 JVM의 java.io.tmpdir만 ASCII 경로로 지정 |
 
 위 결과는 이 브랜치의 현재 스키마·코드를 검증한 기록이다. 이후 원천 통계 적재·현황 API의 동작까지 검증했다는 뜻은 아니다.
+
+### 최신 develop 통합 검증
+
+| 기준 | 결과 |
+|---|---|
+| 검증일 | 2026-11-05 |
+| 병합 방향 | origin/develop 3e2a980 → feature/statistics-schema |
+| 통합 범위 | 자치구·행정동·지원 업종 API + T11 스키마·마이그레이션·업그레이드 검증 |
+| 전체 clean build | 115건 통과 · 실패·오류·건너뜀 0건 · 실행 JAR 빌드 성공 |
+| 구성 | 최신 develop 테스트 85건 + T11 전용 30건 |
+| 개발 DB | 적용하지 않음 |
+
+T11은 v0.3.0 대상이다. 이번 통합은 최신 develop을 작업 브랜치로 반영한 것이며 작업 브랜치를 develop이나 main에 병합한 것은 아니다.

@@ -40,7 +40,7 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 ### 빌드된 JAR로 실행
 
 ```cmd
-java -jar build/libs/pickplace-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local,reference-import --pickplace.reference-import.confirm=true
+java -jar build/libs/pickplace-backend-0.2.0.jar --spring.profiles.active=local,reference-import --pickplace.reference-import.confirm=true
 ```
 
 실행 순서:

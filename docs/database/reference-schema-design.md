@@ -5,7 +5,7 @@
 
 [문서 목록](../README.md) · [마이그레이션 검증](migration-validation.md) · [수동 적재 방법](../data/reference-import.md)
 
-> 현재 상태 보완: District Entity·Repository·자치구 API는 PR #9에 반영됐다. 개발 DB 실제 상태는 별도 확인하며, 23건/34건은 해당 단계의 검증 이력이다. [현재 지원 API](../api/frontend-api-guide.md)를 함께 본다.
+> 현재 상태 보완: 자치구·행정동·지원 업종 조회용 Entity·Repository·API는 PR #9·#10·#11에 반영됐다. 개발 DB 실제 상태는 별도 확인하며, 23건/34건은 해당 단계의 검증 이력이다. [현재 지원 API](../api/frontend-api-guide.md)를 함께 본다.
 
 ## 1. 설계 범위
 
@@ -23,7 +23,7 @@
 |---|---|---|
 | 스키마 | Flyway V1·PK/FK/CHECK | 변경 시 V2 이상 추가 |
 | 초기 적재 | 고정 스냅샷·수동 명령·재적재 검증 | 개발 DB 실제 반영 |
-| 조회 | District Entity·Repository·자치구 API 구현 | 행정동·업종 API 및 FE 연결 |
+| 조회 | 자치구·행정동·지원 업종 Entity·Repository·목록 API 구현 | FE 연결·공동 검수 |
 | 통계·지도 | 통계는 [T11 별도 설계](statistics-schema-design.md)에서 V2로 구현 | 실제 통계 적재·조회 API, 좌표·경계 |
 
 설계 근거: [데이터 정의서](https://app.notion.com/p/3fa2114f823a818c9bd8e2664cbcd618) · [T06 테이블 생성](https://app.notion.com/p/3f42114f823a813d83c9ce5714ddf36a) · [T07 초기 적재](https://app.notion.com/p/3f42114f823a8144b85ae2859153c767)
@@ -218,10 +218,10 @@ DB의 `snake_case`와 API 응답 필드명은 DTO에서 분리한다.
 <details>
 <summary>6. JPA 구현 원칙</summary>
 
-District 조회는 구현됐다. 아래는 Entity 추가·확장 시 참고할 설계 원칙이며 나머지 엔티티 구현 완료를 뜻하지 않는다.
+District·AdministrativeDong·BusinessType 조회는 구현됐다. 아래는 Entity 추가·확장 시 참고할 설계 원칙이다.
 
 - ID는 `String`으로 직접 할당하고 `@GeneratedValue`를 사용하지 않는다.
-- 행정동 → 자치구 단방향 LAZY 관계를 제안한다.
+- 행정동 → 자치구는 단방향 LAZY 관계로 구현했다.
 - 목록은 DTO 조회 등으로 N+1을 방지하고 Entity를 API 응답으로 직접 노출하지 않는다.
 - 직접 할당 ID의 신규 판정과 `save` / `merge` 동작은 Entity 구현 때 검토한다.
 - 현재 기준정보 배치 적재에는 JDBC를 사용한다. 향후 조회 API의 JPA 선택을 변경한 것은 아니다.
@@ -271,7 +271,8 @@ T07 단계(2026-10-26)의 전체 빌드는 **34건 성공**이었다. 최초 V1 
 
 - [ ] 개발 DB 실제 적재 및 팀 검토
 - [x] District Entity·Repository·자치구 목록 API 구현 — PR #9
-- [ ] 행정동·지원 업종 목록 API와 FE 응답 검수
+- [x] 행정동·지원 업종 Entity·Repository·목록 API 구현 — PR #10·#11
+- [ ] FE 응답 공동 검수
 - [ ] FE와 원천/현재 지역 선택·LEGACY 안내 정책 확정
 - [ ] 지도 좌표·면적·경계 및 통계 테이블 설계·검수
 

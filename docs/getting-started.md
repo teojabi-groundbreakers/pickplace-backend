@@ -249,7 +249,7 @@ gradlew.bat build --no-daemon
 
 `build`는 컴파일·패키징·테스트를 수행한다. `--no-daemon`은 빌드 후 지속 실행되는 Gradle 데몬을 유지하지 않도록 요청하는 옵션이다.
 
-정상 결과는 **`BUILD SUCCESSFUL`**이다. 작성 시점에는 34건이 통과했으며 이후 테스트 추가에 따라 건수는 달라질 수 있다.
+정상 결과는 **`BUILD SUCCESSFUL`**이다. 초기 T07 단계는 34건, 2026-11-05의 최신 develop·T11 통합 검증은 115건이 통과했다. 이후 테스트 추가에 따라 건수는 달라질 수 있으며 [T11 검증 기록](database/statistics-schema-design.md#최신-develop-통합-검증)을 함께 확인한다.
 
 <a id="테스트-성공과-개발-db-적재는-다르다"></a>
 

@@ -2,9 +2,11 @@
 
 작성일: 2026-10-31 · 상태: **BE 통합 제안 / FE 공동 검토 전**
 
+구현 상태 확인: 2026-11-05 · PR #9·#10·#11 반영 기준
+
 [Notion 검토 페이지](https://app.notion.com/p/40a2114f823a8133b662fb5aa49b457c)에도 같은 v0.2 초안을 게시했다. 두 문서 변경 시 버전과 결정 기록을 함께 맞춘다.
 
-> 이번 문서는 목록 API와 공통 통신 규칙의 통합 초안이다. 공통 응답·자치구 조회는 이미 구현됐고, 행정동·업종 목록과 FE 어댑터 변경은 미구현이다. 문서 작성이나 기존 API 병합을 FE 승인·연동 완료로 간주하지 않는다.
+> 이번 문서는 목록 API와 공통 통신 규칙의 통합 초안이다. 공통 응답·자치구·행정동·지원 업종 조회는 구현됐다. 행정동의 추가 제안 필드와 FE 어댑터 전환·공동 검수는 별도로 남아 있다. 문서 작성이나 기존 API 병합을 FE 승인·연동 완료로 간주하지 않는다.
 
 > 읽는 순서: 구현 상태와 남은 결정을 먼저 확인하고 필요한 API만 펼친다. 실제 호출 방법은 [현재 지원 API 안내](frontend-api-guide.md)를 참고한다.
 
@@ -15,8 +17,8 @@
 | GET | `/api/health` | 서버 생존 확인 | 구현 |
 | GET | `/api/health/ready` | DB 준비 상태 확인 | 구현 |
 | GET | `/api/districts` | 서울 자치구 목록 | 구현, PR #9 |
-| GET | `/api/districts/{districtCode}/administrative-dongs` | 자치구에 속한 원천 행정동 목록 | 명세 초안 |
-| GET | `/api/business-types` | 서비스 지원 업종 목록 | 명세 초안 |
+| GET | `/api/districts/{districtCode}/administrative-dongs` | 자치구에 속한 원천 행정동 목록 | 기본 5필드 구현, PR #10. officialDongCode 추가는 제안 |
+| GET | `/api/business-types` | 서비스 지원 업종 목록 | 구현, PR #11 |
 
 - API 기준 URL을 `/api`로 설정한 FE에서는 `/districts`처럼 접두사를 제외한 경로를 전달한다. `/api/api/districts`가 되지 않게 한다.
 - 기존 FE 초안의 `/catalog`를 추가로 구현하거나 기존 경로로 자동 우회하지 않는 안이다. FE의 개별 조회 전환에 대한 공동 확인이 필요하다.
@@ -28,7 +30,7 @@
 | --- | --- | --- |
 | 목록 통신 형식 | 기존 BE 개별 경로·data.items·공통 meta 유지 | BE 제안, FE 확인 필요 |
 | 자치구 형식 | PR #9 구현 유지 | BE 구현 완료, FE 연결 미검수 |
-| 행정동·업종 필드/정렬 | 5·6절 적용 | 구현 전, FE 확인 필요 |
+| 행정동·업종 필드/정렬 | 기본 필드·정렬은 PR #10·#11 구현 | officialDongCode 추가 제안·FE 확인 필요 |
 | H10·LEGACY | 공식 대응 필드 제공, 지도 수용·선택 정책 별도 결정 | 미확정 |
 | 목록 검색 범위 | 선택 자치구 내 검색 우선 | FE 전체 검색 요구 확인 필요 |
 | 단계 구분 | 첫 목록 연결과 현황·AI·좌표 계약 분리 | 개발 범위 제안 |
@@ -36,7 +38,8 @@
 - [x] FE·BE 원문·코드 대조
 - [x] 목록·공통 통신·오류·빈 목록·FE 변경·검수 초안 작성
 - [ ] FE 담당자 검토 및 결정 기록
-- [ ] 행정동·업종 구현 및 FE 어댑터 적용
+- [x] 행정동 기본 5필드·정렬 및 지원 업종 API 구현
+- [ ] officialDongCode 추가 제안 검토 및 FE 어댑터 적용
 - [ ] OpenAPI·Mock·실서버 계약 검수
 
 v0.1의 A2~A4와 공통 응답 규칙을 통합하고, 공식 대응 코드 필드·정렬·전환 작업을 제안했다. A5/A6·분기·결측·AI 규칙을 무단 확정하지 않는다. 승인 기록이 없으므로 T02 전체를 완료로 표시하지 않는다.
@@ -78,9 +81,11 @@ v0.1의 A2~A4와 공통 응답 규칙을 통합하고, 공식 대응 코드 필�
 <a id="5-행정동-목록--구현-전-제안"></a>
 
 <details>
-<summary>5. 행정동 목록 — 구현 전 제안</summary>
+<summary>5. 행정동 목록 — 기본 구현·추가 필드 제안</summary>
 
 `GET /api/districts/{districtCode}/administrative-dongs`
+
+현재 구현은 dongCode·dongName·districtCode·officialCodeStatus·regionVersion 5필드다. 아래 JSON과 표에는 **아직 응답하지 않는 officialDongCode 추가 제안**이 포함돼 있다. 실제 호출 계약은 [현재 지원 API 안내](frontend-api-guide.md)와 [기준정보 API](reference-api.md)를 따른다.
 
 | Path | 자료형 | 검증 |
 | --- | --- | --- |
@@ -113,10 +118,10 @@ v0.1의 A2~A4와 공통 응답 규칙을 통합하고, 공식 대응 코드 필�
 | `officialCodeStatus` | CURRENT / LEGACY / UNVERIFIED | O | 공식 코드 대응 확인 상태 |
 | `regionVersion` | string | O | 코드 대응 자료의 버전 |
 
-- 정렬 제안: `dongName`, `dongCode` 오름차순. 이름 정렬은 DB의 한글 정렬 규칙을 따르고 같은 이름은 코드로 구분한다.
+- 구현 정렬: `dongName`, `dongCode` 오름차순. 이름 정렬은 DB의 한글 정렬 규칙을 따르고 같은 이름은 코드로 구분한다.
 - 등록된 자치구에 동이 없으면 200 + 빈 배열. 부모 자치구가 미등록이면 404 `REGION_NOT_FOUND`.
 - 원천 스냅샷의 425개 동을 보존한다. 현행 목록으로 과거 통계를 임의 재배분하지 않는다.
-- `officialDongCode`는 T02 v0.1에 없던 대응 식별자 추가 제안이다. 현재 DB의 `official_dong_code`에서 읽으며 FE가 `dongCode + '00'`으로 생성하지 않는다.
+- `officialDongCode`는 T02 v0.1에 없던 대응 식별자 추가 제안이며 현재 API 응답에는 없다. 추가가 확정되면 DB의 `official_dong_code`에서 읽고 FE가 `dongCode + '00'`으로 생성하지 않는다.
 - CURRENT는 공식 대응 확인 상태이며 모든 기간의 경계 일치를 보증하지 않는다. LEGACY 선택 허용 여부는 FE 공동 검토 사항이다. 상태를 누락하거나 현행 코드처럼 표시하지 않는다.
 - 목록에는 중심 좌표를 약속하지 않는다. 기존 FE `Neighborhood.center` 필수 조건은 선택 목록 모델에서 분리해야 한다. 지도 이동에 필요한 좌표 계약은 별도 작업이다.
 
@@ -125,7 +130,7 @@ v0.1의 A2~A4와 공통 응답 규칙을 통합하고, 공식 대응 코드 필�
 <a id="6-지원-업종-목록--구현-전-제안"></a>
 
 <details>
-<summary>6. 지원 업종 목록 — 구현 전 제안</summary>
+<summary>6. 지원 업종 목록 — 구현</summary>
 
 `GET /api/business-types` · 요청 파라미터 없음
 
@@ -149,7 +154,7 @@ v0.1의 A2~A4와 공통 응답 규칙을 통합하고, 공식 대응 코드 필�
 | `supported` | boolean | O | 이 목록은 true인 지원 업종만 반환 |
 
 - 지원 여부는 DB의 `is_supported`로 판단하고 코드 3개를 API 로직에 하드코딩하지 않는다.
-- 정렬 제안: `display_order`, `business_type_code` 오름차순. 동률 순서를 코드로 고정한다.
+- 구현 정렬: `display_order`, `business_type_code` 오름차순. 동률 순서를 코드로 고정한다.
 - 초기 스냅샷은 위 3개를 활성화한다. 전체 100업종 저장과 서비스 지원 범위는 다르다.
 - 지원 업종이 없으면 200 + 빈 배열. FE는 분석/조회 진행을 막고 안내하며 데모 목록으로 대체하지 않는다.
 - 대분류 계층은 이번 응답에 추가하지 않는다. FE의 `categories` 구조를 유지하려면 화면용 그룹임을 구분하고 공식 원천 분류인 것처럼 만들지 않는다.
