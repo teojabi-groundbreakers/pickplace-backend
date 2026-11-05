@@ -2,7 +2,7 @@
 
 지역·업종 선택 화면에서 쓰는 목록 API다. 응답·오류 형식은 [공통 응답 형식](common-response.md)을 따른다.
 
-> 상태: 자치구·행정동 목록 구현. 지원 업종 목록은 후속 작업에서 이 문서에 추가한다.
+> 상태: 자치구·행정동·지원 업종 목록 구현.
 > 기준: 팀 API 명세 초안(데이터 계약 초안 v0.1). 데이터는 [기준정보 수동 적재](../data/reference-import.md)로 넣은 값을 그대로 읽는다.
 
 API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagger-ui.html`, OpenAPI JSON은 `/v3/api-docs`에서 확인한다.
@@ -146,3 +146,46 @@ FE 연동 초안은 지역·업종을 `GET /catalog` 하나로 받는 구조라 
 ### DB 장애 — 503
 
 자치구 목록과 같이 `DATA_SERVICE_UNAVAILABLE`을 돌려준다.
+
+## 3. 지원 업종 목록 — `GET /api/business-types`
+
+화면에서 선택할 수 있는 **지원 업종만** 표시 순서대로 돌려준다. 요청 파라미터는 없다.
+
+### 정상 응답 — 200
+
+```json
+{
+  "data": {
+    "items": [
+      { "businessTypeCode": "CS100010", "businessTypeName": "커피·음료", "supported": true },
+      { "businessTypeCode": "CS100008", "businessTypeName": "분식", "supported": true },
+      { "businessTypeCode": "CS100005", "businessTypeName": "제과점", "supported": true }
+    ]
+  },
+  "meta": { "requestId": "..." }
+}
+```
+
+| 필드 | 형식 | 설명 |
+|---|---|---|
+| `businessTypeCode` | 문자열, `CS` + 숫자 6자리 | 서비스 업종 코드. KSIC 코드와 다르다 |
+| `businessTypeName` | 문자열 | 화면 표시명(`display_name`). 원천 업종명(예: `커피-음료`, `분식전문점`)이 아니다 |
+| `supported` | 불리언 | 화면 선택 지원 여부. 지원 업종만 돌려주므로 항상 `true`다 |
+
+- DB에는 원천 업종 100개가 저장돼 있지만, `is_supported`가 `TRUE`인 업종만 돌려준다. 초기 지원 업종은 위 3개다.
+- 정렬은 `display_order` 순이고, 순서가 같으면 업종 코드순이다.
+- 지원 여부·표시 순서를 DB에서 바꾸면 다음 요청부터 바로 반영된다. 결과를 따로 저장(캐시)해 두지 않는다.
+- 쿼리 파라미터(예: `?supported=false`)를 붙여도 무시하며, 미지원 업종은 노출하지 않는다.
+- 원천 업종명, `display_order`, `data_version`, `collected_at` 같은 DB 관리용 컬럼은 응답에 넣지 않는다.
+
+### 지원 업종이 없을 때 — 200
+
+업종을 아직 적재하지 않았거나 지원 업종이 하나도 없으면 오류가 아니라 빈 목록을 돌려준다.
+
+```json
+{ "data": { "items": [] }, "meta": { "requestId": "..." } }
+```
+
+### DB 장애 — 503
+
+자치구 목록과 같이 `DATA_SERVICE_UNAVAILABLE`을 돌려준다. 빈 목록으로 위장하지 않는다.
