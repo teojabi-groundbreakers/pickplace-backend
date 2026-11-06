@@ -1,5 +1,6 @@
 package com.pickplace.backend.ingestion.download.cli;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -14,14 +15,15 @@ import tools.jackson.databind.json.JsonMapper;
 
 import com.pickplace.backend.ingestion.download.model.DownloadRequest;
 import com.pickplace.backend.ingestion.download.service.DownloadPlanService;
+import com.pickplace.backend.ingestion.download.service.ResidentDownloadService;
 import com.pickplace.backend.ingestion.download.service.SourceCatalogLoader;
 
-// 수집 명령을 받아 실행 계획을 출력한다.
+// 수집 계획 확인과 실제 다운로드를 연결한다.
 public final class DataDownloadCommand {
 
 	private static final String PROFILE = "data-download";
 	private static final Set<String> OPTIONS =
-			Set.of("spring.profiles.active", "dataset", "quarter", "output", "plan-only");
+			Set.of("spring.profiles.active", "dataset", "quarter", "output", "plan-only", "download");
 
 	private DataDownloadCommand() {}
 
@@ -32,9 +34,9 @@ public final class DataDownloadCommand {
 
 	// 입력을 검사하고 실행 결과에 맞는 종료 코드를 돌려준다.
 	public static int execute(String[] args, PrintStream output, PrintStream error) {
-		DownloadRequest request;
+		CommandInput input;
 		try {
-			request = parse(args);
+			input = parse(args);
 		} catch (IllegalArgumentException exception) {
 			error.println("수집 명령 오류: " + exception.getMessage());
 			error.println("사용 예: --spring.profiles.active=data-download --dataset=RESIDENT --quarter=20262 --output=data/raw");
@@ -44,23 +46,34 @@ public final class DataDownloadCommand {
 		var mapper = JsonMapper.builder().build();
 		try {
 			var loader = new SourceCatalogLoader(mapper);
-			var plan = new DownloadPlanService(loader.load(), loader).plan(request);
-			output.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(plan));
+			var plan = new DownloadPlanService(loader.load(), loader).plan(input.request());
+			var writer = mapper.writerWithDefaultPrettyPrinter();
+			if (input.download()) {
+				var result = new ResidentDownloadService(mapper).download(plan);
+				output.println(writer.writeValueAsString(result));
+			} else {
+				output.println(writer.writeValueAsString(plan));
+			}
 			return 0;
 		} catch (IllegalArgumentException exception) {
 			error.println("수집 명령 오류: " + exception.getMessage());
 			return 2;
-		} catch (RuntimeException exception) {
-			error.println("수집 계획을 생성할 수 없습니다: " + exception.getMessage());
+		} catch (InterruptedException exception) {
+			Thread.currentThread().interrupt();
+			error.println("공공데이터 수집이 중단되었습니다.");
+			return 3;
+		} catch (IOException | RuntimeException exception) {
+			String action = input.download() ? "공공데이터 수집" : "수집 계획 생성";
+			error.println(action + " 실패: " + exception.getMessage());
 			return 3;
 		}
 	}
 
 	// 명령줄 옵션을 수집 요청으로 바꾼다.
-	private static DownloadRequest parse(String[] args) {
+	private static CommandInput parse(String[] args) {
 		var arguments = new DefaultApplicationArguments(args);
 		if (!arguments.getNonOptionArgs().isEmpty() || !OPTIONS.containsAll(arguments.getOptionNames())) {
-			throw new IllegalArgumentException("알 수 없는 인자입니다. dataset·quarter·output·plan-only 옵션을 확인하세요.");
+			throw new IllegalArgumentException("알 수 없는 인자입니다. dataset·quarter·output·plan-only·download 옵션을 확인하세요.");
 		}
 		for (String name : arguments.getOptionNames()) {
 			if (arguments.getOptionValues(name).size() > 1) {
@@ -70,14 +83,24 @@ public final class DataDownloadCommand {
 		if (!profiles(args).equals(List.of(PROFILE))) {
 			throw new IllegalArgumentException("data-download 프로필만 단독으로 지정하세요.");
 		}
-		if (arguments.containsOption("plan-only") && !arguments.getOptionValues("plan-only").isEmpty()) {
-			throw new IllegalArgumentException("--plan-only는 값을 받지 않는 플래그입니다.");
+		for (String flag : List.of("plan-only", "download")) {
+			if (arguments.containsOption(flag) && !arguments.getOptionValues(flag).isEmpty()) {
+				throw new IllegalArgumentException("--" + flag + "는 값을 받지 않는 플래그입니다.");
+			}
+		}
+		boolean download = arguments.containsOption("download");
+		if (download && arguments.containsOption("plan-only")) {
+			throw new IllegalArgumentException("--download와 --plan-only는 함께 지정할 수 없습니다.");
 		}
 		String dataset = value(arguments, "dataset", null);
 		String quarter = value(arguments, "quarter", null);
 		String directory = value(arguments, "output", "data/raw");
 		try {
-			return new DownloadRequest(dataset, quarter, Path.of(directory));
+			var request = new DownloadRequest(dataset, quarter, Path.of(directory));
+			if (download && (!"RESIDENT".equals(request.dataset()) || !"20262".equals(request.quarter()))) {
+				throw new IllegalArgumentException("실제 다운로드는 현재 RESIDENT 20262만 지원합니다.");
+			}
+			return new CommandInput(request, download);
 		} catch (InvalidPathException exception) {
 			throw new IllegalArgumentException("--output 경로 형식이 올바르지 않습니다.");
 		}
@@ -105,4 +128,6 @@ public final class DataDownloadCommand {
 		return Arrays.stream(environment.getProperty("spring.profiles.active", "").split(","))
 				.map(String::trim).filter(value -> !value.isEmpty()).toList();
 	}
+
+	private record CommandInput(DownloadRequest request, boolean download) {}
 }
