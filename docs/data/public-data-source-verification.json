@@ -1,0 +1,653 @@
+{
+  "checkedAt": "2026-11-05T07:47:21.050Z",
+  "runId": "2026-11-05T07-47-21-048Z",
+  "targetQuarter": "20262",
+  "scope": "Route verification only; not complete collection or production downloader",
+  "datasets": {
+    "store": {
+      "datasetId": "OA-22172",
+      "page": {
+        "url": "https://data.seoul.go.kr/dataList/OA-22172/S/1/datasetView.do",
+        "method": "GET",
+        "fetchedAt": "2026-11-05T07:47:21.264Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 111884,
+        "sha256": "110884238b0723474adbe9569cc65c410b1dbd69942e79f5b41d874316fb8f08",
+        "file": "2026-11-05T07-47-21-048Z/store-page.html"
+      },
+      "annualArchives": [
+        {
+          "fileName": "서울시 상권분석서비스(점포-행정동)_2025년.zip",
+          "seq": "7"
+        },
+        {
+          "fileName": "서울시 상권분석서비스(점포-행정동)_2024년.zip",
+          "seq": "6"
+        },
+        {
+          "fileName": "서울시 상권분석서비스(점포-행정동)_2023년.zip",
+          "seq": "5"
+        },
+        {
+          "fileName": "서울시_상권분석서비스(점포-행정동)_2022년.zip",
+          "seq": "4"
+        },
+        {
+          "fileName": "서울시_상권분석서비스(점포-행정동)_2021년.zip",
+          "seq": "3"
+        }
+      ],
+      "latestPreview": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22172",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "",
+          "txtFilter": "",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:21.414Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 349,
+        "sha256": "0861b5f90c1b89a2708d7a4ff763ca2e0744e44ff34dc8d0f9d40b40ac6c3637",
+        "file": "2026-11-05T07-47-21-048Z/store-latest-preview.txt",
+        "quarter": "20262",
+        "totalAcrossQuarters": 775084
+      },
+      "targetCount": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22172",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:21.670Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 364,
+        "sha256": "305d92cfc7ea1f377e4692592e8b8306dca4f795ad602e3732370e99e41642d9",
+        "file": "2026-11-05T07-47-21-048Z/store-target-count.txt",
+        "officialRows": 35301,
+        "sampleQuarter": "20262"
+      },
+      "partitions": [
+        {
+          "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+          "method": "POST",
+          "parameters": {
+            "infId": "OA-22172",
+            "srvType": "S",
+            "serviceKind": "0",
+            "pageNo": "1",
+            "ssUserId": "SAMPLE_VIEW",
+            "strWhere": "",
+            "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+            "filterCol": "SVC_INDUTY_CD",
+            "txtFilter": "CS100010"
+          },
+          "fetchedAt": "2026-11-05T07:47:23.350Z",
+          "status": 200,
+          "contentType": "application/x-msdownload;charset=UTF-8",
+          "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì í¬-íì ë).json\"",
+          "bytes": 663245,
+          "sha256": "1bc2152fd60035b95e76e81f4b5d67499a666bea80cc76e70a5e6b62f329f0a4",
+          "file": "2026-11-05T07-47-21-048Z/store-CS100010.json",
+          "rows": 2550,
+          "targetRows": 425,
+          "uniqueTargetKeys": 425,
+          "quarters": [
+            "20251",
+            "20252",
+            "20253",
+            "20254",
+            "20261",
+            "20262"
+          ],
+          "industries": [
+            "CS100010"
+          ],
+          "columns": [
+            "adstrd_cd",
+            "adstrd_cd_nm",
+            "clsbiz_rt",
+            "clsbiz_stor_co",
+            "frc_stor_co",
+            "opbiz_rt",
+            "opbiz_stor_co",
+            "similr_induty_stor_co",
+            "stdr_yyqu_cd",
+            "stor_co",
+            "svc_induty_cd",
+            "svc_induty_cd_nm"
+          ],
+          "duplicateTargetKeys": 0
+        },
+        {
+          "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+          "method": "POST",
+          "parameters": {
+            "infId": "OA-22172",
+            "srvType": "S",
+            "serviceKind": "0",
+            "pageNo": "1",
+            "ssUserId": "SAMPLE_VIEW",
+            "strWhere": "",
+            "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+            "filterCol": "SVC_INDUTY_CD",
+            "txtFilter": "CS100008"
+          },
+          "fetchedAt": "2026-11-05T07:47:25.082Z",
+          "status": 200,
+          "contentType": "application/x-msdownload;charset=UTF-8",
+          "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì í¬-íì ë).json\"",
+          "bytes": 666301,
+          "sha256": "b6ab8fd4e4dfe72eb03267aa7a01e27d864a51c178ab9054b5e96573f21fb448",
+          "file": "2026-11-05T07-47-21-048Z/store-CS100008.json",
+          "rows": 2550,
+          "targetRows": 425,
+          "uniqueTargetKeys": 425,
+          "quarters": [
+            "20251",
+            "20252",
+            "20253",
+            "20254",
+            "20261",
+            "20262"
+          ],
+          "industries": [
+            "CS100008"
+          ],
+          "columns": [
+            "adstrd_cd",
+            "adstrd_cd_nm",
+            "clsbiz_rt",
+            "clsbiz_stor_co",
+            "frc_stor_co",
+            "opbiz_rt",
+            "opbiz_stor_co",
+            "similr_induty_stor_co",
+            "stdr_yyqu_cd",
+            "stor_co",
+            "svc_induty_cd",
+            "svc_induty_cd_nm"
+          ],
+          "duplicateTargetKeys": 0
+        },
+        {
+          "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+          "method": "POST",
+          "parameters": {
+            "infId": "OA-22172",
+            "srvType": "S",
+            "serviceKind": "0",
+            "pageNo": "1",
+            "ssUserId": "SAMPLE_VIEW",
+            "strWhere": "",
+            "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+            "filterCol": "SVC_INDUTY_CD",
+            "txtFilter": "CS100005"
+          },
+          "fetchedAt": "2026-11-05T07:47:26.738Z",
+          "status": 200,
+          "contentType": "application/x-msdownload;charset=UTF-8",
+          "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì í¬-íì ë).json\"",
+          "bytes": 644523,
+          "sha256": "e7e53b96ff3abaf9593683ce4dc0c66e313aba07944e02fd81852df89ba4f2c6",
+          "file": "2026-11-05T07-47-21-048Z/store-CS100005.json",
+          "rows": 2531,
+          "targetRows": 421,
+          "uniqueTargetKeys": 421,
+          "quarters": [
+            "20251",
+            "20252",
+            "20253",
+            "20254",
+            "20261",
+            "20262"
+          ],
+          "industries": [
+            "CS100005"
+          ],
+          "columns": [
+            "adstrd_cd",
+            "adstrd_cd_nm",
+            "clsbiz_rt",
+            "clsbiz_stor_co",
+            "frc_stor_co",
+            "opbiz_rt",
+            "opbiz_stor_co",
+            "similr_induty_stor_co",
+            "stdr_yyqu_cd",
+            "stor_co",
+            "svc_induty_cd",
+            "svc_induty_cd_nm"
+          ],
+          "duplicateTargetKeys": 0
+        }
+      ],
+      "archiveProbe": {
+        "url": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22172",
+          "seqNo": "",
+          "seq": "7",
+          "infSeq": "3"
+        },
+        "fetchedAt": "2026-11-05T07:47:26.844Z",
+        "status": 200,
+        "contentType": "application/x-msdownload",
+        "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì í¬-íì ë)_2025ë.zip\"",
+        "bytes": 1073668,
+        "sha256": "1eb65713ac04861ac54a765984e9a9072e55288fd1c715409f3cce22782d2e69",
+        "file": "2026-11-05T07-47-21-048Z/store-2025.zip",
+        "requestedFile": "서울시 상권분석서비스(점포-행정동)_2025년.zip",
+        "entries": [
+          {
+            "name": "서울시 상권분석서비스(점포-행정동)_2025년.csv",
+            "bytes": 11525299,
+            "header": "\"기준_년분기_코드\",\"행정동_코드\",\"행정동_코드_명\",\"서비스_업종_코드\",\"서비스_업종_코드_명\",\"점포_수\",\"유사_업종_점포_수\",\"개업_율\",\"개업_점포_수\",\"폐업_률\",\"폐업_점포_수\",\"프랜차이즈_점포_수\""
+          }
+        ]
+      },
+      "status": "VERIFIED"
+    },
+    "resident": {
+      "datasetId": "OA-22183",
+      "page": {
+        "url": "https://data.seoul.go.kr/dataList/OA-22183/S/1/datasetView.do",
+        "method": "GET",
+        "fetchedAt": "2026-11-05T07:47:21.283Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 107721,
+        "sha256": "75c0b08ff17ff5df18fce4476f044fe3f2f6399a7e1d465582ee44f917bb546a",
+        "file": "2026-11-05T07-47-21-048Z/resident-page.html"
+      },
+      "annualArchives": [],
+      "latestPreview": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22183",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "",
+          "txtFilter": "",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:21.340Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 734,
+        "sha256": "dee2b2bf34803ff718b589c9bc79cb7dcd0f0fcefb53e1c6c488ff3547300b47",
+        "file": "2026-11-05T07-47-21-048Z/resident-latest-preview.txt",
+        "quarter": "20262",
+        "totalAcrossQuarters": 9350
+      },
+      "targetCount": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22183",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:21.375Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 731,
+        "sha256": "271b4362a3dd5c1417cd54dcdeec16b1fc37a8db65756d78297c08719e32831e",
+        "file": "2026-11-05T07-47-21-048Z/resident-target-count.txt",
+        "officialRows": 425,
+        "sampleQuarter": "20262"
+      },
+      "download": {
+        "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22183",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "gridTotalCnt": "425"
+        },
+        "fetchedAt": "2026-11-05T07:47:22.463Z",
+        "status": 200,
+        "contentType": "application/x-msdownload;charset=UTF-8",
+        "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ìì£¼ì¸êµ¬-íì ë).json\"",
+        "bytes": 273965,
+        "sha256": "7425d2f97af3e3c7ae0ada33c56f36dd63c0ef2d6bf0fcafbf3cfd7af620e5e3",
+        "file": "2026-11-05T07-47-21-048Z/resident-20262.json",
+        "rows": 425,
+        "targetRows": 425,
+        "uniqueTargetKeys": 425,
+        "quarters": [
+          "20262"
+        ],
+        "columns": [
+          "adstrd_cd",
+          "adstrd_cd_nm",
+          "agrde_10_repop_co",
+          "agrde_20_repop_co",
+          "agrde_30_repop_co",
+          "agrde_40_repop_co",
+          "agrde_50_repop_co",
+          "agrde_60_above_repop_co",
+          "apt_hshld_co",
+          "fag_10_repop_co",
+          "fag_20_repop_co",
+          "fag_30_repop_co",
+          "fag_40_repop_co",
+          "fag_50_repop_co",
+          "fag_60_above_repop_co",
+          "fml_repop_co",
+          "mag_10_repop_co",
+          "mag_20_repop_co",
+          "mag_30_repop_co",
+          "mag_40_repop_co",
+          "mag_50_repop_co",
+          "mag_60_above_repop_co",
+          "ml_repop_co",
+          "non_apt_hshld_co",
+          "stdr_yyqu_cd",
+          "tot_hshld_co",
+          "tot_repop_co"
+        ],
+        "duplicateTargetKeys": 0
+      },
+      "status": "VERIFIED"
+    },
+    "worker": {
+      "datasetId": "OA-22184",
+      "page": {
+        "url": "https://data.seoul.go.kr/dataList/OA-22184/S/1/datasetView.do",
+        "method": "GET",
+        "fetchedAt": "2026-11-05T07:47:26.935Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 107777,
+        "sha256": "fd231aa4bbc626ca4e79a8d7478e3a0df8641c6a342da1e3ec7ed3c715568bb8",
+        "file": "2026-11-05T07-47-21-048Z/worker-page.html"
+      },
+      "annualArchives": [],
+      "latestPreview": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22184",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "",
+          "txtFilter": "",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:26.988Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 764,
+        "sha256": "d5d126089455ddadad73a605dd404f8f82e4ea4c21230eb2124b690c7b41239c",
+        "file": "2026-11-05T07-47-21-048Z/worker-latest-preview.txt",
+        "quarter": "20262",
+        "totalAcrossQuarters": 9108
+      },
+      "targetCount": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22184",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:27.013Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 761,
+        "sha256": "0feb2ff2f3c8a7dee197c7bc7d792af164c2b384970f5802f87a697df8788529",
+        "file": "2026-11-05T07-47-21-048Z/worker-target-count.txt",
+        "officialRows": 414,
+        "sampleQuarter": "20262"
+      },
+      "download": {
+        "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22184",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "gridTotalCnt": "414"
+        },
+        "fetchedAt": "2026-11-05T07:47:28.040Z",
+        "status": 200,
+        "contentType": "application/x-msdownload;charset=UTF-8",
+        "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì§ì¥ì¸êµ¬-íì ë).json\"",
+        "bytes": 274719,
+        "sha256": "d19950077be341619a5e2d7074cca46724b2c2918879854ab3b2722a9bb7cfa8",
+        "file": "2026-11-05T07-47-21-048Z/worker-20262.json",
+        "rows": 414,
+        "targetRows": 414,
+        "uniqueTargetKeys": 414,
+        "quarters": [
+          "20262"
+        ],
+        "columns": [
+          "adstrd_cd",
+          "adstrd_cd_nm",
+          "agrde_10_wrc_popltn_co",
+          "agrde_20_wrc_popltn_co",
+          "agrde_30_wrc_popltn_co",
+          "agrde_40_wrc_popltn_co",
+          "agrde_50_wrc_popltn_co",
+          "agrde_60_above_wrc_popltn_co",
+          "fag_10_wrc_popltn_co",
+          "fag_20_wrc_popltn_co",
+          "fag_30_wrc_popltn_co",
+          "fag_40_wrc_popltn_co",
+          "fag_50_wrc_popltn_co",
+          "fag_60_above_wrc_popltn_co",
+          "fml_wrc_popltn_co",
+          "mag_10_wrc_popltn_co",
+          "mag_20_wrc_popltn_co",
+          "mag_30_wrc_popltn_co",
+          "mag_40_wrc_popltn_co",
+          "mag_50_wrc_popltn_co",
+          "mag_60_above_wrc_popltn_co",
+          "ml_wrc_popltn_co",
+          "stdr_yyqu_cd",
+          "tot_wrc_popltn_co"
+        ],
+        "duplicateTargetKeys": 0
+      },
+      "status": "VERIFIED"
+    },
+    "facility": {
+      "datasetId": "OA-22169",
+      "page": {
+        "url": "https://data.seoul.go.kr/dataList/OA-22169/S/1/datasetView.do",
+        "method": "GET",
+        "fetchedAt": "2026-11-05T07:47:26.930Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 108037,
+        "sha256": "05150c1f3d0c044fd6cf743eb2947721d4e2401451585135bae212f0a74cd669",
+        "file": "2026-11-05T07-47-21-048Z/facility-page.html"
+      },
+      "annualArchives": [],
+      "latestPreview": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22169",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "",
+          "txtFilter": "",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:26.978Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 517,
+        "sha256": "b10b79e291b5cdf8f5e637243bd689f01f0c3bc8cf5b27167ea1896a26b7720b",
+        "file": "2026-11-05T07-47-21-048Z/facility-latest-preview.txt",
+        "quarter": "20262",
+        "totalAcrossQuarters": 9350
+      },
+      "targetCount": {
+        "url": "https://data.seoul.go.kr/dataList/dataView.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22169",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "onepagerow": "1"
+        },
+        "fetchedAt": "2026-11-05T07:47:27.010Z",
+        "status": 200,
+        "contentType": "text/html;charset=UTF-8",
+        "contentDisposition": null,
+        "bytes": 514,
+        "sha256": "dbfeeaf9f981d545533bfec4058a9a76efab7676078bd9386ac2b4270c1d4b6b",
+        "file": "2026-11-05T07-47-21-048Z/facility-target-count.txt",
+        "officialRows": 425,
+        "sampleQuarter": "20262"
+      },
+      "download": {
+        "url": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+        "method": "POST",
+        "parameters": {
+          "infId": "OA-22169",
+          "srvType": "S",
+          "serviceKind": "0",
+          "pageNo": "1",
+          "ssUserId": "SAMPLE_VIEW",
+          "strWhere": "",
+          "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+          "filterCol": "STDR_YYQU_CD",
+          "txtFilter": "20262",
+          "gridTotalCnt": "425"
+        },
+        "fetchedAt": "2026-11-05T07:47:28.089Z",
+        "status": 200,
+        "contentType": "application/x-msdownload;charset=UTF-8",
+        "contentDisposition": "attachment; filename=\"ìì¸ì ìê¶ë¶ììë¹ì¤(ì§ê°ìì¤-íì ë).json\"",
+        "bytes": 177641,
+        "sha256": "54ae88593cf47834be7bf23ba5d79d3cbe1419d274e73b167425636f078b745c",
+        "file": "2026-11-05T07-47-21-048Z/facility-20262.json",
+        "rows": 425,
+        "targetRows": 425,
+        "uniqueTargetKeys": 425,
+        "quarters": [
+          "20262"
+        ],
+        "columns": [
+          "adstrd_cd",
+          "adstrd_cd_nm",
+          "arprt_co",
+          "bank_co",
+          "bus_sttn_co",
+          "bus_trminl_co",
+          "drts_co",
+          "elesch_co",
+          "gehspt_co",
+          "gnrl_hsptl_co",
+          "hgschl_co",
+          "kndrgr_co",
+          "mskul_co",
+          "parmacy_co",
+          "pblofc_co",
+          "rlroad_statn_co",
+          "stayng_fclty_co",
+          "stdr_yyqu_cd",
+          "subway_statn_co",
+          "supmk_co",
+          "theat_co",
+          "univ_co",
+          "viatr_fclty_co"
+        ],
+        "duplicateTargetKeys": 0
+      },
+      "status": "VERIFIED"
+    }
+  },
+  "limits": {
+    "storeTotalCountIsObservedOnly": true,
+    "verifiedStorePartitions": 3,
+    "expectedSourceIndustries": 100,
+    "fullStoreCollectionPerformed": false,
+    "numericQualityAuditPerformed": false,
+    "databaseLoaded": false,
+    "springDownloaderImplemented": false
+  },
+  "archiveEncodingObservation": "Strict UTF-8 decoding failed; EUC-KR-compatible decoding succeeded. Exact EUC-KR/MS949 distinction is not established."
+}
