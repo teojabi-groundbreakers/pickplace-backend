@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "purpose": "T12 step 1 research reference and observed evidence; the CLI reads the separate execution catalog",
+  "executionCatalog": "src/main/resources/data-download/source-catalog.json",
+  "verifiedAt": "2026-11-05T07:47:21.050Z",
+  "bootstrapQuarter": "20262",
+  "scope": {
+    "initial": [
+      "STORE",
+      "RESIDENT",
+      "WORKER",
+      "FACILITY"
+    ],
+    "deferred": [
+      "SALES",
+      "FLOW"
+    ],
+    "bootstrapOnly": true,
+    "fullEightQuarterCollection": false
+  },
+  "transport": {
+    "method": "POST",
+    "bodyEncoding": "application/x-www-form-urlencoded",
+    "authentication": "No private API key used in this route probe; SAMPLE_VIEW is the public sheet request value"
+  },
+  "endpoints": {
+    "sheetDownload": "https://datafile.seoul.go.kr/bigfile/iot/sheet/json/download.do",
+    "previewAndCount": "https://data.seoul.go.kr/dataList/dataView.do",
+    "annualArchive": "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false"
+  },
+  "requestDefaults": {
+    "srvType": "S",
+    "serviceKind": "0",
+    "pageNo": "1",
+    "ssUserId": "SAMPLE_VIEW",
+    "strWhere": ""
+  },
+  "format": {
+    "sheetDownload": {
+      "encoding": "UTF-8",
+      "descriptionField": "DESCRIPTION",
+      "dataField": "DATA",
+      "rowKeyCase": "lowercase",
+      "observedContentType": "application/x-msdownload;charset=UTF-8",
+      "requireBodyValidation": true
+    },
+    "previewAndCount": {
+      "wireFormat": "JAVASCRIPT_OBJECT_LITERAL",
+      "strictJson": false,
+      "resultField": "result",
+      "successValue": "ok",
+      "totalCountField": "page.totalCount",
+      "rowsField": "list",
+      "rowKeyCase": "UPPERCASE",
+      "productionParserImplemented": false
+    }
+  },
+  "datasets": [
+    {
+      "datasetCode": "STORE",
+      "datasetId": "OA-22172",
+      "displayName": "점포-행정동",
+      "logicalKey": [
+        "STDR_YYQU_CD",
+        "ADSTRD_CD",
+        "SVC_INDUTY_CD"
+      ],
+      "primaryMetric": "SIMILR_INDUTY_STOR_CO",
+      "strategy": "SHEET_INDUSTRY_PARTITION",
+      "filterCol": "SVC_INDUTY_CD",
+      "filterValue": "{businessTypeCode}",
+      "orderBy": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD",
+      "pageUrl": "https://data.seoul.go.kr/dataList/OA-22172/S/1/datasetView.do",
+      "request": {
+        "infId": "OA-22172",
+        "filterCol": "SVC_INDUTY_CD",
+        "txtFilter": "{businessTypeCode}",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD, SVC_INDUTY_CD"
+      },
+      "acceptance": {
+        "returnedQuarter": "Keep all received quarters in raw; require requested quarter to exist and extract only for verification/T13",
+        "returnedIndustry": "All rows must match the requested industry partition",
+        "requireUniqueTargetKeys": true,
+        "officialCount": "Query for each collection run; the observed count below is evidence, not a fixed invariant"
+      },
+      "observed": {
+        "quarter": "20262",
+        "latestPreviewQuarter": "20262",
+        "officialQuarterRows": 35301,
+        "verifiedPartitionCount": 3,
+        "requiredPartitionCount": 100,
+        "fullCollectionVerified": false,
+        "partitions": [
+          {
+            "industryCode": "CS100010",
+            "targetRows": 425,
+            "rawRows": 2550,
+            "rawQuarters": [
+              "20251",
+              "20252",
+              "20253",
+              "20254",
+              "20261",
+              "20262"
+            ],
+            "duplicateTargetKeys": 0
+          },
+          {
+            "industryCode": "CS100008",
+            "targetRows": 425,
+            "rawRows": 2550,
+            "rawQuarters": [
+              "20251",
+              "20252",
+              "20253",
+              "20254",
+              "20261",
+              "20262"
+            ],
+            "duplicateTargetKeys": 0
+          },
+          {
+            "industryCode": "CS100005",
+            "targetRows": 421,
+            "rawRows": 2531,
+            "rawQuarters": [
+              "20251",
+              "20252",
+              "20253",
+              "20254",
+              "20261",
+              "20262"
+            ],
+            "duplicateTargetKeys": 0
+          }
+        ]
+      }
+    },
+    {
+      "datasetCode": "RESIDENT",
+      "datasetId": "OA-22183",
+      "displayName": "상주인구-행정동",
+      "logicalKey": [
+        "STDR_YYQU_CD",
+        "ADSTRD_CD"
+      ],
+      "primaryMetric": "TOT_REPOP_CO",
+      "strategy": "SHEET_QUARTER_FILTER",
+      "filterCol": "STDR_YYQU_CD",
+      "filterValue": "{quarter}",
+      "orderBy": "STDR_YYQU_CD DESC, ADSTRD_CD",
+      "pageUrl": "https://data.seoul.go.kr/dataList/OA-22183/S/1/datasetView.do",
+      "request": {
+        "infId": "OA-22183",
+        "filterCol": "STDR_YYQU_CD",
+        "txtFilter": "{quarter}",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+        "gridTotalCnt": "{officialQuarterCount}"
+      },
+      "acceptance": {
+        "returnedQuarter": "All returned rows must match requested quarter",
+        "returnedIndustry": null,
+        "requireUniqueTargetKeys": true,
+        "officialCount": "Query for each collection run; the observed count below is evidence, not a fixed invariant"
+      },
+      "observed": {
+        "quarter": "20262",
+        "latestPreviewQuarter": "20262",
+        "officialQuarterRows": 425,
+        "downloadedRows": 425,
+        "uniqueTargetKeys": 425,
+        "sha256": "7425d2f97af3e3c7ae0ada33c56f36dd63c0ef2d6bf0fcafbf3cfd7af620e5e3"
+      }
+    },
+    {
+      "datasetCode": "WORKER",
+      "datasetId": "OA-22184",
+      "displayName": "직장인구-행정동",
+      "logicalKey": [
+        "STDR_YYQU_CD",
+        "ADSTRD_CD"
+      ],
+      "primaryMetric": "TOT_WRC_POPLTN_CO",
+      "strategy": "SHEET_QUARTER_FILTER",
+      "filterCol": "STDR_YYQU_CD",
+      "filterValue": "{quarter}",
+      "orderBy": "STDR_YYQU_CD DESC, ADSTRD_CD",
+      "pageUrl": "https://data.seoul.go.kr/dataList/OA-22184/S/1/datasetView.do",
+      "request": {
+        "infId": "OA-22184",
+        "filterCol": "STDR_YYQU_CD",
+        "txtFilter": "{quarter}",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+        "gridTotalCnt": "{officialQuarterCount}"
+      },
+      "acceptance": {
+        "returnedQuarter": "All returned rows must match requested quarter",
+        "returnedIndustry": null,
+        "requireUniqueTargetKeys": true,
+        "officialCount": "Query for each collection run; the observed count below is evidence, not a fixed invariant"
+      },
+      "observed": {
+        "quarter": "20262",
+        "latestPreviewQuarter": "20262",
+        "officialQuarterRows": 414,
+        "downloadedRows": 414,
+        "uniqueTargetKeys": 414,
+        "sha256": "d19950077be341619a5e2d7074cca46724b2c2918879854ab3b2722a9bb7cfa8"
+      }
+    },
+    {
+      "datasetCode": "FACILITY",
+      "datasetId": "OA-22169",
+      "displayName": "집객시설-행정동",
+      "logicalKey": [
+        "STDR_YYQU_CD",
+        "ADSTRD_CD"
+      ],
+      "primaryMetric": "VIATR_FCLTY_CO",
+      "strategy": "SHEET_QUARTER_FILTER",
+      "filterCol": "STDR_YYQU_CD",
+      "filterValue": "{quarter}",
+      "orderBy": "STDR_YYQU_CD DESC, ADSTRD_CD",
+      "pageUrl": "https://data.seoul.go.kr/dataList/OA-22169/S/1/datasetView.do",
+      "request": {
+        "infId": "OA-22169",
+        "filterCol": "STDR_YYQU_CD",
+        "txtFilter": "{quarter}",
+        "strOrderby": "STDR_YYQU_CD DESC, ADSTRD_CD",
+        "gridTotalCnt": "{officialQuarterCount}"
+      },
+      "acceptance": {
+        "returnedQuarter": "All returned rows must match requested quarter",
+        "returnedIndustry": null,
+        "requireUniqueTargetKeys": true,
+        "officialCount": "Query for each collection run; the observed count below is evidence, not a fixed invariant"
+      },
+      "observed": {
+        "quarter": "20262",
+        "latestPreviewQuarter": "20262",
+        "officialQuarterRows": 425,
+        "downloadedRows": 425,
+        "uniqueTargetKeys": 425,
+        "sha256": "54ae88593cf47834be7bf23ba5d79d3cbe1419d274e73b167425636f078b745c"
+      }
+    }
+  ],
+  "storePartitionUniverse": {
+    "source": "src/main/resources/reference-data/seoul-reference.json#/businessTypes",
+    "expectedSourceIndustries": 100,
+    "useSupportedFlagFilter": false,
+    "serviceSupportedIndustries": 3,
+    "completion": "Collect all source-industry partitions, then compare total target rows and unique target keys against the official target-quarter count"
+  },
+  "storeAnnualArchive": {
+    "routeRole": "2024/2025 historical quarters; not a 2026 archive fallback",
+    "discovery": "Read frmFile inputs and match the official page fileName for the requested year; discover seq and infSeq dynamically",
+    "observedFile2025": "서울시 상권분석서비스(점포-행정동)_2025년.zip",
+    "probe2025": {
+      "verified": true,
+      "bytes": 1073668,
+      "sha256": "1eb65713ac04861ac54a765984e9a9072e55288fd1c715409f3cce22782d2e69",
+      "parametersObservedOnly": {
+        "infId": "OA-22172",
+        "seqNo": "",
+        "seq": "7",
+        "infSeq": "3"
+      },
+      "entries": [
+        {
+          "name": "서울시 상권분석서비스(점포-행정동)_2025년.csv",
+          "bytes": 11525299
+        }
+      ],
+      "csvEncodingObservation": "Strict UTF-8 decoding failed; EUC-KR-compatible decoding succeeded. Exact EUC-KR/MS949 distinction is not established."
+    },
+    "archive2024": "Listed on the current official page; content was verified historically on 2026-10-16, not redownloaded in this step",
+    "csvFieldMapping": {
+      "점포_수": "STOR_CO",
+      "유사_업종_점포_수": "SIMILR_INDUTY_STOR_CO",
+      "프랜차이즈_점포_수": "FRC_STOR_CO"
+    }
+  },
+  "storage": {
+    "plannedRoot": "data/raw",
+    "commitRawData": false,
+    "preserveOriginalBytes": true
+  },
+  "implementationBoundary": {
+    "step1": "Dataset/route decisions and live probe evidence only",
+    "step2": "Manual command and binding of collection configuration",
+    "step3": "Production downloader/storage implementation",
+    "qualityParsing": "T13",
+    "databaseLoadingAndPublication": "T14"
+  }
+}

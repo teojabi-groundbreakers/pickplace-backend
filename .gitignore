@@ -40,3 +40,6 @@ out/
 .env
 .env.*
 !.env.example
+
+# Public-data raw downloads (metadata and fixtures live under docs/src instead)
+/data/raw/
