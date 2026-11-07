@@ -10,7 +10,7 @@
 | --- | --- |
 | 처음 서버·DB 실행 | [단계별 실행 안내](docs/getting-started.md) |
 | FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
-| 공공데이터 수집 | [수집 계획 확인·상주인구 원본 다운로드](docs/data/public-data-command.md) |
+| 공공데이터 수집 | [수집 계획 확인·인구·시설 원본 다운로드](docs/data/public-data-command.md) |
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
 
 <a id="설계-문서"></a>
@@ -25,7 +25,7 @@
 - [V1 마이그레이션](src/main/resources/db/migration/V1__create_reference_tables.sql): 실제 테이블 생성의 기준입니다.
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
 - [공공데이터 수집 대상·다운로드 경로](docs/data/public-data-sources.md): T12 초기 4종·수집 설정·실제 요청 검증 결과.
-- [공공데이터 수동 CLI](docs/data/public-data-command.md): 수집 계획과 2026년 2분기 상주인구 원본·메타데이터 저장.
+- [공공데이터 수동 CLI](docs/data/public-data-command.md): 수집 계획과 2026년 2분기 상주인구·직장인구·시설 원본 및 메타데이터 저장.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
 - [FE·BE 통합 API 명세 v0.2](docs/api/fe-be-contract.md): 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안.

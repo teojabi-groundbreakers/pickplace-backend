@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.pickplace.backend.ingestion.download.model.DownloadPlan;
+import com.pickplace.backend.ingestion.download.model.SourceCatalog;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
@@ -33,12 +35,15 @@ import tools.jackson.databind.json.JsonMapper;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 // 공식 건수와 원본을 대조한 뒤 한 묶음으로 보관한다.
-public class ResidentDownloadService {
+public class QuarterDownloadService {
 
 	private static final int MAX_ATTEMPTS = 3;
 	private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(25);
 	private static final long MAX_RESPONSE_BYTES = 8L * 1024 * 1024;
-	private static final String RAW_FILE = "resident.json";
+	private static final Map<String, String> PRIMARY_FIELDS = Map.of(
+			"RESIDENT", "tot_repop_co",
+			"WORKER", "tot_wrc_popltn_co",
+			"FACILITY", "viatr_fclty_co");
 	private static final String METADATA_FILE = "metadata.json";
 
 	private final JsonMapper mapper;
@@ -47,11 +52,18 @@ public class ResidentDownloadService {
 			.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
 			.build();
 
-	public ResidentDownloadService(JsonMapper mapper) {
+	public QuarterDownloadService(JsonMapper mapper) {
 		this.mapper = mapper;
 	}
 
+	public static boolean supports(String dataset) {
+		return PRIMARY_FIELDS.containsKey(dataset);
+	}
+
 	public Result download(DownloadPlan plan) throws IOException, InterruptedException {
+		if (!supports(plan.dataset()) || plan.strategy() != SourceCatalog.Strategy.SHEET_QUARTER_FILTER) {
+			throw new IllegalArgumentException("분기별 다운로드는 RESIDENT·WORKER·FACILITY를 지원합니다.");
+		}
 		try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
 			var countResponse = post(client, "공식 총건수 조회", plan.countRequest());
 			int officialCount = officialCount(countResponse.body(), plan.quarter());
@@ -61,10 +73,10 @@ public class ResidentDownloadService {
 			parameters.put("gridTotalCnt", Integer.toString(officialCount));
 			var downloadRequest = new DownloadPlan.Request(
 					template.method(), template.url(), template.contentType(), parameters);
-			var response = post(client, "상주인구 원본 다운로드", downloadRequest);
+			var response = post(client, plan.dataset() + " 원본 다운로드", downloadRequest);
 			Instant collectedAt = Instant.now();
 			byte[] raw = response.body();
-			int rows = validateRows(raw, plan.quarter(), officialCount);
+			int rows = validateRows(raw, plan.quarter(), officialCount, PRIMARY_FIELDS.get(plan.dataset()));
 			return save(plan, downloadRequest, collectedAt, raw, officialCount, rows);
 		}
 	}
@@ -86,7 +98,7 @@ public class ResidentDownloadService {
 		return count.asInt();
 	}
 
-	private int validateRows(byte[] raw, String quarter, int officialCount) throws IOException {
+	private int validateRows(byte[] raw, String quarter, int officialCount, String primaryField) throws IOException {
 		JsonNode document = mapper.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).readTree(raw);
 		JsonNode rows = document.path("DATA");
 		if (!document.path("DESCRIPTION").isObject() || !rows.isArray()) {
@@ -98,6 +110,10 @@ public class ResidentDownloadService {
 		}
 		var dongs = new HashSet<String>();
 		for (JsonNode row : rows) {
+			// 데이터 종류를 식별하는 필드를 확인하고 숫자 정제는 후속 단계에서 처리한다.
+			if (!row.has(primaryField)) {
+				throw new IOException("원본에 해당 데이터의 필수 필드가 없습니다: " + primaryField);
+			}
 			String dong = row.path("adstrd_cd").asString();
 			if (!quarter.equals(row.path("stdr_yyqu_cd").asString())
 					|| dong == null || !dong.matches("[0-9]{8}") || !dongs.add(dong)) {
@@ -163,27 +179,29 @@ public class ResidentDownloadService {
 	private Result save(DownloadPlan plan, DownloadPlan.Request downloadRequest, Instant collectedAt,
 			byte[] raw, int officialCount, int rows) throws IOException {
 		String checksum = sha256(raw);
+		String directory = plan.dataset().toLowerCase(Locale.ROOT);
+		String rawFile = directory + ".json";
 		var metadata = new Metadata(plan.dataset(), plan.sourceId(), plan.quarter(), collectedAt.toString(),
-				RAW_FILE, officialCount, rows, raw.length, checksum, plan.countRequest(), downloadRequest);
-		Path parent = Files.createDirectories(Path.of(plan.outputDirectory()).resolve("resident").resolve(plan.quarter()));
+				rawFile, officialCount, rows, raw.length, checksum, plan.countRequest(), downloadRequest);
+		Path parent = Files.createDirectories(Path.of(plan.outputDirectory()).resolve(directory).resolve(plan.quarter()));
 		Path destination = parent.resolve(UUID.randomUUID().toString());
 		Path staging = Files.createTempDirectory(parent, ".pending-");
 		try {
-			Files.write(staging.resolve(RAW_FILE), raw);
+			Files.write(staging.resolve(rawFile), raw);
 			Files.write(staging.resolve(METADATA_FILE), mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(metadata));
 			// 두 파일을 모두 저장한 뒤 수집 폴더를 한 번에 확정한다.
 			Files.move(staging, destination, StandardCopyOption.ATOMIC_MOVE);
 		} catch (IOException | RuntimeException exception) {
 			try {
 				Files.deleteIfExists(staging.resolve(METADATA_FILE));
-				Files.deleteIfExists(staging.resolve(RAW_FILE));
+				Files.deleteIfExists(staging.resolve(rawFile));
 				Files.deleteIfExists(staging);
 			} catch (IOException cleanupError) {
 				exception.addSuppressed(cleanupError);
 			}
 			throw exception;
 		}
-		return new Result("DOWNLOADED", destination.resolve(RAW_FILE).toString(),
+		return new Result("DOWNLOADED", destination.resolve(rawFile).toString(),
 				destination.resolve(METADATA_FILE).toString(), officialCount, rows, checksum);
 	}
 

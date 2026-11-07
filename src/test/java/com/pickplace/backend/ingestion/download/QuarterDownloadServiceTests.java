@@ -13,13 +13,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.pickplace.backend.ingestion.download.model.DownloadPlan;
 import com.pickplace.backend.ingestion.download.model.SourceCatalog;
-import com.pickplace.backend.ingestion.download.service.ResidentDownloadService;
+import com.pickplace.backend.ingestion.download.service.QuarterDownloadService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -27,12 +28,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ResidentDownloadServiceTests {
+class QuarterDownloadServiceTests {
 
 	private static final String PREVIEW =
 			"{result:\"ok\",page:{totalCount:1},list:[{STDR_YYQU_CD:\"20262\"},]}";
 	private static final String RAW =
-			"{\"DESCRIPTION\":{},\"DATA\":[{\"stdr_yyqu_cd\":\"20262\",\"adstrd_cd\":\"11110515\"}]}\n";
+			"{\"DESCRIPTION\":{},\"DATA\":[{\"stdr_yyqu_cd\":\"20262\",\"adstrd_cd\":\"11110515\",\"tot_repop_co\":\"10\"}]}\n";
 
 	@TempDir
 	Path temporaryDirectory;
@@ -54,7 +55,7 @@ class ResidentDownloadServiceTests {
 		});
 		server.start();
 		try {
-			var service = new ResidentDownloadService(mapper);
+			var service = new QuarterDownloadService(mapper);
 			var result = service.download(plan(server));
 			Path rawFile = Path.of(result.rawFile());
 			var metadata = mapper.readTree(Files.readAllBytes(Path.of(result.metadataFile())));
@@ -80,7 +81,7 @@ class ResidentDownloadServiceTests {
 	@ValueSource(strings = {
 			"<html>error</html>",
 			"{\"DESCRIPTION\":{},\"DATA\":[]}",
-			"{\"DESCRIPTION\":{},\"DATA\":[{\"stdr_yyqu_cd\":\"20261\",\"adstrd_cd\":\"11110515\"}]}",
+			"{\"DESCRIPTION\":{},\"DATA\":[{\"stdr_yyqu_cd\":\"20261\",\"adstrd_cd\":\"11110515\",\"tot_repop_co\":\"10\"}]}",
 			RAW + "{}"
 	})
 	void rejectsInvalidDownloadsWithoutPublishingFiles(String body) throws Exception {
@@ -88,7 +89,7 @@ class ResidentDownloadServiceTests {
 		server.createContext("/download", exchange -> respond(exchange, 200, body));
 		server.start();
 		try {
-			assertThatThrownBy(() -> new ResidentDownloadService(mapper).download(plan(server)))
+			assertThatThrownBy(() -> new QuarterDownloadService(mapper).download(plan(server)))
 					.isInstanceOfAny(IOException.class, JacksonException.class);
 			assertThat(temporaryDirectory.resolve("raw")).doesNotExist();
 		} finally {
@@ -106,9 +107,58 @@ class ResidentDownloadServiceTests {
 		});
 		server.start();
 		try {
-			assertThatThrownBy(() -> new ResidentDownloadService(mapper).download(plan(server)))
+			assertThatThrownBy(() -> new QuarterDownloadService(mapper).download(plan(server)))
 					.isInstanceOf(IOException.class).hasMessageContaining("기준 분기");
 			assertThat(downloadCalls.get()).isZero();
+			assertThat(temporaryDirectory.resolve("raw")).doesNotExist();
+		} finally {
+			server.stop(0);
+		}
+	}
+
+	@ParameterizedTest
+	@CsvSource({"WORKER, OA-22184, tot_wrc_popltn_co, worker", "FACILITY, OA-22169, viatr_fclty_co, facility"})
+	void savesEachDatasetWithItsOwnFileAndSource(String dataset, String source, String field, String directory)
+			throws Exception {
+		String raw = RAW.replace("tot_repop_co", field);
+		var countForm = new AtomicReference<String>();
+		var downloadForm = new AtomicReference<String>();
+		HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+		server.createContext("/count", exchange -> {
+			countForm.set(new String(exchange.getRequestBody().readAllBytes(), UTF_8));
+			respond(exchange, 200, PREVIEW);
+		});
+		server.createContext("/download", exchange -> {
+			downloadForm.set(new String(exchange.getRequestBody().readAllBytes(), UTF_8));
+			respond(exchange, 200, raw);
+		});
+		server.start();
+		try {
+			var result = new QuarterDownloadService(mapper).download(plan(server, dataset, source));
+			Path file = Path.of(result.rawFile());
+			assertThat(file.getFileName().toString()).isEqualTo(directory + ".json");
+			assertThat(file.getParent().getParent().getParent().getFileName().toString()).isEqualTo(directory);
+			assertThat(Files.readAllBytes(file)).isEqualTo(raw.getBytes(UTF_8));
+			var metadata = mapper.readTree(Files.readAllBytes(Path.of(result.metadataFile())));
+			assertThat(metadata.path("dataset").asString()).isEqualTo(dataset);
+			assertThat(metadata.path("sourceId").asString()).isEqualTo(source);
+			assertThat(metadata.path("rows").asInt()).isEqualTo(1);
+			assertThat(countForm.get()).contains("infId=" + source);
+			assertThat(downloadForm.get()).contains("infId=" + source, "gridTotalCnt=1");
+		} finally {
+			server.stop(0);
+		}
+	}
+
+	@Test
+	void rejectsOtherDatasetPayloadBeforeWritingFiles() throws Exception {
+		HttpServer server = server(PREVIEW);
+		server.createContext("/download", exchange -> respond(exchange, 200, RAW));
+		server.start();
+		try {
+			assertThatThrownBy(() -> new QuarterDownloadService(mapper)
+					.download(plan(server, "WORKER", "OA-22184")))
+					.isInstanceOf(IOException.class).hasMessageContaining("tot_wrc_popltn_co");
 			assertThat(temporaryDirectory.resolve("raw")).doesNotExist();
 		} finally {
 			server.stop(0);
@@ -122,13 +172,17 @@ class ResidentDownloadServiceTests {
 	}
 
 	private DownloadPlan plan(HttpServer server) {
+		return plan(server, "RESIDENT", "OA-22183");
+	}
+
+	private DownloadPlan plan(HttpServer server, String dataset, String source) {
 		String base = "http://127.0.0.1:" + server.getAddress().getPort();
 		String form = "application/x-www-form-urlencoded";
-		return new DownloadPlan("PLANNED", "PLAN_ONLY", "", "RESIDENT", "OA-22183", "20262",
+		return new DownloadPlan("PLANNED", "PLAN_ONLY", "", dataset, source, "20262",
 				temporaryDirectory.resolve("raw").toString(), SourceCatalog.Strategy.SHEET_QUARTER_FILTER,
-				1, null, null, new DownloadPlan.Request("POST", base + "/count", form, Map.of()),
+				1, null, null, new DownloadPlan.Request("POST", base + "/count", form, Map.of("infId", source)),
 				new DownloadPlan.Request("POST", base + "/download", form,
-						Map.of("gridTotalCnt", "{officialQuarterCount}")), List.of("officialQuarterCount"), 0, 0);
+						Map.of("infId", source, "gridTotalCnt", "{officialQuarterCount}")), List.of("officialQuarterCount"), 0, 0);
 	}
 
 	private void respond(HttpExchange exchange, int status, String body) throws IOException {

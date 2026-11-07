@@ -1,8 +1,8 @@
 # 공공데이터 수동 CLI
 
-> T12 · 수집 계획 확인과 2026년 2분기 상주인구 원본 수집
+> T12 · 수집 계획 확인과 2026년 2분기 상주인구·직장인구·시설 원본 수집
 >
-> 기본 실행은 계획만 출력한다. `--download`를 지정하면 상주인구 원본과 메타데이터를 저장한다. 두 모드 모두 웹 서버·DB·Flyway 없이 실행한다.
+> 기본 실행은 계획만 출력한다. `--download`를 지정하면 선택 데이터의 원본과 메타데이터를 저장한다. 두 모드 모두 웹 서버·DB·Flyway 없이 실행한다.
 
 ## 실행
 
@@ -12,6 +12,13 @@
 
 ```cmd
 gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=RESIDENT --quarter=20262 --output=data/raw --download"
+```
+
+직장인구와 시설도 같은 옵션으로 실행한다.
+
+```cmd
+gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=WORKER --quarter=20262 --output=data/raw --download"
+gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=FACILITY --quarter=20262 --output=data/raw --download"
 ```
 
 상주인구 수집 계획만 확인하는 명령이다.
@@ -43,7 +50,7 @@ java -jar build/libs/pickplace-backend-0.2.0.jar --spring.profiles.active=data-d
 | quarter | 필수 | YYYYQ 형식과 실행 카탈로그의 지원 분기 검사. 초기 범위는 20262 |
 | output | 기본 data/raw | 절대 경로로 정규화. 실제 수집이 검증을 통과하면 저장 경로 생성 |
 | plan-only | 선택 플래그 | 값을 받지 않음. 실행 모드 옵션을 생략해도 PLAN_ONLY |
-| download | 선택 플래그 | 값을 받지 않음. RESIDENT 20262만 지원하며 plan-only와 함께 지정할 수 없음 |
+| download | 선택 플래그 | 값을 받지 않음. RESIDENT / WORKER / FACILITY를 지원하며 plan-only와 함께 지정할 수 없음 |
 
 형식상 유효해도 초기 수집 경로를 설정하지 않은 분기는 거부한다. 예를 들어 점포 20243을 2026년용 업종 분할 경로로 잘못 계획하지 않는다. 과거 연도 ZIP과 신규 분기는 경로를 검증·설정한 뒤 확장한다. 다른 분기에 원천 데이터가 없다는 뜻은 아니다.
 
@@ -83,14 +90,17 @@ officialQuarterCount는 실제 조회 전이므로 425·414 같은 과거 관찰
 
 ## 원본과 메타데이터
 
-`--download`는 공식 분기 총건수를 조회해 `gridTotalCnt`를 채운 뒤 원본을 요청한다. 원본의 JSON 구조, 행 수, 기준 분기, 행정동 코드 형식과 중복 여부를 검사한다.
+`--download`는 공식 분기 총건수를 조회해 `gridTotalCnt`를 채운 뒤 원본을 요청한다. 원본의 JSON 구조, 행 수, 기준 분기, 행정동 코드 형식과 중복 여부를 검사한다. 선택 데이터의 핵심 필드 존재 여부도 확인한다. 숫자 정제와 지표 계산은 T13에서 처리한다.
 
-검증을 통과하면 `<output>/resident/20262/<수집 ID>/`에 아래 두 파일을 저장한다.
+검증을 통과하면 `<output>/<데이터 종류 소문자>/<분기>/<수집 ID>/`에 원본과 `metadata.json`을 저장한다. 메타데이터에는 원천 ID, 요청 주소와 조건, 수집 시각(UTC), 공식·실제 행 수, 바이트 수, SHA-256을 기록한다.
 
-| 파일 | 내용 |
-|---|---|
-| `resident.json` | 서울시 서버에서 받은 원본 바이트 |
-| `metadata.json` | 원천 ID, 요청 주소와 조건, 수집 시각(UTC), 공식·실제 행 수, 바이트 수, SHA-256 |
+| 데이터 | 원천 ID | 원본 파일 | 핵심 필드 |
+|---|---|---|---|
+| 상주인구 | OA-22183 | `resident.json` | `tot_repop_co` |
+| 직장인구 | OA-22184 | `worker.json` | `tot_wrc_popltn_co` |
+| 시설 | OA-22169 | `facility.json` | `viatr_fclty_co` |
+
+행 수는 매번 조회한 공식 분기 총건수와 비교한다. 직장인구를 포함해 데이터별 건수가 다를 수 있으므로 425행을 고정 조건으로 사용하지 않는다.
 
 두 파일을 임시 폴더에 기록한 뒤 폴더를 한 번에 확정한다. 성공 시 `DOWNLOADED`와 두 파일의 절대경로를 출력한다. 다시 실행하면 새로운 수집 폴더를 만든다. 기본 경로인 `data/raw/`는 Git에서 제외한다.
 
@@ -126,7 +136,7 @@ PickplaceBackendApplication
   → SourceCatalogLoader: 실행 카탈로그·필요한 업종 목록 읽기
   → DownloadPlanService: 요청 조건 조합
   → 기본 모드: PLANNED JSON 출력
-  → --download: ResidentDownloadService에서 총건수 조회 → 원본 다운로드
+  → --download: QuarterDownloadService에서 총건수 조회 → 원본 다운로드
                 → 검증 → 원본·메타데이터 저장 → DOWNLOADED JSON 출력
 ```
 
@@ -136,15 +146,25 @@ PickplaceBackendApplication
 
 ```cmd
 gradlew.bat test --tests "*DataDownload*"
-gradlew.bat test --tests "*ResidentDownloadServiceTests"
+gradlew.bat test --tests "*QuarterDownloadServiceTests"
 gradlew.bat clean build
 ```
 
 CLI 전용 테스트는 Docker 없이 실행된다. 전체 빌드는 기존 DB 통합 테스트를 포함하므로 Docker가 필요하다.
 
-CLI 테스트는 입력 검증과 독립 기동을 검사한다. 상주인구 서비스 테스트는 로컬 HTTP 응답으로 일시 오류 재시도, 원본과 메타데이터의 일치, 잘못된 응답에서 파일 저장이 차단되는지 확인한다.
+CLI 테스트는 입력 검증과 독립 기동을 검사한다. 분기별 서비스 테스트는 로컬 HTTP 응답으로 일시 오류 재시도, 원본과 메타데이터의 일치, 데이터별 요청·저장 경로, 다른 데이터의 응답을 받았을 때 저장이 차단되는지 확인한다.
 
-### 2026-11-07 상주인구 수집 확인
+### 2026-11-07 분기별 3종 수집 확인
+
+| 데이터 | 공식 행 수 | 원본·고유 행정동 수 | 원본·메타데이터 체크섬 |
+|---|---|---|---|
+| 상주인구 | 425 | 425 | 일치 |
+| 직장인구 | 414 | 414 | 일치 |
+| 시설 | 425 | 425 | 일치 |
+
+공통화한 서비스로 빌드한 JAR의 CLI를 실행해 세 데이터를 실제 수집했다. 전체 build는 157건 통과, 실패·오류·건너뜀 0건이다. 수집 관련 테스트는 CLI 33건과 서비스 9건으로 총 42건이다.
+
+### 상주인구 최초 수집 기록
 
 | 항목 | 결과 |
 |---|---|
