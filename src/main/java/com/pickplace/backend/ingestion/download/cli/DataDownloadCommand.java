@@ -17,6 +17,7 @@ import com.pickplace.backend.ingestion.download.model.DownloadRequest;
 import com.pickplace.backend.ingestion.download.service.DownloadPlanService;
 import com.pickplace.backend.ingestion.download.service.QuarterDownloadService;
 import com.pickplace.backend.ingestion.download.service.SourceCatalogLoader;
+import com.pickplace.backend.ingestion.download.service.StoreDownloadService;
 
 // 수집 계획 확인과 실제 다운로드를 연결한다.
 public final class DataDownloadCommand {
@@ -46,10 +47,16 @@ public final class DataDownloadCommand {
 		var mapper = JsonMapper.builder().build();
 		try {
 			var loader = new SourceCatalogLoader(mapper);
-			var plan = new DownloadPlanService(loader.load(), loader).plan(input.request());
+			var catalog = loader.load();
+			var plan = new DownloadPlanService(catalog, loader).plan(input.request());
 			var writer = mapper.writerWithDefaultPrettyPrinter();
 			if (input.download()) {
-				var result = new QuarterDownloadService(mapper).download(plan);
+				Object result;
+				if ("STORE".equals(plan.dataset())) {
+					result = new StoreDownloadService(mapper).download(plan, loader.loadIndustryCodes(catalog), error);
+				} else {
+					result = new QuarterDownloadService(mapper).download(plan);
+				}
 				output.println(writer.writeValueAsString(result));
 			} else {
 				output.println(writer.writeValueAsString(plan));
@@ -97,8 +104,8 @@ public final class DataDownloadCommand {
 		String directory = value(arguments, "output", "data/raw");
 		try {
 			var request = new DownloadRequest(dataset, quarter, Path.of(directory));
-			if (download && !QuarterDownloadService.supports(request.dataset())) {
-				throw new IllegalArgumentException("실제 다운로드는 RESIDENT·WORKER·FACILITY를 지원합니다.");
+			if (download && !"STORE".equals(request.dataset()) && !QuarterDownloadService.supports(request.dataset())) {
+				throw new IllegalArgumentException("실제 다운로드는 STORE·RESIDENT·WORKER·FACILITY를 지원합니다.");
 			}
 			return new CommandInput(request, download);
 		} catch (InvalidPathException exception) {

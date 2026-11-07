@@ -1,6 +1,6 @@
 # 공공데이터 수동 CLI
 
-> T12 · 수집 계획 확인과 2026년 2분기 상주인구·직장인구·시설 원본 수집
+> T12 · 2026년 2분기 핵심 4종 수집과 원본 보관
 >
 > 기본 실행은 계획만 출력한다. `--download`를 지정하면 선택 데이터의 원본과 메타데이터를 저장한다. 두 모드 모두 웹 서버·DB·Flyway 없이 실행한다.
 
@@ -19,6 +19,12 @@ gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=RES
 ```cmd
 gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=WORKER --quarter=20262 --output=data/raw --download"
 gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=FACILITY --quarter=20262 --output=data/raw --download"
+```
+
+점포는 전체 원천 100업종을 순서대로 수집한다.
+
+```cmd
+gradlew.bat bootRun --args="--spring.profiles.active=data-download --dataset=STORE --quarter=20262 --output=data/raw --download"
 ```
 
 상주인구 수집 계획만 확인하는 명령이다.
@@ -48,9 +54,9 @@ java -jar build/libs/pickplace-backend-0.2.0.jar --spring.profiles.active=data-d
 | spring.profiles.active | data-download | 다른 프로필과 혼합하지 않음. 환경변수 SPRING_PROFILES_ACTIVE로도 지정 가능 |
 | dataset | 필수 | STORE / RESIDENT / WORKER / FACILITY. 소문자는 대문자로 정규화 |
 | quarter | 필수 | YYYYQ 형식과 실행 카탈로그의 지원 분기 검사. 초기 범위는 20262 |
-| output | 기본 data/raw | 절대 경로로 정규화. 실제 수집이 검증을 통과하면 저장 경로 생성 |
+| output | 기본 data/raw | 절대 경로로 정규화. 점포는 수집 시작부터 임시 폴더에 원본과 상태 기록 |
 | plan-only | 선택 플래그 | 값을 받지 않음. 실행 모드 옵션을 생략해도 PLAN_ONLY |
-| download | 선택 플래그 | 값을 받지 않음. RESIDENT / WORKER / FACILITY를 지원하며 plan-only와 함께 지정할 수 없음 |
+| download | 선택 플래그 | 값을 받지 않음. STORE / RESIDENT / WORKER / FACILITY 지원. plan-only와 함께 지정할 수 없음 |
 
 형식상 유효해도 초기 수집 경로를 설정하지 않은 분기는 거부한다. 예를 들어 점포 20243을 2026년용 업종 분할 경로로 잘못 계획하지 않는다. 과거 연도 ZIP과 신규 분기는 경로를 검증·설정한 뒤 확장한다. 다른 분기에 원천 데이터가 없다는 뜻은 아니다.
 
@@ -90,7 +96,7 @@ officialQuarterCount는 실제 조회 전이므로 425·414 같은 과거 관찰
 
 ## 원본과 메타데이터
 
-`--download`는 공식 분기 총건수를 조회해 `gridTotalCnt`를 채운 뒤 원본을 요청한다. 원본의 JSON 구조, 행 수, 기준 분기, 행정동 코드 형식과 중복 여부를 검사한다. 선택 데이터의 핵심 필드 존재 여부도 확인한다. 숫자 정제와 지표 계산은 T13에서 처리한다.
+인구·시설의 `--download`는 공식 분기 총건수를 조회해 `gridTotalCnt`를 채운 뒤 원본을 요청한다. 원본의 JSON 구조, 행 수, 기준 분기, 행정동 코드 형식과 중복 여부를 검사한다. 선택 데이터의 핵심 필드 존재 여부도 확인한다. 숫자 정제와 지표 계산은 T13에서 처리한다.
 
 검증을 통과하면 `<output>/<데이터 종류 소문자>/<분기>/<수집 ID>/`에 원본과 `metadata.json`을 저장한다. 메타데이터에는 원천 ID, 요청 주소와 조건, 수집 시각(UTC), 공식·실제 행 수, 바이트 수, SHA-256을 기록한다.
 
@@ -105,6 +111,27 @@ officialQuarterCount는 실제 조회 전이므로 425·414 같은 과거 관찰
 두 파일을 임시 폴더에 기록한 뒤 폴더를 한 번에 확정한다. 성공 시 `DOWNLOADED`와 두 파일의 절대경로를 출력한다. 다시 실행하면 새로운 수집 폴더를 만든다. 기본 경로인 `data/raw/`는 Git에서 제외한다.
 
 연결 제한은 5초, 요청당 본문 수신까지 25초, 응답 크기는 최대 8 MiB다. 일시적인 연결·읽기 오류와 일부 HTTP 오류는 요청별 최대 3번 시도한다. 응답 내용 검증에 실패하면 해당 수집을 중단한다.
+
+## 점포 분할 수집
+
+`StoreDownloadService`는 기준정보의 전체 원천 업종을 사용한다. 화면 지원 업종 3개와 수집 범위를 구분한다. 인구·시설 수집기와 `PublicDataHttpClient`의 연결·읽기 제한 및 재시도 정책을 공유한다.
+
+| 파일 | 내용 |
+|---|---|
+| `CS100001.json` 등 업종별 파일 | 실제 응답 바이트. 응답에 포함된 과거 분기도 보존 |
+| `official-count.txt` | 선택 분기의 공식 총건수 조회 응답 원문 |
+| `store-target.json` | 업종별 원본에서 요청 분기만 추출한 파일. 수집한 원본과 구분 |
+| `metadata.json` | 상태, 기대·완료 업종 수, 원천·분기, 요청 조건, 파일별 수집 시각·건수·체크섬, 전체 검증 결과 |
+
+1. `<output>/store/<분기>/.pending-<수집 ID>/`에 RUNNING 기록을 만든다.
+2. 공식 분기 총건수를 조회하고 100개 업종을 순차 요청한다. 10업종마다 진행 상황을 표준 오류에 출력한다.
+3. 업종별 원본을 저장한 뒤 JSON 구조·요청 업종·분기 코드·행정동 코드·핵심 필드·고유키 중복을 검사한다.
+4. 요청 분기의 행 수와 고유키 수가 공식 총건수와 일치해야 대상 분기 추출본을 만든다.
+5. 모든 파일과 DOWNLOADED 메타데이터를 기록한 뒤 폴더를 `<수집 ID>/`로 한 번에 확정한다.
+
+실패하면 원본과 FAILED 기록을 `failed-<수집 ID>/`에 보관하고 종료 코드 3을 반환한다. 기록이나 폴더 확정도 실패하면 `.pending-` 경로가 남을 수 있다. 후속 적재는 완료 상태가 확인된 수집 결과를 사용한다.
+
+다시 실행하면 100업종을 새로 수집한다. 이전 실패·성공 폴더를 보존하며, 실패한 실행의 파일을 자동으로 이어받는 기능은 후속 범위다.
 
 ## 종료 코드
 
@@ -136,8 +163,11 @@ PickplaceBackendApplication
   → SourceCatalogLoader: 실행 카탈로그·필요한 업종 목록 읽기
   → DownloadPlanService: 요청 조건 조합
   → 기본 모드: PLANNED JSON 출력
-  → --download: QuarterDownloadService에서 총건수 조회 → 원본 다운로드
-                → 검증 → 원본·메타데이터 저장 → DOWNLOADED JSON 출력
+  → --download:
+      인구·시설 → QuarterDownloadService
+      점포      → StoreDownloadService
+      공통 HTTP → PublicDataHttpClient
+  → 검증 → 원본·메타데이터 확정 → DOWNLOADED JSON 출력
 ```
 
 다운로드 모드에서는 일반 SpringApplication.run을 호출하지 않는다. 일반 서버·기준정보 적재는 기존 기동 경로를 사용한다.
@@ -147,12 +177,29 @@ PickplaceBackendApplication
 ```cmd
 gradlew.bat test --tests "*DataDownload*"
 gradlew.bat test --tests "*QuarterDownloadServiceTests"
+gradlew.bat test --tests "*StoreDownloadServiceTests"
 gradlew.bat clean build
 ```
 
 CLI 전용 테스트는 Docker 없이 실행된다. 전체 빌드는 기존 DB 통합 테스트를 포함하므로 Docker가 필요하다.
 
 CLI 테스트는 입력 검증과 독립 기동을 검사한다. 분기별 서비스 테스트는 로컬 HTTP 응답으로 일시 오류 재시도, 원본과 메타데이터의 일치, 데이터별 요청·저장 경로, 다른 데이터의 응답을 받았을 때 저장이 차단되는지 확인한다.
+
+점포 테스트는 전체 100업종 요청, 과거 분기 원본 보존과 대상 분기 추출, 파일별 체크섬, 총건수 불일치, 중복·잘못된 응답, 일부 업종 실패 후 재실행과 기존 성공 결과 보존을 검사한다.
+
+### 2026-11-07 점포 100업종 수집 확인
+
+| 항목 | 결과 |
+|---|---|
+| 수집 범위 | OA-22172 · 20262 · 원천 업종 100개 |
+| 원본 보관 | 100개 JSON · 전체 반환 분기 합계 211,832행 · 54,695,432바이트 |
+| 대상 분기 | 35,301행 · 고유키 35,301개 · 공식 총건수와 일치 |
+| 무결성 | 원본 100개와 대상 분기 추출본의 SHA-256을 다시 계산해 메타데이터와 일치 확인 |
+| 수집 기록 | 로컬 `data/raw/store/20262/c149e0d9-331a-4d22-b08d-135c9320c0e3/metadata.json` |
+| 전체 build | 169건 통과 · 실패·오류·건너뜀 0건 |
+| 수집 관련 테스트 | CLI 33건 + 분기별 9건 + 점포 12건 = 54건 통과 |
+
+이 결과는 Java CLI로 실제 수집한 원본의 완전성 검사다. T13 숫자·합계 검사와 T14 DB 적재·게시 검수는 후속 작업이다.
 
 ### 2026-11-07 분기별 3종 수집 확인
 

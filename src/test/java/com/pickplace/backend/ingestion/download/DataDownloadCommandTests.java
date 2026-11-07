@@ -143,7 +143,7 @@ class DataDownloadCommandTests {
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--plan-only=false"}),
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--download=false"}),
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--plan-only", "--download"}),
-				Arguments.of((Object) new String[]{"--dataset=STORE", "--quarter=20262", "--download"}),
+				Arguments.of((Object) new String[]{"--dataset=SALES", "--quarter=20262", "--download"}),
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20261", "--download"}));
 	}
 

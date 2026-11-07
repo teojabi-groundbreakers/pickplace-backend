@@ -1,18 +1,11 @@
 package com.pickplace.backend.ingestion.download.service;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.HexFormat;
@@ -20,26 +13,16 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 import com.pickplace.backend.ingestion.download.model.DownloadPlan;
 import com.pickplace.backend.ingestion.download.model.SourceCatalog;
-import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 // 공식 건수와 원본을 대조한 뒤 한 묶음으로 보관한다.
 public class QuarterDownloadService {
 
-	private static final int MAX_ATTEMPTS = 3;
-	private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(25);
-	private static final long MAX_RESPONSE_BYTES = 8L * 1024 * 1024;
 	private static final Map<String, String> PRIMARY_FIELDS = Map.of(
 			"RESIDENT", "tot_repop_co",
 			"WORKER", "tot_wrc_popltn_co",
@@ -47,10 +30,6 @@ public class QuarterDownloadService {
 	private static final String METADATA_FILE = "metadata.json";
 
 	private final JsonMapper mapper;
-	private final JsonMapper previewMapper = JsonMapper.builder()
-			.enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES, JsonReadFeature.ALLOW_TRAILING_COMMA)
-			.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-			.build();
 
 	public QuarterDownloadService(JsonMapper mapper) {
 		this.mapper = mapper;
@@ -64,38 +43,20 @@ public class QuarterDownloadService {
 		if (!supports(plan.dataset()) || plan.strategy() != SourceCatalog.Strategy.SHEET_QUARTER_FILTER) {
 			throw new IllegalArgumentException("분기별 다운로드는 RESIDENT·WORKER·FACILITY를 지원합니다.");
 		}
-		try (var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
-			var countResponse = post(client, "공식 총건수 조회", plan.countRequest());
-			int officialCount = officialCount(countResponse.body(), plan.quarter());
+		try (var client = new PublicDataHttpClient()) {
+			byte[] countResponse = client.post("공식 총건수 조회", plan.countRequest());
+			int officialCount = client.officialCount(countResponse, plan.quarter());
 
 			var template = plan.downloadRequestTemplate();
 			var parameters = new LinkedHashMap<>(template.parameters());
 			parameters.put("gridTotalCnt", Integer.toString(officialCount));
 			var downloadRequest = new DownloadPlan.Request(
 					template.method(), template.url(), template.contentType(), parameters);
-			var response = post(client, plan.dataset() + " 원본 다운로드", downloadRequest);
+			byte[] raw = client.post(plan.dataset() + " 원본 다운로드", downloadRequest);
 			Instant collectedAt = Instant.now();
-			byte[] raw = response.body();
 			int rows = validateRows(raw, plan.quarter(), officialCount, PRIMARY_FIELDS.get(plan.dataset()));
 			return save(plan, downloadRequest, collectedAt, raw, officialCount, rows);
 		}
-	}
-
-	private int officialCount(byte[] body, String quarter) throws IOException {
-		// 서울시 미리보기 응답의 따옴표 없는 키와 마지막 쉼표만 허용한다.
-		JsonNode preview = previewMapper.readTree(body);
-		JsonNode count = preview.path("page").path("totalCount");
-		JsonNode sample = preview.path("list");
-		if (!"ok".equals(preview.path("result").asString()) || !count.isIntegralNumber()
-				|| !count.canConvertToInt() || count.asInt() <= 0 || !sample.isArray() || sample.isEmpty()) {
-			throw new IOException("공식 총건수 응답의 형식 또는 건수가 올바르지 않습니다.");
-		}
-		for (JsonNode row : sample) {
-			if (!quarter.equals(row.path("STDR_YYQU_CD").asString())) {
-				throw new IOException("공식 총건수 응답의 기준 분기가 요청과 다릅니다.");
-			}
-		}
-		return count.asInt();
 	}
 
 	private int validateRows(byte[] raw, String quarter, int officialCount, String primaryField) throws IOException {
@@ -121,59 +82,6 @@ public class QuarterDownloadService {
 			}
 		}
 		return rows.size();
-	}
-
-	private HttpResponse<byte[]> post(HttpClient client, String label, DownloadPlan.Request request)
-			throws IOException, InterruptedException {
-		String form = request.parameters().entrySet().stream()
-				.map(entry -> URLEncoder.encode(entry.getKey(), UTF_8) + "="
-						+ URLEncoder.encode(entry.getValue(), UTF_8))
-				.collect(Collectors.joining("&"));
-		var httpRequest = HttpRequest.newBuilder(URI.create(request.url()))
-				.header("Content-Type", request.contentType())
-				.POST(HttpRequest.BodyPublishers.ofString(form))
-				.build();
-
-		for (int attempt = 1; ; attempt++) {
-			HttpResponse<byte[]> response;
-			try {
-				response = send(client, httpRequest);
-			} catch (IOException exception) {
-				if (attempt == MAX_ATTEMPTS) {
-					throw new IOException(label + " 연결 또는 응답 읽기 실패: " + exception.getMessage(), exception);
-				}
-				Thread.sleep(Duration.ofSeconds(attempt));
-				continue;
-			}
-			int status = response.statusCode();
-			if (status == 200) {
-				return response;
-			}
-			if (attempt == MAX_ATTEMPTS || !retryable(status)) {
-				throw new IOException(label + " 실패 (HTTP " + status + ")");
-			}
-			Thread.sleep(Duration.ofSeconds(attempt));
-		}
-	}
-
-	private boolean retryable(int status) {
-		return status == 408 || status == 429 || status == 500 || status == 502 || status == 503 || status == 504;
-	}
-
-	private HttpResponse<byte[]> send(HttpClient client, HttpRequest request) throws IOException, InterruptedException {
-		var pending = client.sendAsync(request,
-				HttpResponse.BodyHandlers.limiting(HttpResponse.BodyHandlers.ofByteArray(), MAX_RESPONSE_BYTES));
-		try {
-			return pending.get(REQUEST_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-		} catch (TimeoutException exception) {
-			pending.cancel(true);
-			throw new HttpTimeoutException("응답 본문 포함 " + REQUEST_TIMEOUT.toSeconds() + "초 초과");
-		} catch (InterruptedException exception) {
-			pending.cancel(true);
-			throw exception;
-		} catch (ExecutionException exception) {
-			throw new IOException(exception.getCause().getMessage(), exception.getCause());
-		}
 	}
 
 	private Result save(DownloadPlan plan, DownloadPlan.Request downloadRequest, Instant collectedAt,
