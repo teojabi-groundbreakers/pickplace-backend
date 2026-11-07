@@ -2,7 +2,7 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동·지원 업종 목록 API와 통합 테스트입니다. 통계 원본 적재·현황 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동·지원 업종 목록 API, 핵심 4종 원본 수집과 통합 테스트입니다. 통계 DB 적재·현황 API와 AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 빠른 시작 · 문서 선택
 
@@ -10,7 +10,7 @@
 | --- | --- |
 | 처음 서버·DB 실행 | [단계별 실행 안내](docs/getting-started.md) |
 | FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
-| 공공데이터 수집 조건 확인 | [DB 없이 수동 CLI 실행·계획 출력](docs/data/public-data-command.md) |
+| 공공데이터 수집 | [수집 계획 확인·점포·인구·시설 다운로드](docs/data/public-data-command.md) |
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
 
 <a id="설계-문서"></a>
@@ -25,7 +25,7 @@
 - [V1 마이그레이션](src/main/resources/db/migration/V1__create_reference_tables.sql): 실제 테이블 생성의 기준입니다.
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
 - [공공데이터 수집 대상·다운로드 경로](docs/data/public-data-sources.md): T12 초기 4종·수집 설정·실제 요청 검증 결과.
-- [공공데이터 수동 CLI](docs/data/public-data-command.md): 입력 검증·실행 카탈로그·PLAN_ONLY 출력. 실제 다운로드는 후속 단계.
+- [공공데이터 수동 CLI](docs/data/public-data-command.md): 2026년 2분기 핵심 4종 원본·메타데이터 저장과 점포 100업종 완전성 검증.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
 - [FE·BE 통합 API 명세 v0.2](docs/api/fe-be-contract.md): 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안.
