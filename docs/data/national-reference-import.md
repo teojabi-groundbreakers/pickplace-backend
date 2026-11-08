@@ -1,5 +1,7 @@
 # 전국 기준정보 수동 적재 — T07
 
+계층·대응 후속 검토는 [전국 기준정보 검토](national-reference-review.md)를 참조한다. 원래 후보본·검증 이력은 보존하며 새 검토본과 구분한다.
+
 구현일: 2026-11-09 · 브랜치 `feature/nationwide-reference-import`
 
 전국 인구·업소 통계를 연결할 지역·원천 대응·업종 분류를 저장한다. 인구 수치나 개별 업소275만행을 서비스 통계 테이블에 적재하는 작업은 T13/T14다. [T06 저장 구조](../database/nationwide-reference-schema.md)를 먼저 확인한다.

@@ -265,6 +265,32 @@ class NationalReferenceImportTests {
         }));
     }
 
+    @TestFactory
+    Stream<DynamicTest> reviewedSourceImport() {
+        String path = System.getenv("PICKPLACE_REVIEWED_REFERENCE_SNAPSHOT");
+        if (path == null) return Stream.empty();
+        return Stream.of(DynamicTest.dynamicTest("imports reviewed identities and quarantines unresolved navigation and temporal edges", () -> {
+            var loaded = loader.load(Path.of(path), System.getenv("PICKPLACE_REVIEWED_REFERENCE_SHA256"));
+            var result = importer.importSnapshot(loaded);
+            assertThat(result.inserted()).isTrue();
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE review_status = 'VERIFIED'", Integer.class)).isEqualTo(3850);
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE review_status = 'BLOCKED' AND selectable = FALSE", Integer.class)).isEqualTo(76);
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE selectable", Integer.class)).isEqualTo(3837);
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_stat_mapping WHERE review_status = 'VERIFIED'", Integer.class)).isEqualTo(7177);
+            assertThat(jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM region_stat_mapping
+                    WHERE JSON_UNQUOTE(JSON_EXTRACT(evidence, '$.temporalStatus')) = 'CHANGE_DATE_HOLD'
+                    """, Integer.class)).isEqualTo(2);
+            assertThat(jdbc.queryForObject("""
+                    SELECT region_code FROM region_stat_mapping
+                    WHERE source_system = 'SEMAS_STORE' AND source_region_code = '27710380'
+                    """, String.class)).isEqualTo("2771038000");
+            assertThat(importer.importSnapshot(loaded).inserted()).isFalse();
+            assertThatThrownBy(() -> publisher.approve(loaded.snapshot().version(), "test")).isInstanceOf(IllegalArgumentException.class);
+            assertThat(count("region_publication")).isZero();
+        }));
+    }
+
     private DynamicTest invalid(String name, java.util.function.Consumer<ObjectNode> change) {
         return DynamicTest.dynamicTest(name, () -> {
             ObjectNode changed = fixture.deepCopy();
