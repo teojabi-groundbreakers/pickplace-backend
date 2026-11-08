@@ -1,0 +1,9 @@
+{
+  "snapshotVersion": "national-202609-release-v1",
+  "snapshotFile": "snapshot.json",
+  "sha256": "f9b3815bcb4b5f9362dd467191840b8b77b4eed67399fa4ac5ba895f1e9cb371",
+  "byteCount": 13931580,
+  "scope": "Reference codes, names, hierarchy, source mappings and industry classifications only; no population counts or individual store records",
+  "preparationReport": "preparation-report.json",
+  "publicationNote": "Approval and publication are local DB operations; development DB IDs and revision must not be copied as local IDs."
+}

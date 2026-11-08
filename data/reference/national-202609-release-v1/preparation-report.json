@@ -1,0 +1,17 @@
+{
+  "excludedNodes": 76,
+  "supportedCodes": {
+    "I21201": "카페",
+    "I21007": "김밥/만두/분식",
+    "I21001": "빵/도넛"
+  },
+  "classificationVersion": "semas-202609-service-v1",
+  "usageScope": "Initial service reference codes/names and source classification; raw ZIP/HWPX not redistributed",
+  "inputSha256": "f49f3a59e88a74b735578b49d26d887d459bf6af6c2f58814c7867af3524629a",
+  "snapshotVersion": "national-202609-release-v1",
+  "snapshotSha256": "f9b3815bcb4b5f9362dd467191840b8b77b4eed67399fa4ac5ba895f1e9cb371",
+  "usageManifestSha256": "9fac932cb725558c3d25a97868cc6746cb2f1dc07b15240cb576a9a14585aa3f",
+  "policyManifestSha256": "957f1e77cff8b4f8679836200523ac44d199e8f99c24e3abca211dc32c5ad4d2",
+  "approved": false,
+  "published": false
+}
