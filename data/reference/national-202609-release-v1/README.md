@@ -66,8 +66,6 @@ ORDER BY c.display_order, c.industry_code;
 
 이 버전의 정상 결과는 APPROVED, PROVINCE 16 / GROUP 256 / LOCALITY 3,565, 지원 업종 I21201 / I21007 / I21001이다. 출장소 관련 76개는 보존하지만 선택 대상에서 제외한다.
 
-기존 서울 API는 별도 서울 테이블을 조회한다. 이 파일 적재만으로 전국 목록 API가 제공되거나 기존 서울 테이블이 채워지지는 않는다. 기존 서울 API를 개발할 때는 [서울 기준정보 적재](../../../docs/data/reference-import.md)를 사용하고, 전국 API 수정은 [T08~T10 인계서](../../../docs/api/nationwide-reference-api-handoff.md)를 따른다.
-
 ## 출처·변경 정책
 
 행정안전부 공식 현행/말소 행정기관 코드 및 소상공인시장진흥공단 분류를 바탕으로 PickPlace에서 계층·대응·화면 지원 정책을 가공했다. [공식 출처와 이용조건](../../../docs/data/national-reference-usage.md), [이용 근거 manifest](../../../docs/data/national-reference-usage.json), [승인·게시 검증](../../../docs/data/national-reference-completion.md)을 함께 참고한다.
