@@ -1,6 +1,13 @@
 {
   "reviewedOn": "2026-11-09",
+  "latestCompletionRecord": "national-reference-completion.json",
   "policyVersion": "national-reference-review-v1",
+  "confirmedInitialSelectionPolicy": {
+    "confirmedOn": "2026-11-09",
+    "decision": "Preserve the 76 reviewed branch-like nodes and their history; exclude them from initial region selection",
+    "jurisdictionReview": "Deferred expansion, not a prerequisite for initial service",
+    "changesExistingSnapshotOrApprovalCode": false
+  },
   "inputSnapshotSha256": "0bba5b78b84d9feee9600459e1c783d9ce6a2af101d496988506d76ba3eca0e8",
   "reviewedSnapshotVersion": "national-202609-reviewed-v1",
   "reviewedSnapshotSha256": "f49f3a59e88a74b735578b49d26d887d459bf6af6c2f58814c7867af3524629a",

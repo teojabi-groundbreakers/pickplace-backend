@@ -1,5 +1,7 @@
 # 전국 기준정보 수동 적재 — T07
 
+최신 상태: [T07 최종 승인·게시 완료](national-reference-completion.md). 아래 READY·미공개 실행 결과는 최초 후보본 단계의 이력으로 보존한다.
+
 계층·대응 후속 검토는 [전국 기준정보 검토](national-reference-review.md)를 참조한다. 원래 후보본·검증 이력은 보존하며 새 검토본과 구분한다.
 
 구현일: 2026-11-09 · 브랜치 `feature/nationwide-reference-import`

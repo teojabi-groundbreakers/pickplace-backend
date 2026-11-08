@@ -28,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -146,6 +147,46 @@ class NationalReferenceImportTests {
         assertThat(jdbc.queryForList("SELECT industry_code FROM national_industry_code WHERE is_supported", String.class))
                 .containsExactly("I21201");
         assertThat(count("region_publication")).isZero();
+    }
+
+    @Test
+    void confirmedExclusionsDoNotBlockApprovalAndNeverBecomeSelectable() throws Exception {
+        addConfirmedExclusions(fixture);
+        importer.importSnapshot(loaded(fixture));
+        publisher.approve("national-test-v1", "reviewer");
+        publisher.publish("national-test-v1", 0, "reviewer", "confirmed exclusion", false);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE review_status = 'BLOCKED'", Integer.class)).isEqualTo(76);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE review_status = 'BLOCKED' AND selectable", Integer.class)).isZero();
+        assertThat(count("official_region_node")).isEqualTo(79);
+    }
+
+    @Test
+    void exclusionCannotBeMadeSelectableOrReusedForAnotherOfficialSnapshot() throws Exception {
+        addConfirmedExclusions(fixture);
+        var changedSource = fixture.deepCopy();
+        item(changedSource, "artifacts", 0).put("sha256", "0".repeat(64));
+        assertThatThrownBy(() -> validator.validate(mapper.treeToValue(changedSource, NationalReferenceSnapshot.class)))
+                .isInstanceOf(IllegalArgumentException.class);
+        item(fixture, "navigation", 3).put("reviewStatus", "VERIFIED").put("role", "LOCALITY")
+                .put("selectable", true).put("selectionParent", "1111000000");
+        assertThatThrownBy(() -> validator.validate(mapper.treeToValue(fixture, NationalReferenceSnapshot.class)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void arbitraryBlockedNodeAndMissingPolicyEvidenceStillPreventApproval() throws Exception {
+        addConfirmedExclusions(fixture);
+        var noEvidence = fixture.deepCopy();
+        item(noEvidence, "navigation", 3).put("evidence", "{}");
+        assertThatThrownBy(() -> validator.validate(mapper.treeToValue(noEvidence, NationalReferenceSnapshot.class)))
+                .isInstanceOf(IllegalArgumentException.class);
+        var extraNode = item(fixture, "nodes", 3).deepCopy();
+        extraNode.put("code", "9999900000").put("rowNumber", 100);
+        ((ArrayNode) fixture.path("nodes")).add(extraNode);
+        var extraNav = item(fixture, "navigation", 3).deepCopy();
+        extraNav.put("code", "9999900000");
+        ((ArrayNode) fixture.path("navigation")).add(extraNav);
+        assertThat(validator.validate(mapper.treeToValue(fixture, NationalReferenceSnapshot.class)).approvable()).isFalse();
     }
 
     @Test
@@ -289,6 +330,47 @@ class NationalReferenceImportTests {
             assertThatThrownBy(() -> publisher.approve(loaded.snapshot().version(), "test")).isInstanceOf(IllegalArgumentException.class);
             assertThat(count("region_publication")).isZero();
         }));
+    }
+
+    @TestFactory
+    Stream<DynamicTest> releaseSourcePublication() {
+        String path = System.getenv("PICKPLACE_RELEASE_REFERENCE_SNAPSHOT");
+        if (path == null) return Stream.empty();
+        return Stream.of(DynamicTest.dynamicTest("approves and publishes actual release with confirmed exclusions and supported industries", () -> {
+            var input = loader.load(Path.of(path), System.getenv("PICKPLACE_RELEASE_REFERENCE_SHA256"));
+            importer.importSnapshot(input);
+            publisher.approve(input.snapshot().version(), "test");
+            assertThat(publisher.publish(input.snapshot().version(), 0, "test", "initial release test", false)).isEqualTo(1);
+            assertThat(jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM region_publication p JOIN region_navigation n ON n.release_id=p.release_id
+                    WHERE n.selectable
+                    """, Integer.class)).isEqualTo(3837);
+            assertThat(jdbc.queryForList("SELECT industry_code FROM national_industry_code WHERE is_supported ORDER BY display_order", String.class))
+                    .containsExactly("I21201", "I21007", "I21001");
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM region_navigation WHERE review_status='BLOCKED' AND selectable", Integer.class)).isZero();
+            assertThat(count("region_publication_event")).isEqualTo(1);
+            assertThat(importer.importSnapshot(input).inserted()).isFalse();
+        }));
+    }
+
+    private void addConfirmedExclusions(ObjectNode tree) throws Exception {
+        try (var stream = new ClassPathResource("reference-data/national-initial-selection-policy.json").getInputStream()) {
+            var policy = mapper.readTree(stream);
+            String version = policy.path("version").asText();
+            tree.put("policyVersion", version);
+            item(tree, "artifacts", 0).put("sha256", policy.path("currentArtifactSha256").asText());
+            int rowNumber = 5;
+            for (var code : policy.path("excludedCodes")) {
+                var node = item(tree, "nodes", 1).deepCopy();
+                node.put("code", code.asText()).put("rowNumber", rowNumber++).putNull("district");
+                ((ArrayNode) tree.path("nodes")).add(node);
+                var navigation = item(tree, "navigation", 1).deepCopy();
+                navigation.put("code", code.asText()).put("kind", "BRANCH").put("role", "NONE")
+                        .putNull("selectionParent").put("selectable", false).put("reviewStatus", "BLOCKED")
+                        .put("evidence", "{\"policy\":\"" + version + "\",\"reason\":\"INITIAL_SELECTION_EXCLUDED\"}");
+                ((ArrayNode) tree.path("navigation")).add(navigation);
+            }
+        }
     }
 
     private DynamicTest invalid(String name, java.util.function.Consumer<ObjectNode> change) {

@@ -14,6 +14,11 @@ import static com.pickplace.backend.reference.nationwide.NationalReferenceSnapsh
 
 @Component
 public class NationalReferenceValidator {
+    private final InitialRegionSelectionPolicy selectionPolicy;
+
+    public NationalReferenceValidator(InitialRegionSelectionPolicy selectionPolicy) {
+        this.selectionPolicy = selectionPolicy;
+    }
 
     public Validation validate(NationalReferenceSnapshot snapshot) {
         require(snapshot != null, "Missing snapshot");
@@ -115,8 +120,10 @@ public class NationalReferenceValidator {
             }
             require(!row.supported() || row.level().equals("SMALL"), "Only small industries supported");
         }
+        selectionPolicy.validate(snapshot);
         boolean approvable = artifacts.values().stream().allMatch(a -> a.usageStatus().equals("VERIFIED"))
-                && navigation.values().stream().allMatch(n -> n.reviewStatus().equals("VERIFIED"))
+                && navigation.values().stream().allMatch(n -> n.reviewStatus().equals("VERIFIED")
+                        || selectionPolicy.acceptsExcluded(snapshot, n))
                 && navigation.values().stream().anyMatch(Navigation::selectable)
                 && sources.keySet().equals(verifiedSources)
                 && snapshot.mappings().stream().allMatch(m -> m.reviewStatus().equals("VERIFIED"));

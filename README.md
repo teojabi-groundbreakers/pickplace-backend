@@ -15,6 +15,7 @@
 | 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
 | 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |
 | 전국 기준정보 적재 | [T07 원본 준비·적재·승인·게시](docs/data/national-reference-import.md) |
+| 전국 기준정보 완료 기록 | [T07 최종 승인·게시](docs/data/national-reference-completion.md) |
 
 <a id="설계-문서"></a>
 
