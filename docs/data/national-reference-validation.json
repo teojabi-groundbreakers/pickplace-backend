@@ -1,0 +1,55 @@
+{
+  "validatedOn": "2026-11-09",
+  "branch": "feature/nationwide-reference-import",
+  "scope": "T06 V3/V4 schema and T07 reference import, approval and publication commands",
+  "fullVerification": {
+    "command": "gradlew.bat clean check bootJar --init-script <local-test-temp.init.gradle>",
+    "result": "BUILD SUCCESSFUL",
+    "suites": 22,
+    "tests": 229,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "mysqlImage": "mysql:8.4.11",
+    "nationalReferenceCases": 23,
+    "actualSnapshotImportIncluded": true
+  },
+  "snapshot": {
+    "version": "national-202609-candidate-v1",
+    "sha256": "0bba5b78b84d9feee9600459e1c783d9ce6a2af101d496988506d76ba3eca0e8",
+    "bytes": 9030993,
+    "originalStoreRowsScanned": 2753778,
+    "officialNodes": 9613,
+    "currentNavigationNodes": 3926,
+    "populationSourceRegions": 3619,
+    "storeSourceRegions": 3558,
+    "mappingCandidates": 7177,
+    "largeIndustries": 10,
+    "middleIndustries": 75,
+    "smallIndustries": 247,
+    "invalidOfficialDateNodes": 1,
+    "candidateOnly": true
+  },
+  "developmentDatabase": {
+    "database": "pickplace",
+    "container": "pickplace-backend-mysql-1",
+    "before": "No application tables",
+    "appliedFlywayVersions": ["1", "2", "3", "4"],
+    "releaseId": 1,
+    "classificationId": 1,
+    "releaseStatus": "READY",
+    "approvable": false,
+    "countsMatchSnapshot": true,
+    "selectableNodes": 0,
+    "supportedIndustries": 0,
+    "publicationRows": 0,
+    "repeatImportInserted": false,
+    "approvedOrPublished": false
+  },
+  "remaining": [
+    "Actual hierarchy, usage conditions and source mappings need reviewed evidence before approval/publication",
+    "Initial supported industry names and scope need review; no automatic CS conversion",
+    "T11 nationwide statistics schema, T13/T14 numeric/store ingestion and temporal boundary compatibility",
+    "Nationwide list/summary APIs, FE and AI integration"
+  ]
+}
