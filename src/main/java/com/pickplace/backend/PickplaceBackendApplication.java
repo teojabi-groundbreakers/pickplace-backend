@@ -18,7 +18,7 @@ public class PickplaceBackendApplication {
 			return;
 		}
 		var context = SpringApplication.run(PickplaceBackendApplication.class, args);
-		if (context.getEnvironment().matchesProfiles("reference-import")) {
+		if (context.getEnvironment().matchesProfiles("reference-import", "national-reference")) {
 			context.close();
 		}
 	}

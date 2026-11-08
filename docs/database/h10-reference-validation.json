@@ -1,0 +1,153 @@
+{
+  "reviewDate": "2026-11-08",
+  "baseCommit": "9e18ccad021e0fd2137869be81d6b21ae286f391",
+  "branch": "feature/h10-reference-schema",
+  "mysql": "8.4.11",
+  "tests": 189.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "skipped": 0.0,
+  "suites": [
+    {
+      "suite": "com.pickplace.backend.AdministrativeDongApiTests",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.AdministrativeDongDatabaseFailureTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.BusinessTypeApiTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.BusinessTypeDatabaseFailureTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.common.error.GlobalExceptionHandlerTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.DistrictApiTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.H10ReferenceSchemaTests",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.health.HealthControllerTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.HealthApiTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ingestion.download.DataDownloadBootstrapTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ingestion.download.DataDownloadCommandTests",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ingestion.download.QuarterDownloadServiceTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ingestion.download.StoreDownloadServiceTests",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.PickplaceBackendApplicationTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ReferenceDataImportTests",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ReferenceImportCommandTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ReferenceImportProfileTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.ReferenceSchemaMigrationTests",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.StatisticsSchemaMigrationTests",
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.pickplace.backend.StatisticsSchemaUpgradeTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "scope": "Isolated MySQL schema and upgrade tests; no application database migration or real H10 import."
+}

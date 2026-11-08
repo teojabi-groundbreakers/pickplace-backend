@@ -12,6 +12,10 @@
 | FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
 | 공공데이터 수집 | [수집 계획 확인·점포·인구·시설 다운로드](docs/data/public-data-command.md) |
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
+| 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
+| 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |
+| 전국 기준정보 적재 | [T07 원본 준비·적재·승인·게시](docs/data/national-reference-import.md) |
+| 전국 기준정보 완료 기록 | [T07 최종 승인·게시](docs/data/national-reference-completion.md) |
 
 <a id="설계-문서"></a>
 
@@ -21,6 +25,7 @@
 - [FE 인계 · 현재 지원 API 안내](docs/api/frontend-api-guide.md): 현재 호출 가능한 API, main/develop 차이, 요청·응답·오류와 FE 연동 순서.
 - [처음 실행부터 DB 적재까지](docs/getting-started.md): Windows CMD·IntelliJ 기준의 통합 실행 안내. 명령어 의미·정상 결과·오류 대응 포함.
 - [기준정보 DB 설계](docs/database/reference-schema-design.md): 자치구·행정동·업종 ERD, 컬럼, 제약조건, 검수 기준.
+- [H10 기준정보 DB](docs/database/h10-reference-schema.md): V3 지역 마스터·공식 스냅샷·계층·원천 대응·게시 이력. 실제 적재와 통계 FK 전환은 후속 작업.
 - [상권 통계·적재 이력 DB 설계](docs/database/statistics-schema-design.md): T11 통계 6종·배치 이력·게시 버전·품질 이슈, V2 적용·검증 방법.
 - [V1 마이그레이션](src/main/resources/db/migration/V1__create_reference_tables.sql): 실제 테이블 생성의 기준입니다.
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
