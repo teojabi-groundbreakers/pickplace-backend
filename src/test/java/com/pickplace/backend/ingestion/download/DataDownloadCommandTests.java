@@ -140,7 +140,11 @@ class DataDownloadCommandTests {
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--output="}),
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--quater=20262"}),
 				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "unexpected"}),
-				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--plan-only=false"}));
+				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--plan-only=false"}),
+				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--download=false"}),
+				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20262", "--plan-only", "--download"}),
+				Arguments.of((Object) new String[]{"--dataset=SALES", "--quarter=20262", "--download"}),
+				Arguments.of((Object) new String[]{"--dataset=RESIDENT", "--quarter=20261", "--download"}));
 	}
 
 	// 저장 경로에 기존 파일을 지정해도 덮어쓰지 않는지 확인한다.

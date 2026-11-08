@@ -30,7 +30,7 @@
 | [기준정보 수동 적재](data/reference-import.md) | 실행 명령·원천 스냅샷·재적재 정책·T07 단계 34건 검증 |
 | [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 | [공공데이터 수집 대상·다운로드 경로](data/public-data-sources.md) | T12 1단계 · 초기 4종·분할 수집·실제 응답·수집 설정 |
-| [공공데이터 수동 CLI](data/public-data-command.md) | T12 2단계 · DB 없는 기동·입력 검증·수집 계획 |
+| [공공데이터 수동 CLI](data/public-data-command.md) | T12 · 핵심 4종 수집·점포 100업종 검증·원본 보관 |
 
 ## 실제 실행 기준과 설계 이력
 
