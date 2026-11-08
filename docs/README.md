@@ -11,6 +11,7 @@
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
 | [FE 인계 · 현재 지원 API 안내](api/frontend-api-guide.md) | 실제 호출 가능한 API·main/develop 차이·응답·접속·오류·미구현 목록 |
 | [T08~T10 전국 목록 API 개발 인계](api/nationwide-reference-api-handoff.md) | 수정 위치·게시본 조회·H10/업종 전환·계약 협의·구현 순서·검수표 |
+| [전국 기준정보 로컬 적재 묶음](../data/reference/national-202609-release-v1/README.md) | 클론에 포함된 검증 JSON·해시·로컬 적재/승인/게시·SQL 확인 |
 
 ## 설계 · API 계약
 

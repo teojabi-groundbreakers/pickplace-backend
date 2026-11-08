@@ -2,6 +2,8 @@
 
 최신 상태: [T07 최종 승인·게시 완료](national-reference-completion.md). 아래 READY·미공개 실행 결과는 최초 후보본 단계의 이력으로 보존한다.
 
+**팀원 로컬 적재:** 저장소에 [검증된 적재 묶음과 실행 안내](../../data/reference/national-202609-release-v1/README.md)를 포함했다. 원본 재다운로드·Python 없이 import→approve→publish할 수 있다. 아래 원본 생성 절차는 새 버전을 만들 때 사용한다.
+
 계층·대응 후속 검토는 [전국 기준정보 검토](national-reference-review.md)를 참조한다. 원래 후보본·검증 이력은 보존하며 새 검토본과 구분한다.
 
 구현일: 2026-11-09 · 브랜치 `feature/nationwide-reference-import`
@@ -38,7 +40,7 @@ python scripts\build_national_reference.py --regions C:\pickplace-data\nationwid
 
 metadata는 기존 다운로드 결과의 URL·시각·bytes·sha256을 사용한다. 파일명이 버전/공식 코드 체계의 증거를 대신하지 않는다. 생성기는 원본 체크섬·크기, 현행/이력 일치, 원천 지역/업종 이름·부모 충돌과 CSV 행폭을 검사한다. 상가는 ZIP member를 스트리밍하며 업소 전체를 메모리에 보관하지 않는다. 기존의 인구 수치 합계·업소 ID/좌표 전수 검증을 대신하는 스크립트는 아니다.
 
-출력은 `snapshot.json`과 `snapshot.report.json`이다. 출력 파일이 이미 있으면 덮어쓰지 않는다. 보고서의 `snapshotSha256`을 Java 적재 명령에 전달한다. 원본과 생성 묶음은 저장소 밖에 보관하며 자격증명은 포함하지 않는다.
+출력은 `snapshot.json`과 `snapshot.report.json`이다. 출력 파일이 이미 있으면 덮어쓰지 않는다. 보고서의 `snapshotSha256`을 Java 적재 명령에 전달한다. 원본·후보·검토 중 묶음은 저장소 밖에 보관한다. 검증을 마친 최종 개발용 묶음은 버전별 `data/reference/`에 포함하며 자격증명은 포함하지 않는다.
 
 ## 2. DB에 READY 상태로 적재
 

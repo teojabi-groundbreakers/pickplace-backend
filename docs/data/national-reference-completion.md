@@ -24,6 +24,8 @@
 
 ## 재현 순서
 
+팀원이 같은 데이터를 로컬 DB에 적재하려면 [저장소 포함 묶음](../../data/reference/national-202609-release-v1/README.md)을 사용한다. 원본 재생성은 필요하지 않다. 아래는 원본부터 새 묶음을 만드는 유지보수 절차다.
+
 1. [검토본 생성](national-reference-review.md)을 마친다.
 2. `scripts/prepare_national_reference_release.py`에 검토본 경로/해시, 정책 JSON, 이용 근거 JSON, 원문 보관 폴더를 전달한다.
 3. 출력 SHA256으로 새 버전을 import한다. 검토본의 원본·분류 내용을 직접 UPDATE하지 않는다.
