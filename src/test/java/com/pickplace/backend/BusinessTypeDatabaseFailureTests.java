@@ -10,15 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,6 +47,8 @@ class BusinessTypeDatabaseFailureTests {
 	void simulateDatabaseDown() throws SQLException {
 		doThrow(new SQLException("Communications link failure: jdbc:mysql://secret-host:3307"))
 				.when(dataSource).getConnection();
+		// 앱 시작 때 Hibernate가 연 연결 기록이 남아 있으면 "DB에 손대지 않았는지" 검사가 틀어지므로 지운다.
+		clearInvocations(dataSource);
 	}
 
 	// DB 연결에 실패하면 빈 목록으로 위장하지 않고 503 DATA_SERVICE_UNAVAILABLE이며 DB 주소가 응답에 없는지 확인한다.
@@ -51,8 +58,19 @@ class BusinessTypeDatabaseFailureTests {
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(jsonPath("$.error.code").value("DATA_SERVICE_UNAVAILABLE"))
 				.andExpect(jsonPath("$.data").doesNotExist())
+				.andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
 				.andExpect(content().string(not(containsString("jdbc"))))
 				.andExpect(content().string(not(containsString("secret-host"))));
+	}
+
+	// 파라미터를 붙인 잘못된 요청은 DB 장애 중에도 503이 아니라 400이고, DB 연결을 아예 시도하지 않는지 확인한다.
+	@Test
+	void returns400BeforeTouchingDatabaseWhenQueryIsGiven() throws Exception {
+		mockMvc.perform(get("/api/business-types").param("regionVersion", "v1"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.error.code").value("INVALID_REQUEST"));
+
+		verify(dataSource, never()).getConnection();
 	}
 
 }

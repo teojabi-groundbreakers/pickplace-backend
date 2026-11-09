@@ -5,7 +5,7 @@
 > 전국 지역 선택은 [전국 지역 목록 API](region-api.md)(`/api/regions/*`)를 쓴다. 아래 1·2절의 서울 전용 경로는 FE가 전국 API로 옮긴 뒤 폐기한다.
 >
 > 상태: 자치구·행정동·지원 업종 목록 구현.
-> 기준: 팀 API 명세 초안(데이터 계약 초안 v0.1). 데이터는 [기준정보 수동 적재](../data/reference-import.md)로 넣은 값을 그대로 읽는다.
+> 기준: 1·2절은 팀 API 명세 초안(데이터 계약 초안 v0.1)이며 [기준정보 수동 적재](../data/reference-import.md)로 넣은 서울 값을 읽는다. 3절 업종 목록은 전국 기준정보 게시본에 연결된 소진공 업종 분류를 읽는다([전국 목록 API 개발 인계](nationwide-reference-api-handoff.md) 3절).
 
 API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagger-ui.html`, OpenAPI JSON은 `/v3/api-docs`에서 확인한다.
 
@@ -166,17 +166,21 @@ FE 연동 초안은 기준 URL `/api`에 `/catalog`를 붙여 지역·업종을 
 
 ## 3. 지원 업종 목록 — `GET /api/business-types`
 
-화면에서 선택할 수 있는 **지원 업종만** 표시 순서대로 돌려준다. 요청 파라미터는 없다.
+화면에서 선택할 수 있는 **소진공(소상공인시장진흥공단) 소분류 지원 업종만** 표시 순서대로 돌려준다. 요청 파라미터는 없다.
+
+> 서울 업종 테이블(`business_type`, `CS` 코드)은 더 이상 읽지 않는다. 지금은 전국 지역 게시본에 연결된 승인 업종 분류(`national_industry_*`)를 읽는다. `CS` 코드와 소진공 코드는 같은 체계가 아니며, 서로 짝지어 바꾸지 않는다.
 
 ### 정상 응답 — 200
+
+아래 값은 2026-11-09 기준 게시 데이터(`data/reference/national-202609-sejong-hint-v1`)의 결과다. 코드·이름·개수는 프로그램에 적혀 있지 않고, 게시된 분류본이 바뀌면 함께 바뀐다.
 
 ```json
 {
   "data": {
     "items": [
-      { "businessTypeCode": "CS100010", "businessTypeName": "커피·음료", "supported": true },
-      { "businessTypeCode": "CS100008", "businessTypeName": "분식", "supported": true },
-      { "businessTypeCode": "CS100005", "businessTypeName": "제과점", "supported": true }
+      { "businessTypeCode": "I21201", "businessTypeName": "카페", "supported": true },
+      { "businessTypeCode": "I21007", "businessTypeName": "김밥/만두/분식", "supported": true },
+      { "businessTypeCode": "I21001", "businessTypeName": "빵/도넛", "supported": true }
     ]
   },
   "meta": { "requestId": "..." }
@@ -185,24 +189,42 @@ FE 연동 초안은 기준 URL `/api`에 `/catalog`를 붙여 지역·업종을 
 
 | 필드 | 형식 | 설명 |
 |---|---|---|
-| `businessTypeCode` | 문자열, `CS` + 숫자 6자리 | 서비스 업종 코드. KSIC 코드와 다르다 |
-| `businessTypeName` | 문자열 | 화면 표시명(`display_name`). 원천 업종명(예: `커피-음료`, `분식전문점`)이 아니다 |
+| `businessTypeCode` | 문자열 | 소진공 소분류 코드(`industry_code`) |
+| `businessTypeName` | 문자열 | 승인 분류본의 화면 표시명(`display_name`). 현재 합의는 원천명 그대로다 |
 | `supported` | 불리언 | 화면 선택 지원 여부. 지원 업종만 돌려주므로 항상 `true`다 |
 
-- DB에는 원천 업종 100개가 저장돼 있지만, `is_supported`가 `TRUE`인 업종만 돌려준다. 초기 지원 업종은 위 3개다.
-- 정렬은 `display_order` 순이고, 순서가 같으면 업종 코드순이다.
-- 지원 여부·표시 순서를 DB에서 바꾸면 다음 요청부터 바로 반영된다. 결과를 따로 저장(캐시)해 두지 않는다.
-- 쿼리 파라미터(예: `?supported=false`)를 붙여도 무시하며, 미지원 업종은 노출하지 않는다.
-- 원천 업종명, `display_order`, `data_version`, `collected_at` 같은 DB 관리용 컬럼은 응답에 넣지 않는다.
+`meta`에는 `requestId`만 있다. 지역 목록 API의 출처 정보(`codeSystem` 등)는 넣지 않는다.
+
+### 어떤 업종을 돌려주는가 (설계 정책)
+
+1. 지역 게시 포인터(`region_publication`, `NATIONWIDE_SELECTION`)가 가리키는 승인 릴리스를 한 번 읽는다.
+2. 그 릴리스의 검증 보고서(`validation_report`)에 적힌 `classificationId`로 업종 분류본을 찾고, 승인(`APPROVED`) 상태인지 확인한다. 업종에는 따로 게시 포인터가 없다.
+3. 같은 분류본에서 소분류(`SMALL`)이면서 `is_supported = TRUE`, `support_release_status = 'APPROVED'`인 업종만 돌려준다.
+4. 정렬은 `display_order` 순이고, 순서가 같으면 업종 코드순이다.
+
+- 번호가 가장 큰 분류본, 가장 최근에 수집한 분류본, 여러 승인 분류본의 합집합은 쓰지 않는다. 게시본에 연결된 분류본 하나만 쓴다.
+- 분류본에는 대·중·소분류 전체가 저장돼 있지만 지원 소분류만 노출한다.
+- 결과를 따로 저장(캐시)해 두지 않는다. 새 릴리스를 게시하면 다음 요청부터 그 분류본의 업종이 나온다.
+- 원천 업종명(`industry_name`), 상위 분류, `display_order` 같은 관리용 컬럼은 응답에 넣지 않는다.
+- 성공·오류 응답 모두 `Cache-Control: no-store`를 붙인다.
 
 ### 지원 업종이 없을 때 — 200
 
-업종을 아직 적재하지 않았거나 지원 업종이 하나도 없으면 오류가 아니라 빈 목록을 돌려준다.
+연결된 분류본에 지원 업종이 하나도 없으면 오류가 아니라 빈 목록을 돌려준다. FE는 업종 선택·분석 진행을 막고 안내한다.
 
 ```json
 { "data": { "items": [] }, "meta": { "requestId": "..." } }
 ```
 
-### DB 장애 — 503
+### 오류
 
-자치구 목록과 같이 `DATA_SERVICE_UNAVAILABLE`을 돌려준다. 빈 목록으로 위장하지 않는다.
+| 상황 | HTTP·`error.code` | `details` |
+|---|---|---|
+| 쿼리 파라미터를 붙임(예: `?supported=false`, `?regionVersion=v1`) | 400 `INVALID_REQUEST` | `[{"field": "query", "reason": "INVALID_VALUE"}]` |
+| 지역 기준정보가 아직 게시 전 | 503 `REFERENCE_DATA_NOT_READY` | `[]` |
+| DB 연결·조회 실패 | 503 `DATA_SERVICE_UNAVAILABLE` | `[]` |
+| 게시본의 업종 연결이 깨짐(`classificationId` 없음·정수 아님, 없는 분류본, 승인 전 분류본) | 500 `INTERNAL_ERROR` | `[]` |
+
+- 파라미터 검사는 DB를 읽기 전에 하므로 DB 장애 중에도 잘못된 요청은 400이다. 붙인 파라미터 이름은 응답에 되돌려주지 않는다.
+- 게시 전이나 DB 장애를 빈 목록으로 위장하지 않는다. 서울 업종 목록으로 대신하지도 않는다.
+- 업종 연결이 깨진 상태는 승인·게시 명령이 미리 막기 때문에 정상 운영에서는 생기지 않는다. 생기면 다른 분류본으로 대신하지 않고 500으로 알린다.
