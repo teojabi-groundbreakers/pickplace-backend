@@ -1,5 +1,7 @@
 # T08~T10 개발 인계 · 전국 지역·업종 목록 전환
 
+> 데이터 후속 반영: [세종 권고 릴리스](../data/sejong-auto-select-release.md). autoSelect는 BE 권고이며 false가 자동 선택 금지는 아니다. 현재 개발 DB에서 세종 그룹은 true, FE 동작은 별도 검수다.
+
 > 작성: 2026-11-09 · 상태: 확정 지역 계약에 따른 구현 인계 / 보조 필드·오류 세부·공개 업종 전환은 별도 확인
 > 코드 대조 기준: `feature/nationwide-reference-import`의 `2354912`.
 > 기존 서울 API는 구현 완료 상태다. 이 문서는 전국 전환에 필요한 추가 수정 범위를 다룬다.
@@ -17,8 +19,8 @@ T06의 V3·V4는 개발 DB에 적용됐고, T07의 최종본은 승인·게시�
 | 현재 개발 DB 확인값 | 값 |
 | --- | --- |
 | 게시 키 | NATIONWIDE_SELECTION |
-| 지역 버전 | national-202609-release-v1 |
-| 지역 release_id / revision | 4 / 1 |
+| 지역 버전 | national-202609-sejong-hint-v1 |
+| 지역 release_id / revision | 5 / 2 |
 | 연결 업종 classification_id | 3 |
 | 업종 버전 | semas-202609-service-v1 |
 | 선택 대상 | 시·도 16 / 그룹 256 / 읍면동 3,565 |

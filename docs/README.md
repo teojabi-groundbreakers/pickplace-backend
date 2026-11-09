@@ -11,7 +11,7 @@
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
 | [FE 인계 · 현재 지원 API 안내](api/frontend-api-guide.md) | 실제 호출 가능한 API·main/develop 차이·응답·접속·오류·미구현 목록 |
 | [T08~T10 전국 목록 API 개발 인계](api/nationwide-reference-api-handoff.md) | 수정 위치·게시본 조회·H10/업종 전환·계약 협의·구현 순서·검수표 |
-| [전국 기준정보 로컬 적재 묶음](../data/reference/national-202609-release-v1/README.md) | 클론에 포함된 검증 JSON·해시·로컬 적재/승인/게시·SQL 확인 |
+| [전국 기준정보 로컬 적재 묶음](../data/reference/national-202609-sejong-hint-v1/README.md) | 세종 권고 반영 JSON·해시·로컬 적재/승인/게시 |
 
 ## 설계 · API 계약
 
@@ -35,6 +35,7 @@
 | [전국 기준정보 수동 적재](data/national-reference-import.md) | T07 전국 원본→검토 묶음→적재·승인·게시·복구, 실제 실행 결과 |
 | [전국 기준정보 계층·대응 검토](data/national-reference-review.md) | 정상 대응·표기 차이·출장소 보류·변경일 예외와 새 검토본 |
 | [T07 최종 승인·게시](data/national-reference-completion.md) | 확정 제외 정책·자료 이용 근거·초기 업종·실제 승인/게시 결과 |
+| [세종 자동 선택 권고 게시](data/sejong-auto-select-release.md) | 새 릴리스·세종 true·이전 false 보존·현재 revision 2·FE 후속 |
 | [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
 | [공공데이터 수집 대상·다운로드 경로](data/public-data-sources.md) | T12 1단계 · 초기 4종·분할 수집·실제 응답·수집 설정 |
 | [공공데이터 수동 CLI](data/public-data-command.md) | T12 · 핵심 4종 수집·점포 100업종 검증·원본 보관 |

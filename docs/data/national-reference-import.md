@@ -2,7 +2,7 @@
 
 최신 상태: [T07 최종 승인·게시 완료](national-reference-completion.md). 아래 READY·미공개 실행 결과는 최초 후보본 단계의 이력으로 보존한다.
 
-**팀원 로컬 적재:** 저장소에 [검증된 적재 묶음과 실행 안내](../../data/reference/national-202609-release-v1/README.md)를 포함했다. 원본 재다운로드·Python 없이 import→approve→publish할 수 있다. 아래 원본 생성 절차는 새 버전을 만들 때 사용한다.
+**팀원 로컬 적재:** 저장소에 [세종 권고를 반영한 적재 묶음과 실행 안내](../../data/reference/national-202609-sejong-hint-v1/README.md)를 포함했다. 원본 재다운로드·Python 없이 import→approve→publish할 수 있다. 아래 원본 생성 절차는 새 버전을 만들 때 사용한다.
 
 계층·대응 후속 검토는 [전국 기준정보 검토](national-reference-review.md)를 참조한다. 원래 후보본·검증 이력은 보존하며 새 검토본과 구분한다.
 

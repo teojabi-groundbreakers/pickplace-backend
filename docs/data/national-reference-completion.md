@@ -1,5 +1,7 @@
 # T07 최종 승인·게시
 
+> 최신 개발 DB는 [세종 자동 선택 권고 후속 릴리스](sejong-auto-select-release.md)가 revision 2로 게시됐다. 아래 release 4/revision 1은 최초 승인·게시 이력이다.
+
 기준일: 2026-11-09 · 브랜치 `feature/nationwide-reference-import`
 
 **T07 완료.** 개발 DB에서 `national-202609-release-v1`(release ID4)을 APPROVED로 승인하고 최초 게시 revision1/event1을 기록했다. 분류 승인본은 ID3이며 초기3업종을 활성화했다. 기존 후보ID1·검토본ID3과 출장소 원본76개를 보존했다.
