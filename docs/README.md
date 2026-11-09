@@ -1,6 +1,6 @@
 # 백엔드 개발 문서
 
-> 이 브랜치의 상태: Flyway V1 기준정보·V2 통계 및 적재 이력·V3 H10 기준정보·V4 전국 원천/소진공 업종 스키마, 기존 수동 기준정보 적재·공통 처리·서울 목록 API 구현. 전국 실제 적재·통계 구조·새 목록 전환은 후속 작업.
+> 이 브랜치의 상태: V1~V4와 T07 전국 기준정보를 보존하며 V5 전국 인구·업소 통계/적재 스키마를 추가했다. V5 실제 개발 DB 적용·숫자 적재·게시 서비스는 미수행이며, 전국 목록 API 전환은 별도 작업이다.
 
 <a id="문서-바로가기"></a>
 
@@ -20,6 +20,7 @@
 | [기준정보 DB 설계](database/reference-schema-design.md) | ERD·컬럼·PK/FK·인덱스·이력 정책 |
 | [H10 기준정보 DB](database/h10-reference-schema.md) | T06 V3·전국 지역/서울 원천 분리·9개 테이블·제약·T07/T11 후속 범위 |
 | [전국 원천 기준정보 DB](database/nationwide-reference-schema.md) | T06 V4·인구 H10/상가8 대응·소진공 업종 계층·승인 제약 |
+| [전국 인구·업소 통계 DB](database/national-statistics-schema.md) | T11 V5·월/배포본·사실/집계/품질·게시 구조·T13/T14 경계 |
 | [상권 통계·적재 이력 DB 설계](database/statistics-schema-design.md) | T11 통계 6종·배치·게시·품질 이슈, V2 적용 방법 |
 | [공통 응답 형식](api/common-response.md) | 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API |
 | [FE·BE 통합 API 명세 v0.2](api/fe-be-contract.md) | 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안 |

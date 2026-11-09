@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StatisticsSchemaUpgradeTests {
 
     @Test
-    void upgradesV1ThroughV4WithoutChangingExistingReferenceOrStatisticsData() {
+    void upgradesV1ThroughV5WithoutChangingExistingReferenceOrStatisticsData() {
         try (MySQLContainer mysql = new MySQLContainer("mysql:8.4.11").withDatabaseName("pickplace_upgrade_test")) {
             mysql.start();
             var source = new DriverManagerDataSource(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
@@ -118,7 +118,7 @@ class StatisticsSchemaUpgradeTests {
                     """);
             var originalMapping = jdbc.queryForMap("SELECT * FROM region_stat_mapping");
             var v3Checksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
-            var v4 = Flyway.configure().dataSource(source).cleanDisabled(true).load();
+            var v4 = Flyway.configure().dataSource(source).target("4").cleanDisabled(true).load();
             assertThat(v4.migrate().migrationsExecuted).isEqualTo(1);
             assertThat(jdbc.queryForMap("SELECT * FROM source_region_reference")).isEqualTo(originalSource);
             assertThat(jdbc.queryForMap("SELECT * FROM region_stat_mapping")).isEqualTo(originalMapping);
@@ -129,6 +129,19 @@ class StatisticsSchemaUpgradeTests {
             assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_industry_code", Integer.class)).isZero();
             assertThat(v4.migrate().migrationsExecuted).isZero();
             assertThat(v4.validateWithResult().validationSuccessful).isTrue();
+            var previousChecksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
+            var v5 = Flyway.configure().dataSource(source).cleanDisabled(true).load();
+            assertThat(v5.migrate().migrationsExecuted).isEqualTo(1);
+            assertThat(jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history WHERE version IN ('1','2','3','4') ORDER BY installed_rank"))
+                    .isEqualTo(previousChecksums);
+            assertThat(jdbc.queryForMap("SELECT * FROM source_region_reference")).isEqualTo(originalSource);
+            assertThat(jdbc.queryForMap("SELECT * FROM region_stat_mapping")).isEqualTo(originalMapping);
+            assertThat(jdbc.queryForObject("SELECT resident_population FROM dong_resident_quarter", Long.class)).isZero();
+            assertThat(jdbc.queryForObject("SELECT is_supported FROM business_type", Boolean.class)).isTrue();
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_import_batch", Integer.class)).isZero();
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_summary_publication", Integer.class)).isZero();
+            assertThat(v5.migrate().migrationsExecuted).isZero();
+            assertThat(v5.validateWithResult().validationSuccessful).isTrue();
         }
     }
 }
