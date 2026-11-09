@@ -14,6 +14,7 @@
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
 | 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
 | 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |
+| 전국 인구·업소 통계 저장 | [T11 V5 테이블·제약·검증 범위](docs/database/national-statistics-schema.md) |
 | 전국 기준정보 적재 | [T07 원본 준비·적재·승인·게시](docs/data/national-reference-import.md) |
 | 팀원 로컬에 전국 기준정보 적재 | [클론에 포함된 JSON·해시·실행 명령](data/reference/national-202609-release-v1/README.md) |
 | 전국 기준정보 완료 기록 | [T07 최종 승인·게시](docs/data/national-reference-completion.md) |

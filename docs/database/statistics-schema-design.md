@@ -1,5 +1,7 @@
 # 상권 통계·적재 이력 DB 설계
 
+> 아래는 서울 분기·CS 기준 V2 구현 이력이다. 전국 월별 인구·소진공 업소의 최신 구현은 [T11 V5 전국 통계 DB](national-statistics-schema.md)를 따른다. 기존 V2 SQL과 데이터는 보존한다.
+
 > T11 · 스키마 구현
 >
 > 기준: [데이터 정의서](https://app.notion.com/p/3fa2114f823a818c9bd8e2664cbcd618) · [T11 작업](https://app.notion.com/p/3f42114f823a816e992dc145b433f264)
