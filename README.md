@@ -10,7 +10,8 @@
 | --- | --- |
 | 처음 서버·DB 실행 | [단계별 실행 안내](docs/getting-started.md) |
 | FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
-| 공공데이터 수집 | [수집 계획 확인·점포·인구·시설 다운로드](docs/data/public-data-command.md) |
+| 전국 인구·업소 원본 수집 | [T12 전국 CLI·기존 원본 재사용·검증](docs/data/national-data-download.md) |
+| 이전 서울 자료 수집 이력 | [분기별 점포·인구·시설 수집](docs/data/public-data-command.md) |
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
 | 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
 | 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |
