@@ -16,17 +16,19 @@
 
 ## 1. 정상 응답 — 200
 
+현재 게시본(`national-202609-release-v1`)의 `GET /api/regions/groups?provinceCode=3600000000` 응답이다.
+
 ```json
 {
   "data": {
     "items": [
-      { "regionCode": "3611000000", "regionName": "세종특별자치시", "selectionLevel": "GROUP", "parentCode": "3600000000", "autoSelect": true }
+      { "regionCode": "3611000000", "regionName": "세종특별자치시", "selectionLevel": "GROUP", "parentCode": "3600000000", "autoSelect": false }
     ]
   },
   "meta": {
     "requestId": "3f2a9c1e-...",
     "codeSystem": "MOIS_H10",
-    "sourceReferenceOn": "2026-10-30",
+    "sourceReferenceOn": null,
     "sourceFileVersion": "20261026"
   }
 }
@@ -38,13 +40,13 @@
 | `regionName` | 문자열 | 화면 표시명. 공식 원본 이름과 다를 수 있다(예: `수원시 장안구`) |
 | `selectionLevel` | `PROVINCE` / `GROUP` / `LOCALITY` | 화면 선택 단계. 법적 행정구역 유형이 아니다 |
 | `parentCode` | 문자열 또는 `null` | 화면 선택 부모의 코드. 시·도는 `null`이다. 공식 행정 계층의 부모와 다를 수 있다 |
-| `autoSelect` | 불리언 | 화면에서 자동으로 고르는 그룹이면 `true`(현재 세종). 그 밖에는 `false` |
+| `autoSelect` | 불리언 | BE의 자동 선택 권고. 게시된 기준정보 값을 그대로 내보내며 API에서 특정 코드를 정하지 않는다 |
 
 | `meta` 필드 | 설명 |
 |---|---|
 | `requestId` | 응답 헤더 `X-Request-Id`와 같은 값 |
 | `codeSystem` | 항상 `MOIS_H10`. 모든 코드가 행정안전부 행정기관 코드라는 뜻 |
-| `sourceReferenceOn` | 공식 자료 게시글의 기준일(`YYYY-MM-DD`). 없으면 `null` |
+| `sourceReferenceOn` | 공식 자료 게시글의 기준일(`YYYY-MM-DD`). 게시본에 근거 값이 없으면 `null`이다(현재 게시본은 `null`). 근거 없는 날짜를 채우거나 파일 버전을 날짜로 바꾸지 않는다 |
 | `sourceFileVersion` | 공식 첨부 파일 버전 문자열. 날짜처럼 보여도 날짜로 해석하지 않는다 |
 
 - 출처 meta는 설명용이다. FE가 다음 요청에 다시 보내는 값이 아니다.
@@ -52,6 +54,16 @@
 - 목록에는 현행이고, 날짜 품질이 정상이며, 검토가 끝난 화면 선택 대상만 나온다. 출장소·도시 묶음·말소 지역·검토 전 지역은 나오지 않는다.
 - 공식 지역은 있지만 통계가 없는 지역도 목록에 나온다. 통계 제공 여부는 현황 API에서 따로 판단한다.
 - 하위 지역이 없는 정상 부모는 `200` + `items: []`다.
+
+### `autoSelect` 해석
+
+| 값 | 의미 |
+|---|---|
+| `true` | 추가 클릭 없이 이 항목을 적용하도록 권고한다 |
+| `false` | 별도 권고가 없다. 자동 선택을 금지한다는 뜻이 아니다 |
+
+- 실제로 항목을 선택하고 다음 목록을 요청하는 것은 FE가 처리한다.
+- 세종 그룹(`3611000000`)의 설계 권고는 `true`다. 현재 게시본에는 `false`로 저장돼 있으며, 새 기준정보 릴리스 반영과 FE 동작 검수는 후속 작업이다.
 
 ## 2. 입력 규칙
 
