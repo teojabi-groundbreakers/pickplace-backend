@@ -23,11 +23,17 @@ public final class NationalDataDownloadCommand {
 
     private NationalDataDownloadCommand() {}
 
-    public static boolean isRequested(String[] args) { return profiles(args).contains(PROFILE); }
+    public static boolean isRequested(String[] args) {
+        var names = profiles(args);
+        return names.contains(PROFILE) || names.contains("data-download");
+    }
 
     public static int execute(String[] args, PrintStream output, PrintStream error) {
         try {
             var arguments = new DefaultApplicationArguments(args);
+            if (profiles(args).contains("data-download")) {
+                throw new IllegalArgumentException("서울 전용 data-download 프로필은 폐기됐습니다. national-data-download와 --month를 사용하세요.");
+            }
             if (!profiles(args).equals(List.of(PROFILE)) || !arguments.getNonOptionArgs().isEmpty()
                     || !OPTIONS.containsAll(arguments.getOptionNames())) throw new IllegalArgumentException("national-data-download 프로필과 정의된 옵션만 지정하세요.");
             for (String key : arguments.getOptionNames()) {

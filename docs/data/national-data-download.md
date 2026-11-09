@@ -89,4 +89,6 @@ T13은 결과의 rawFile과 metadataFile을 입력으로 받는다. ZIP의 각 �
 
 [Apache Commons CSV 1.14.1](https://commons.apache.org/proper/commons-csv/changes.html)로 인용부호 내부 쉼표·줄바꿈을 레코드 단위로 읽는다. 전체 CSV를 리스트로 올리지 않는다.
 
-[실제 원본·전체 회귀 검증 기록](national-data-download-validation.json)을 참고한다. 기존 서울 data-download는 이전 범위 재현용이며 전국 서비스의 기본 수집 경로는 이 문서다. 원본349MB는 Git에 포함하지 않는다. 다른 개발자는 이 CLI로 같은 검증 배포본을 다운로드하거나 보유 파일을 재사용하면 된다.
+[실제 원본·전체 회귀 검증 기록](national-data-download-validation.json)을 참고한다. 전국 원본에는 서울도 포함된다. 서울 전용 수집 코드·설정·테스트·실행 안내는 제거했으며 이전 구현은 [삭제 전 Git 이력](https://github.com/teojabi-groundbreakers/pickplace-backend/tree/d3d3c9b/src/main/java/com/pickplace/backend/ingestion/download)으로 보존한다. 폐기된 data-download 프로필은 DB/웹 초기화 전에 종료 코드2로 거절한다.
+
+원본349MB는 Git에 포함하지 않는다. 다른 개발자는 이 CLI로 같은 검증 배포본을 다운로드하거나 보유 파일을 재사용하면 된다.

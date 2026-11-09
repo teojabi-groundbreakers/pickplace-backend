@@ -39,8 +39,6 @@
 | [T07 최종 승인·게시](data/national-reference-completion.md) | 확정 제외 정책·자료 이용 근거·초기 업종·실제 승인/게시 결과 |
 | [세종 자동 선택 권고 게시](data/sejong-auto-select-release.md) | 새 릴리스·세종 true·이전 false 보존·현재 revision 2·FE 후속 |
 | [원천 manifest](data/reference-source-manifest.json) | 원본 URL·조회 조건·SHA-256·수집 시각 |
-| [공공데이터 수집 대상·다운로드 경로](data/public-data-sources.md) | T12 1단계 · 초기 4종·분할 수집·실제 응답·수집 설정 |
-| [공공데이터 수동 CLI](data/public-data-command.md) | T12 · 핵심 4종 수집·점포 100업종 검증·원본 보관 |
 
 ## 실제 실행 기준과 설계 이력
 

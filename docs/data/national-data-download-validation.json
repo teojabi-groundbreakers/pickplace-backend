@@ -2,16 +2,16 @@
   "validatedOn": "2026-11-09",
   "branch": "feature/national-data-download",
   "baseCommit": "0b9ef21",
-  "scope": "T12 nationwide raw acquisition and structural validation; no numeric cleansing or DB writes",
+  "scope": "T12 nationwide-only raw acquisition and structural validation; no numeric cleansing or DB writes",
   "fullVerification": {
     "command": "gradlew.bat clean check bootJar --init-script <local-test-temp.init.gradle>",
     "result": "BUILD SUCCESSFUL",
-    "tests": 327,
+    "tests": 274,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "suites": 26,
-    "newNationalDownloadTests": 34
+    "suites": 22,
+    "newNationalDownloadTests": 35
   },
   "realDataVerification": {
     "jvmMaxHeap": "256m",
@@ -72,9 +72,53 @@
     "databaseModifiedByCli": false
   },
   "observations": [
-    "The first full run had a Windows AccessDeniedException in the existing Seoul StoreDownloadService metadata.tmp rename",
-    "That existing test passed in isolation and a subsequent clean full verification passed; no Seoul collector logic was changed",
-    "Store network transport is exercised with local HTTP fixtures; the 349MB official ZIP is verified through existing-original adoption and official HEAD, not a claimed full HTTP redownload"
+    "Before retirement, the first full run had a Windows AccessDeniedException in the existing Seoul StoreDownloadService metadata.tmp rename",
+    "That existing test passed in isolation and a subsequent clean full verification passed; no Seoul collector logic was changed at that verification stage",
+    "Store network transport is exercised with local HTTP fixtures; the 349MB official ZIP is verified through existing-original adoption and official HEAD, not a claimed full HTTP redownload",
+    "The retired Seoul collector and its old instructions/configuration/route verification were subsequently removed by user decision; current verification covers only maintained functionality"
   ],
-  "nextTask": "T13 parsing, numeric and age checks, duplicate store IDs, mapping/temporal/count-impact validation"
+  "nextTask": "T13 parsing, numeric and age checks, duplicate store IDs, mapping/temporal/count-impact validation",
+  "preSeoulRetirementVerification": {
+    "command": "gradlew.bat clean check bootJar --init-script <local-test-temp.init.gradle>",
+    "result": "BUILD SUCCESSFUL",
+    "tests": 327,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 26,
+    "newNationalDownloadTests": 34
+  },
+  "seoulCollectorRetirement": {
+    "retiredProfile": "data-download",
+    "retiredProfileExitCode": 2,
+    "serverOrDbBootstrapOnRetiredCommand": false,
+    "removedDedicatedTestSuites": 4,
+    "removedDedicatedTestCases": 54,
+    "addedRetirementGuardTestCases": 1,
+    "preservedInGitAt": "d3d3c9b",
+    "seoulIncludedInNationalFiles": {
+      "populationSourceRows": 427,
+      "storeSourceRows": 552422
+    },
+    "removedFiles": [
+      "docs/data/public-data-command.md",
+      "docs/data/public-data-source-catalog.json",
+      "docs/data/public-data-source-verification.json",
+      "docs/data/public-data-sources.md",
+      "src/main/java/com/pickplace/backend/ingestion/download/cli/DataDownloadCommand.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/model/DownloadPlan.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/model/DownloadRequest.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/model/SourceCatalog.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/service/DownloadPlanService.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/service/PublicDataHttpClient.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/service/QuarterDownloadService.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/service/SourceCatalogLoader.java",
+      "src/main/java/com/pickplace/backend/ingestion/download/service/StoreDownloadService.java",
+      "src/main/resources/data-download/source-catalog.json",
+      "src/test/java/com/pickplace/backend/ingestion/download/DataDownloadBootstrapTests.java",
+      "src/test/java/com/pickplace/backend/ingestion/download/DataDownloadCommandTests.java",
+      "src/test/java/com/pickplace/backend/ingestion/download/QuarterDownloadServiceTests.java",
+      "src/test/java/com/pickplace/backend/ingestion/download/StoreDownloadServiceTests.java"
+    ]
+  }
 }

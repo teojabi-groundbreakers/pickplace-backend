@@ -63,4 +63,13 @@ class NationalDataDownloadCommandTests {
         all.add("--spring.profiles.active=national-data-download");
         return NationalDataDownloadCommand.execute(all.toArray(String[]::new), new PrintStream(new ByteArrayOutputStream()), new PrintStream(new ByteArrayOutputStream()));
     }
+
+    @Test
+    void rejectsRetiredSeoulProfileBeforeNormalApplicationBootstrap() {
+        String[] args = {"--spring.profiles.active=data-download", "--dataset=RESIDENT", "--quarter=20262"};
+        assertThat(NationalDataDownloadCommand.isRequested(args)).isTrue();
+        var error = new ByteArrayOutputStream();
+        assertThat(NationalDataDownloadCommand.execute(args, new PrintStream(new ByteArrayOutputStream()), new PrintStream(error))).isEqualTo(2);
+        assertThat(error.toString(java.nio.charset.StandardCharsets.UTF_8)).contains("폐기", "national-data-download");
+    }
 }
