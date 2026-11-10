@@ -157,7 +157,7 @@ curl "http://localhost:8080/api/regions/localities?groupCode=1111000000"
 
 전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다.
 
-`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 기준정보를 적재하기 전에는 자치구·지원 업종 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
+`/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 서울 기준정보를 적재하기 전에는 자치구 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. 전국 지역 목록과 지원 업종 목록은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 
 ### 4. 개발용 DB 종료
 
