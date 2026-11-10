@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-11-10T03:14:14.091698+00:00",
+  "branch": "feature/summary-availability",
+  "baseCommit": "9d955c9",
+  "scope": "T15 internal query context and availability policy; no public summary endpoint or T17 fact-query implementation",
+  "tests": {
+    "tests": 428,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 33,
+    "newT15Tests": 39,
+    "classes": [
+      {
+        "name": "com.pickplace.backend.ingestion.statistics.service.SummaryContextIntegrationTests",
+        "tests": 10
+      },
+      {
+        "name": "com.pickplace.backend.summary.MetricAvailabilityPolicyTests",
+        "tests": 15
+      },
+      {
+        "name": "com.pickplace.backend.summary.SummaryContextServiceTests",
+        "tests": 14
+      }
+    ],
+    "command": "gradlew.bat check bootJar --console=plain --init-script <local Mockito temporary-directory init script>",
+    "result": "PASSED"
+  },
+  "environment": {
+    "java": "Temurin 25.0.4.1",
+    "mysql": "8.4.11 isolated Testcontainers pickplace_test",
+    "developmentDatabaseModified": false
+  },
+  "checks": [
+    "DEFAULT only: newer monthly publication or newest loaded batch does not replace default; MONTH alone remains SUMMARY_DATA_NOT_READY",
+    "Published current LOCALITY and registered/supported SEMAS classification checked independently of statistics presence",
+    "Source artifact kind, SHA and original collection time checked against successful summary batches",
+    "Input format checked before transaction/connection; business required, H10 ASCII10, SEMAS ASCII1+5",
+    "Real concurrent selection/default publication preserves initial callback snapshot; new request sees new pointers",
+    "Outer READ_COMMITTED transaction is suspended; inner read-only REPEATABLE_READ and caller isolation restored",
+    "Population preserved when store classification mismatches; safe integer and actual zero preserved",
+    "97 accepted + 3 held count impact => null COUNT_INCOMPLETE; invalid coverage cannot create zero",
+    "Source region/row/value absence distinguished from suppression, mapping, boundary, count and quality problems",
+    "Reference/default unpublished, broken published metadata and database failure remain distinct errors"
+  ],
+  "limits": [
+    "Integration uses small deterministic T12/T13/T14 fixtures; no full 2.75-million-row re-import for this read-only change",
+    "T17 must query facts, coverage, relevant quality issues and resolve RegionState from actual mapping/boundary evidence inside the callback",
+    "T18 must implement HTTP query validation, response/OpenAPI mapping and endpoint tests; no new URL in this branch",
+    "No schema migration or changes to existing stored development data"
+  ],
+  "sourceSha256": {
+    "src/main/java/com/pickplace/backend/summary/MetricAvailabilityPolicy.java": "342b167d346afd0262cb8e2b1241ab97ca168f763dda90a1b85fdf1391be3552",
+    "src/main/java/com/pickplace/backend/summary/MetricDecision.java": "44cce3a95e1e8c388775067791cedb2976b220c29fc333d62f195cd5abf4dcf1",
+    "src/main/java/com/pickplace/backend/summary/MetricEvidence.java": "d9ae4858bdb88cb1d986bb01476f02571772dc2525d85107f9e428f5e61c3554",
+    "src/main/java/com/pickplace/backend/summary/SummaryContextRepository.java": "5699d29cfc91510de9b47f92b8d9b30c2c288da2dd8c0adbb004a6200d4133fb",
+    "src/main/java/com/pickplace/backend/summary/SummaryContextService.java": "7f1b5c9470bc66221cfa1ce9276a9b372169c04b3562fea253a642cc071d8c86",
+    "src/main/java/com/pickplace/backend/summary/SummaryReadContext.java": "e8a0f7286058f249ccd957d2ccfd9f98b173e6268ffe571dd128be8be1253ce3"
+  }
+}

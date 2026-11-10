@@ -1,10 +1,12 @@
 # FE 인계 · 현재 지원 API 안내
 
-확인일: 2026-11-10 · 코드 기준: develop `4192eb7` / main `b1002dd`
+확인일: 2026-11-10 · 코드 기준: develop `9d955c9` / main `b1002dd` · T15 작업 브랜치의 내부 판정 구현은 별도
 
 [노션 최신 개발 문서 안내](https://app.notion.com/p/40a2114f823a8133b662fb5aa49b457c) · [지역·업종 정식 명세](https://app.notion.com/p/4122114f823a81988d0ee0c9bf88c5bb)
 
 > **develop에는 HTTP API 8개가 구현되어 있다.** 전국 지역 3개·지원 업종 1개, 상태 2개, 임시 유지 중인 서울 목록 2개다. 현황·추이·지도·AI 공개 API는 아직 구현되지 않았다. T13/T14의 원본 검증·DB 적재 CLI가 생겨도 FE에서 호출할 HTTP API가 자동으로 생기는 것은 아니다.
+
+T15의 DEFAULT 조회 기준·지표 판정은 내부 재사용 기능이다. 신규 공개 URL은 없으며 [T15 구현·T17/18 인계](../data/summary-availability.md)를 참고한다. FE는 현황 API가 구현·배포되기 전까지 설계 경로를 지원 API로 간주하지 않는다.
 
 ## 지원 API
 
