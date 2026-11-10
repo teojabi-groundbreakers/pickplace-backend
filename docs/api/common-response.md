@@ -53,11 +53,13 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 | 400 | `INVALID_REGION_CODE` | 지역 코드 형식 오류 | 명세 초안 |
 | 404 | `NOT_FOUND` | 존재하지 않는 주소 | **추가안(확정 전)** |
 | 404 | `REGION_NOT_FOUND` | 형식은 맞지만 등록되지 않은 지역 코드 | 명세 초안 |
+| 404 | `BUSINESS_TYPE_NOT_FOUND` | 형식은 맞지만 현재 승인 분류에 없는 업종 코드 | 현황 API 명세 v0.4 |
 | 405 | `METHOD_NOT_ALLOWED` | 지원하지 않는 HTTP 메서드 (`Allow` 헤더로 허용 메서드 안내) | **추가안(확정 전)** |
 | 422 | `BUSINESS_TYPE_NOT_SUPPORTED` | 등록됐지만 초기 지원 3업종이 아님 | 명세 초안 |
 | 422 | `QUARTER_NOT_SUPPORTED` | 지원 기간 밖의 분기 | 명세 초안 |
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 (서버 반환값 검증 실패 포함) | 명세 초안 |
 | 503 | `DATA_SERVICE_UNAVAILABLE` | DB 연결·조회 실패 (빈 결과로 위장하지 않음) | 명세 초안 |
+| 503 | `SUMMARY_DATA_NOT_READY` | DB와 지역 기준정보는 정상이지만 기본(DEFAULT) 현황 묶음이 아직 게시되지 않음 | 현황 API 명세 v0.4 |
 | 503 | `REFERENCE_DATA_NOT_READY` | DB는 정상이지만 전국 지역 기준정보가 아직 게시되지 않음(지역 목록·지원 업종 목록) | **추가안(확정 전)** · 지역·업종 API 명세 v0.4 |
 
 그 밖에 Spring이 4xx로 판단한 요청 오류(예: 415 지원하지 않는 Content-Type)는 해당 HTTP 상태와 `INVALID_REQUEST` 코드로 응답한다.
@@ -72,8 +74,9 @@ Spring이 오류와 함께 제공하는 안내 헤더(405의 `Allow`, 415의 `Ac
 | `INVALID_FORMAT` | 타입이 맞지 않음 (예: 숫자 자리에 문자) |
 | `INVALID_VALUE` | 검증 규칙 위반 (예: 자릿수·패턴 불일치) |
 | `NOT_FOUND` | 형식은 맞지만 등록되지 않은 값 (예: 없는 자치구 코드) |
+| `NOT_SUPPORTED` | 등록됐지만 서비스에서 지원하지 않는 값 (예: 미지원 업종) |
 
-전국 지역 목록 API(`/api/regions/*`)와 지원 업종 목록 API(`/api/business-types`)는 정해지지 않은 쿼리 파라미터를 받으면 `field: "query"`, `reason: "INVALID_VALUE"`로 알린다. 사용자가 보낸 파라미터 이름을 응답에 되돌려주지 않기 위해서다.
+전국 지역 목록 API(`/api/regions/*`), 지원 업종 목록 API(`/api/business-types`), 현황 API(`/api/regions/{regionCode}/summary`)는 정해지지 않은 쿼리 파라미터를 받으면 `field: "query"`, `reason: "INVALID_VALUE"`로 알린다. 사용자가 보낸 파라미터 이름을 응답에 되돌려주지 않기 위해서다.
 
 ## 3. 요청 ID (`X-Request-Id`)
 

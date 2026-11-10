@@ -31,6 +31,7 @@
 | [분기별 기본 현황 API·표시 규칙 v0.1](api/quarterly-summary-contract.md) | 핵심 지표·분기 선택·0/null·품질 상태·현황 응답과 화면 표시. 구현 전 초안 |
 | [기준정보 조회 API](api/reference-api.md) | 자치구·행정동·지원 업종 목록 API의 요청·응답·오류 예시 |
 | [전국 지역 목록 API](api/region-api.md) | 시·도·그룹·읍면동 목록 API의 응답·입력 규칙·오류·내부 동작 |
+| [지역·업종 현황 API](api/summary-api.md) | 인구·수록 업소 현황 API의 요청·응답·지표 상태·오류·내부 동작 |
 
 ## 적재 · 원천 · 검증
 
