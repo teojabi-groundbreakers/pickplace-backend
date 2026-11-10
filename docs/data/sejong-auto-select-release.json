@@ -1,0 +1,39 @@
+{
+  "completedOn": "2026-11-09",
+  "branch": "chore/sejong-auto-select",
+  "baseCommit": "cc27ab33c5d497875ea080df3e3f01a387e6199a",
+  "snapshotVersion": "national-202609-sejong-hint-v1",
+  "snapshotSha256": "0b5430750eed5ea951ee9161589e92e07df5fb5beea6c0cc36e651d5982bc1a9",
+  "baseSnapshotSha256": "f9b3815bcb4b5f9362dd467191840b8b77b4eed67399fa4ac5ba895f1e9cb371",
+  "verification": {
+    "javaCommand": "gradlew.bat clean check bootJar --init-script <local-test-temp.init.gradle>",
+    "javaSuites": 23,
+    "javaTests": 235,
+    "pythonTests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "fullJsonDeltaVerified": true,
+    "oldAndNewPublicationTestedInIsolatedMySql": true
+  },
+  "developmentDatabase": {
+    "database": "pickplace",
+    "releaseId": 5,
+    "status": "APPROVED",
+    "revision": 2,
+    "classificationId": 3,
+    "previousReleaseId": 4,
+    "previousSejongAutoSelect": false,
+    "currentSejongAutoSelect": true,
+    "autoSelectTrueCodes": ["3611000000"],
+    "otherNavigationChanges": 0,
+    "selectableCounts": {"PROVINCE": 16, "GROUP": 256, "LOCALITY": 3565},
+    "excludedNodesPreserved": 76,
+    "supportedIndustries": ["I21201", "I21007", "I21001"],
+    "sourceRegions": 7177,
+    "publicationEvents": 2,
+    "flywayVersions": ["1", "2", "3", "4"]
+  },
+  "feBehaviorVerified": false,
+  "deployedApiServerVerified": false
+}

@@ -1,0 +1,44 @@
+{
+  "reviewedOn": "2026-11-09",
+  "status": "VERIFIED",
+  "scope": "Initial service reference codes/names and source classification; raw ZIP/HWPX not redistributed",
+  "datasets": [
+    {
+      "datasetId": "15095148",
+      "name": "행정안전부_주민등록업무 행정기관 및 관할구역",
+      "catalogUrl": "https://www.data.go.kr/data/15095148/fileData.do",
+      "metadataUrl": "https://www.data.go.kr/catalog/15095148/fileData.json",
+      "license": "이용허락범위 제한 없음",
+      "metadataSha256": "fc1e927bdfacbff9cf973ce2e7f45394389630ab524671ea5cb70e0035f3e950",
+      "evidenceFile": "region-license.txt"
+    },
+    {
+      "datasetId": "15097972",
+      "name": "행정안전부_지역별(행정동) 성별 연령별 주민등록 인구수",
+      "catalogUrl": "https://www.data.go.kr/data/15097972/fileData.do",
+      "metadataUrl": "https://www.data.go.kr/catalog/15097972/fileData.json",
+      "license": "이용허락범위 제한 없음",
+      "metadataSha256": "f5de9e7094e99a4c7c67f473e314cce1b8ec768de4b7b1687675c52306e2e1d0",
+      "evidenceFile": "population-license.txt"
+    },
+    {
+      "datasetId": "15083033",
+      "name": "소상공인시장진흥공단_상가(상권)정보",
+      "catalogUrl": "https://www.data.go.kr/data/15083033/fileData.do",
+      "metadataUrl": "https://www.data.go.kr/catalog/15083033/fileData.json",
+      "license": "이용허락범위 제한 없음",
+      "metadataSha256": "dfce4a64f3f20e11c16fc1dfc638c05573c809ad726ae3e67e952b74c0bd9db7",
+      "evidenceFile": "store-license.txt"
+    }
+  ],
+  "regionSourceLink": {
+    "catalogPageUrl": "https://www.data.go.kr/data/15095148/fileData.do",
+    "linkedBoardUrl": "https://www.mois.go.kr/frt/bbs/type001/commonSelectBoardList.do?bbsId=BBSMSTR_000000000052",
+    "currentNoticeUrl": "https://www.mois.go.kr/frt/bbs/type001/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000052&nttId=130674",
+    "pageSha256": "d0b6f52476a775f4de6d2f75c2e80bcd475e08b4c740e8b1cb6e0907c161def2",
+    "evidenceFile": "region-license-page.txt",
+    "assessment": "The official unrestricted catalog links this board and describes current/history address codes and Layout; same-family applicability is the project usage assessment, not an individually attached KOGL mark"
+  },
+  "attribution": "행정안전부 주민등록업무 행정기관 및 관할구역 / 행정안전부 주민등록 인구 / 소상공인시장진흥공단 상가(상권)정보; 원천 기준일과 가공 주체 PickPlace 표시",
+  "restriction": "No inference of SGIS, tourism, third-party photos/maps or unrelated attachment licenses"
+}

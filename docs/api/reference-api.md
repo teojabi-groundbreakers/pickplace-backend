@@ -2,6 +2,8 @@
 
 지역·업종 선택 화면에서 쓰는 목록 API다. 응답·오류 형식은 [공통 응답 형식](common-response.md)을 따른다.
 
+> 전국 지역 선택은 [전국 지역 목록 API](region-api.md)(`/api/regions/*`)를 쓴다. 아래 1·2절의 서울 전용 경로는 FE가 전국 API로 옮긴 뒤 폐기한다.
+>
 > 상태: 자치구·행정동·지원 업종 목록 구현.
 > 기준: 팀 API 명세 초안(데이터 계약 초안 v0.1). 데이터는 [기준정보 수동 적재](../data/reference-import.md)로 넣은 값을 그대로 읽는다.
 
@@ -12,6 +14,9 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
 서울 자치구 전체를 **자치구 코드순**으로 돌려준다. 요청 파라미터는 없다.
 
 ### 정상 응답 — 200
+
+<details>
+<summary>응답 JSON 예시 1</summary>
 
 ```json
 {
@@ -24,6 +29,8 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
   "meta": { "requestId": "3f2a9c1e-8b4d-4e2f-9a1b-7c6d5e4f3a2b" }
 }
 ```
+
+</details>
 
 | 필드 | 형식 | 설명 |
 |---|---|---|
@@ -38,13 +45,21 @@ API 문서 화면(Swagger UI)은 서버 실행 후 `http://localhost:8080/swagge
 
 기준정보를 아직 적재하지 않은 DB에서는 오류가 아니라 빈 목록을 돌려준다.
 
+<details>
+<summary>응답 JSON 예시 2</summary>
+
 ```json
 { "data": { "items": [] }, "meta": { "requestId": "..." } }
 ```
 
+</details>
+
 ### DB 장애 — 503
 
 DB에 연결하거나 조회하지 못하면 빈 목록으로 위장하지 않고 503을 돌려준다. DB 주소·SQL은 응답에 넣지 않는다.
+
+<details>
+<summary>응답 JSON 예시 3</summary>
 
 ```json
 {
@@ -57,9 +72,11 @@ DB에 연결하거나 조회하지 못하면 빈 목록으로 위장하지 않�
 }
 ```
 
+</details>
+
 ### 프론트엔드 참고
 
-FE 연동 초안은 지역·업종을 `GET /catalog` 하나로 받는 구조라 이 API와 경로·필드 이름이 다르다. 이 API는 팀 API 명세 초안(A2)을 따랐으며, FE와의 형식 통일은 명세 검토 때 정리한다.
+FE 연동 초안은 기준 URL `/api`에 `/catalog`를 붙여 지역·업종을 한 번에 받으므로 이 API와 경로·필드 이름이 다르다. 개별 조회와 공통 응답으로 전환하는 안은 [FE·BE 통합 API 명세 v0.2](fe-be-contract.md)에 정리했다. FE 공동 검토 전 초안이며 이 문서는 현재 구현된 자치구·행정동·지원 업종 API를 설명한다.
 
 ## 2. 자치구별 행정동 목록 — `GET /api/districts/{districtCode}/administrative-dongs`
 

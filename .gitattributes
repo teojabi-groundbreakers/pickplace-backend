@@ -3,3 +3,7 @@
 *.jar binary
 src/main/resources/reference-data/*.json text eol=lf
 docs/data/reference-source-manifest.json text eol=lf
+# Keep reviewed snapshot bytes stable across Windows/Linux checkouts.
+/data/reference/**/snapshot.json -text -diff
+/data/reference/**/manifest.json text eol=lf
+/data/reference/**/preparation-report.json text eol=lf

@@ -5,6 +5,14 @@
 
 [문서 목록](../README.md) · [DB 설계](../database/reference-schema-design.md) · [V1 검증](../database/migration-validation.md)
 
+## 실행 요약
+
+| 항목 | 기준 |
+| --- | --- |
+| 최초 전체 적재 | 자치구 25 · 행정동 425 · 업종 100 |
+| 같은 원본 재실행 | 기존 값 유지 · 신규 0/0/0 |
+| 충돌·실패 | 자동 덮어쓰기 없이 이번 적재 전체 롤백 |
+
 ## 1. 실행 전 확인
 
 **아래 적재 명령은 연결된 DB에 실제 데이터를 저장한다.** 대상 DB 주소·사용자·스키마를 먼저 확인하고, 필요하면 기존 데이터를 백업한다.
@@ -32,7 +40,7 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 ### 빌드된 JAR로 실행
 
 ```cmd
-java -jar build/libs/pickplace-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=local,reference-import --pickplace.reference-import.confirm=true
+java -jar build/libs/pickplace-backend-0.2.0.jar --spring.profiles.active=local,reference-import --pickplace.reference-import.confirm=true
 ```
 
 실행 순서:
@@ -59,7 +67,10 @@ java -jar build/libs/pickplace-backend-0.0.1-SNAPSHOT.jar --spring.profiles.acti
 
 `local` 프로필 없이 실행할 경우 DB 연결 설정을 별도로 제공해야 한다.
 
-## 3. 적재 데이터와 출처
+<a id="3-적재-데이터와-출처"></a>
+
+<details>
+<summary>3. 적재 데이터와 출처</summary>
 
 ### 고정 스냅샷 범위
 
@@ -98,7 +109,12 @@ java -jar build/libs/pickplace-backend-0.0.1-SNAPSHOT.jar --spring.profiles.acti
 da5e5e5aaccc7f6ca0e2706dc925a6076274491211060bd386388759e35ec796
 ```
 
-## 4. 저장·재적재·충돌 정책
+</details>
+
+<a id="4-저장재적재충돌-정책"></a>
+
+<details>
+<summary>4. 저장·재적재·충돌 정책</summary>
 
 ### 입력 검증
 
@@ -133,7 +149,12 @@ JDBC 사용은 기준정보 배치 적재에 한정한다. 후속 조회 API의 
 
 수동 명령은 동시에 중복 실행하지 않는다. DB PK가 중복 저장을 막더라도 동시 실행을 자동 조정하지는 않는다. 새 버전은 별도 이력 설계·검토 후 반영한다.
 
-## 5. 테스트와 원본 재현
+</details>
+
+<a id="5-테스트와-원본-재현"></a>
+
+<details>
+<summary>5. 테스트와 원본 재현</summary>
 
 ### Java·MySQL 테스트
 
@@ -153,7 +174,12 @@ Node.js 내장 모듈만 사용하며 파일을 수정하지 않는다. 원본 �
 
 팀원은 이미 검증된 JSON과 manifest로 적재·Java 테스트를 실행할 수 있으므로 **대용량 원본·Node.js·외부 API 키가 필수는 아니다.** Node.js와 원본은 위 재현 검사에만 필요하다.
 
-## 6. 검증 결과
+</details>
+
+<a id="6-검증-결과"></a>
+
+<details>
+<summary>6. 검증 결과</summary>
 
 ### 최종 빌드
 
@@ -187,3 +213,5 @@ Node.js 내장 모듈만 사용하며 파일을 수정하지 않는다. 원본 �
 - [ ] 커밋·푸시
 
 T07은 **검토** 상태다. 임시 DB의 검증 성공과 개발 DB 실제 반영을 구분한다.
+
+</details>

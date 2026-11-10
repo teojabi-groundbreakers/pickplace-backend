@@ -2,17 +2,44 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 자치구·행정동·지원 업종 목록 API와 통합 테스트입니다. 상권 통계 등 나머지 기능 API와 AI 연동은 아직 구현하지 않았습니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 지역·지원 업종 목록 API, 전국 인구·업소 원본 수집·정제·품질 검증과 통합 테스트입니다. 통계 DB 적재·현황 API와 AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
-## 설계 문서
+## 빠른 시작 · 문서 선택
 
+| 하려는 일 | 바로가기 |
+| --- | --- |
+| 처음 서버·DB 실행 | [단계별 실행 안내](docs/getting-started.md) |
+| FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
+| 전국 인구·업소 원본 수집 | [T12 전국 CLI·기존 원본 재사용·검증](docs/data/national-data-download.md) |
+| 전국 인구·업소 정제·검증 | [T13 실행·판정·집계 영향·T14 인계](docs/data/national-data-validation.md) |
+| 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
+| 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
+| 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |
+| 전국 인구·업소 통계 저장 | [T11 V5 테이블·제약·검증 범위](docs/database/national-statistics-schema.md) |
+| 전국 기준정보 적재 | [T07 원본 준비·적재·승인·게시](docs/data/national-reference-import.md) |
+| 팀원 로컬에 전국 기준정보 적재 | [세종 권고 반영 JSON·해시·실행 명령](data/reference/national-202609-sejong-hint-v1/README.md) |
+| 전국 기준정보 완료 기록 | [T07 최종 승인·게시](docs/data/national-reference-completion.md) |
+
+<a id="설계-문서"></a>
+
+<details>
+<summary>설계 문서</summary>
+
+- [FE 인계 · 현재 지원 API 안내](docs/api/frontend-api-guide.md): 현재 호출 가능한 API, main/develop 차이, 요청·응답·오류와 FE 연동 순서.
 - [처음 실행부터 DB 적재까지](docs/getting-started.md): Windows CMD·IntelliJ 기준의 통합 실행 안내. 명령어 의미·정상 결과·오류 대응 포함.
 - [기준정보 DB 설계](docs/database/reference-schema-design.md): 자치구·행정동·업종 ERD, 컬럼, 제약조건, 검수 기준.
+- [H10 기준정보 DB](docs/database/h10-reference-schema.md): V3 지역 마스터·공식 스냅샷·계층·원천 대응·게시 이력. 실제 적재와 통계 FK 전환은 후속 작업.
+- [상권 통계·적재 이력 DB 설계](docs/database/statistics-schema-design.md): T11 통계 6종·배치 이력·게시 버전·품질 이슈, V2 적용·검증 방법.
 - [V1 마이그레이션](src/main/resources/db/migration/V1__create_reference_tables.sql): 실제 테이블 생성의 기준입니다.
 - [기준정보 수동 적재](docs/data/reference-import.md): 검증된 25개 자치구·425개 행정동·100개 업종의 적재 명령과 안전장치.
+- [전국 인구·업소 원본 수집](docs/data/national-data-download.md): 전국 배포본 다운로드·보유 원본 재사용·수집 기록과 검증.
 - [이전 검토용 DDL](docs/database/reference-schema-draft.sql): 설계 검토 이력이며 자동 실행하지 않습니다. 변경 시 V1 대신 이 파일을 적용하지 않습니다.
 - [공통 응답 형식](docs/api/common-response.md): 성공·오류 응답 구조, 오류 코드, `X-Request-Id`, 서버 상태 API.
+- [FE·BE 통합 API 명세 v0.2](docs/api/fe-be-contract.md): 목록·공통 통신·오류·빈 결과와 FE 전환 작업. FE 공동 검토 전 초안.
+- [분기별 기본 현황 API·표시 규칙 v0.1](docs/api/quarterly-summary-contract.md): 핵심 지표·분기 선택·누락·품질 상태·현황 응답과 화면 표시. 구현 전 초안.
 - [기준정보 조회 API](docs/api/reference-api.md): 자치구·행정동·지원 업종 목록 API의 요청·응답·오류 예시.
+
+</details>
 
 ## 개발 환경
 
@@ -35,7 +62,10 @@ docker compose version
 
 `java`가 25인지, `docker version`에 Client와 Server가 모두 표시되는지 확인합니다.
 
-## 로컬 실행
+<a id="로컬-실행"></a>
+
+<details>
+<summary>로컬 실행</summary>
 
 아래 명령은 저장소 루트에서 실행합니다. Windows 예시는 CMD 기준입니다.
 
@@ -85,7 +115,7 @@ SHOW TABLES;
 exit;
 ```
 
-DB 최초 초기화 직후에는 테이블이 비어 있습니다. 아래 단계에서 Spring Boot가 실행되면 Flyway가 기준정보 테이블 3개와 `flyway_schema_history`를 생성합니다. 행정동·업종 데이터는 아직 적재하지 않습니다.
+DB 최초 초기화 직후에는 테이블이 비어 있습니다. 아래 단계에서 Spring Boot가 실행되면 Flyway가 V1 기준정보 3개·V2 통계 및 이력 9개 테이블과 `flyway_schema_history`를 생성합니다. 기준정보·통계 원본 데이터는 아직 적재하지 않습니다.
 
 ### 3. IntelliJ IDEA에서 서버 실행
 
@@ -121,7 +151,12 @@ curl http://localhost:8080/api/health/ready
 curl http://localhost:8080/api/districts
 curl http://localhost:8080/api/districts/11110/administrative-dongs
 curl http://localhost:8080/api/business-types
+curl http://localhost:8080/api/regions/provinces
+curl "http://localhost:8080/api/regions/groups?provinceCode=1100000000"
+curl "http://localhost:8080/api/regions/localities?groupCode=1111000000"
 ```
+
+전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다.
 
 `/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 기준정보를 적재하기 전에는 자치구·지원 업종 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 
@@ -133,7 +168,12 @@ docker compose down
 
 일반 `down`은 데이터를 유지합니다. **`down -v`는 데이터 볼륨을 삭제하므로 데이터 초기화가 목적일 때만 사용합니다.**
 
-## 자동 테스트
+</details>
+
+<a id="자동-테스트"></a>
+
+<details>
+<summary>자동 테스트</summary>
 
 Docker Desktop을 실행한 뒤 저장소 루트에서 실행합니다.
 
@@ -179,7 +219,12 @@ gradlew.bat test --tests "*ReferenceSchemaMigrationTests"
 
 GitHub의 **Actions** 또는 PR의 **Checks**에서 결과를 확인합니다. 이 워크플로는 검증만 수행하며 자동 병합·배포는 하지 않습니다. 실패 시 병합을 막으려면 팀이 브랜치 보호 규칙에 `build-and-test` 검사를 별도로 등록해야 합니다.
 
-## 설정 파일
+</details>
+
+<a id="설정-파일"></a>
+
+<details>
+<summary>설정 파일</summary>
 
 | 파일 | 역할 |
 |---|---|
@@ -190,9 +235,14 @@ GitHub의 **Actions** 또는 PR의 **Checks**에서 결과를 확인합니다. �
 | `compose.yaml` | 개발용 MySQL 컨테이너 |
 | `.env.example` | 비밀값 없는 환경변수 양식 |
 
-현재 `ddl-auto: none`이므로 Hibernate는 테이블을 생성·변경하지 않습니다. **서버 시작 시 Flyway가 연결된 DB에 미적용 마이그레이션을 자동 적용합니다.** 로컬 서버를 실행하면 개발 DB에도 V1이 적용됩니다. 이번 테스트 실행은 별도 임시 DB만 사용합니다.
+현재 `ddl-auto: none`이므로 Hibernate는 테이블을 생성·변경하지 않습니다. **서버 시작 시 Flyway가 연결된 DB에 미적용 마이그레이션을 자동 적용합니다.** 로컬 서버를 실행하면 개발 DB에도 미적용 V1·V2가 적용됩니다. 테스트 실행은 별도 임시 DB만 사용합니다.
 
-## 기준정보 수동 초기 적재
+</details>
+
+<a id="기준정보-수동-초기-적재"></a>
+
+<details>
+<summary>기준정보 수동 초기 적재</summary>
 
 일반 서버 실행은 기준정보 행을 자동으로 넣지 않습니다. 명령 실행 전 DB 대상과 `MYSQL_PASSWORD` 환경변수를 확인합니다. **다음 명령은 개발 DB에 실제로 저장합니다.**
 
@@ -202,11 +252,17 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 
 웹 서버 없이 적재 후 종료합니다. 최초 신규 건수는 25/425/100, 같은 원본 재실행은 0/0/0입니다. 원천 코드·관계가 다르면 덮어쓰지 않고 중단하며, 팀에서 수정한 업종 표시명·지원 여부는 보존합니다. 자세한 원천·검수·실패 처리 규칙은 [수동 적재 문서](docs/data/reference-import.md)를 참고합니다.
 
-## DB 마이그레이션 관리
+</details>
+
+<a id="db-마이그레이션-관리"></a>
+
+<details>
+<summary>DB 마이그레이션 관리</summary>
 
 - 위치: `src/main/resources/db/migration/`
 - V1: `district`, `administrative_dong`, `business_type` 생성. 초기 데이터는 별도 적재 작업입니다.
-- 이미 적용한 SQL은 수정하지 않고 `V2__설명.sql`처럼 새 버전을 추가합니다. Flyway가 체크섬·적용 이력을 검사합니다.
+- V2: 통계 6종과 적재 배치·게시 포인터·품질 이슈 3개 테이블 생성. 실제 통계 적재·게시 코드는 후속 작업입니다.
+- 이미 적용한 SQL은 수정하지 않고 다음 버전의 마이그레이션을 추가합니다. Flyway가 체크섬·적용 이력을 검사합니다.
 - `clean-disabled: true`로 Flyway 전체 초기화를 금지하고, `baseline-on-migrate: false`로 이력이 없는 기존 비어 있지 않은 DB를 자동 승인하지 않습니다.
 - 기존 테이블이 있어 첫 적용이 거부되면 DB/이력을 먼저 확인합니다. `baseline`, `repair`, 테이블/볼륨 삭제로 오류를 무시하지 않습니다.
 - `schema.sql`/`data.sql` 초기화는 비활성화하고 스키마 변경은 Flyway 한 가지로 관리합니다.
@@ -214,7 +270,12 @@ gradlew.bat bootRun --args="--spring.profiles.active=local,reference-import --pi
 
 로컬 JDBC의 SSL 비활성화 및 공개키 조회 허용 설정은 운영 환경에 그대로 사용하지 않습니다.
 
-## 문제 해결
+</details>
+
+<a id="문제-해결"></a>
+
+<details>
+<summary>문제 해결</summary>
 
 | 증상 | 확인할 사항 |
 |---|---|
@@ -235,3 +296,5 @@ docker compose logs --tail 100 mysql
 ```
 
 로그·스크린샷 공유 시 비밀번호와 개인 정보는 가립니다. `.env`, IDE 개인 설정, 빌드 결과물은 커밋하지 않습니다. `gradle-wrapper.jar`와 Wrapper 스크립트는 재현 가능한 빌드를 위해 커밋합니다.
+
+</details>

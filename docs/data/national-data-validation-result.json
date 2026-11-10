@@ -1,0 +1,144 @@
+{
+  "validatedOn": "2026-11-09",
+  "branch": "feature/national-data-validation",
+  "baseCommit": "1b079b3",
+  "scope": "T13 parsing, normalization and quality checks; no statistics DB writes or publication",
+  "verification": {
+    "result": "BUILD SUCCESSFUL",
+    "command": "gradlew.bat check bootJar --init-script <local-test-temp.init.gradle>",
+    "initialCleanCheckAlsoPassed": true,
+    "suites": 28,
+    "tests": 350,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "newValidationTests": 40
+  },
+  "realDataVerification": {
+    "jvmMaxHeap": "256m",
+    "runs": [
+      {
+        "dataset": "POPULATION_MONTH",
+        "evidenceReport": "../data-validation/2026-11-09/t13-national/final-v2/population/report.json",
+        "reportSha256": "5b8864878bb85772925753900b223a4744810803f6515ad166778e2e9f30a704",
+        "sourceRows": 3619,
+        "dispositions": {
+          "ACCEPTED": 3618,
+          "DUPLICATE": 0,
+          "HOLD": 1,
+          "REJECTED": 0
+        },
+        "issueCounts": {
+          "BOUNDARY_REVIEW_PENDING": 1
+        },
+        "blocksNewPublication": false,
+        "rawSha256": "23a269d2fd754f27bab32c9a26c711c3e49e65aee7169dc3184d8b5a548cd36d",
+        "receiptSha256": "9dd1052b7ca5f65f638fdffddffb7d0293d8a174c2b36053530942e41781a2b8",
+        "collectedAt": "2026-11-08T12:25:07.724778Z",
+        "mappingVersion": "national-202609-sejong-hint-v1",
+        "mappingSha256": "0b5430750eed5ea951ee9161589e92e07df5fb5beea6c0cc36e651d5982bc1a9",
+        "sourceRegionVersion": "mois-202609-raw-v1",
+        "classificationVersion": null,
+        "parserVersion": "national-statistics-parser-v1",
+        "policyVersion": "national-statistics-quality-v1",
+        "rowsSha256": "39a884322219db3a77333c70c1d42f052e448661df5890381f0380b52a5e0bcb",
+        "issuesSha256": "fcf6cfb2f47a2d7bf421206af7ea512c08bb2110e06dcae9417d4aa818e0f012",
+        "artifactNumbers": {
+          "raw.csv": 1
+        },
+        "databaseModified": false,
+        "published": false,
+        "observedSourceRegions": 3619,
+        "outputBytes": {
+          "rows.jsonl": 3582665,
+          "issues.jsonl": 301,
+          "report.json": 193442
+        }
+      },
+      {
+        "dataset": "STORE_SNAPSHOT",
+        "evidenceReport": "../data-validation/2026-11-09/t13-national/final-v2/stores/report.json",
+        "reportSha256": "456e6ce9e5c8d7696036a33b60a61f8c6d27d56b2459b56cfa64237041ad4bed",
+        "sourceRows": 2753778,
+        "dispositions": {
+          "ACCEPTED": 2753104,
+          "DUPLICATE": 0,
+          "HOLD": 674,
+          "REJECTED": 0
+        },
+        "issueCounts": {
+          "BOUNDARY_REVIEW_PENDING": 674
+        },
+        "blocksNewPublication": false,
+        "rawSha256": "c83b30e7a1d1144864a91d0e1818abf360f565972878d6e3c88d75ceafe2286a",
+        "receiptSha256": "796d0b5539055f5fdc431b67edeb5c92347ce588bdc6bf9c4cfa2c1f7e38f6ce",
+        "collectedAt": "2026-11-08T12:19:46.095888Z",
+        "mappingVersion": "national-202609-sejong-hint-v1",
+        "mappingSha256": "0b5430750eed5ea951ee9161589e92e07df5fb5beea6c0cc36e651d5982bc1a9",
+        "sourceRegionVersion": "semas-202609-raw-v1",
+        "classificationVersion": "semas-202609-service-v1",
+        "parserVersion": "national-statistics-parser-v1",
+        "policyVersion": "national-statistics-quality-v1",
+        "rowsSha256": "5a30b87183be13a32050b710d8143ae063184d719e5bfa965e5efd10eafd5940",
+        "issuesSha256": "c8ebfaa0f85c1676c83495a0d296b009ad55ffa8a709c2fa31180b9ad80ca559",
+        "artifactNumbers": {
+          "raw.zip": 1,
+          "소상공인시장진흥공단_상가(상권)정보_강원_202609.csv": 2,
+          "소상공인시장진흥공단_상가(상권)정보_경기_202609.csv": 3,
+          "소상공인시장진흥공단_상가(상권)정보_경남_202609.csv": 4,
+          "소상공인시장진흥공단_상가(상권)정보_경북_202609.csv": 5,
+          "소상공인시장진흥공단_상가(상권)정보_대구_202609.csv": 6,
+          "소상공인시장진흥공단_상가(상권)정보_대전_202609.csv": 7,
+          "소상공인시장진흥공단_상가(상권)정보_부산_202609.csv": 8,
+          "소상공인시장진흥공단_상가(상권)정보_서울_202609.csv": 9,
+          "소상공인시장진흥공단_상가(상권)정보_세종_202609.csv": 10,
+          "소상공인시장진흥공단_상가(상권)정보_울산_202609.csv": 11,
+          "소상공인시장진흥공단_상가(상권)정보_인천_202609.csv": 12,
+          "소상공인시장진흥공단_상가(상권)정보_전남광주_202609.csv": 13,
+          "소상공인시장진흥공단_상가(상권)정보_전북_202609.csv": 14,
+          "소상공인시장진흥공단_상가(상권)정보_제주_202609.csv": 15,
+          "소상공인시장진흥공단_상가(상권)정보_충남_202609.csv": 16,
+          "소상공인시장진흥공단_상가(상권)정보_충북_202609.csv": 17
+        },
+        "databaseModified": false,
+        "published": false,
+        "observedSourceRegions": 3558,
+        "outputBytes": {
+          "rows.jsonl": 1638694133,
+          "issues.jsonl": 260893,
+          "report.json": 210666
+        }
+      }
+    ]
+  },
+  "boundaryObservations": [
+    {
+      "dataset": "POPULATION_MONTH",
+      "sourceRegionCode": "2771026800",
+      "regionCode": "2771026800",
+      "rows": 1,
+      "reason": "BOUNDARY_REVIEW_PENDING",
+      "evidence": "Official creation date equals source reference date 2026-09-30; numeric totals pass, temporal approval remains held"
+    },
+    {
+      "dataset": "STORE_SNAPSHOT",
+      "sourceRegionCode": "27710380",
+      "regionCode": "2771038000",
+      "rows": 674,
+      "reason": "BOUNDARY_REVIEW_PENDING",
+      "evidence": "Official abolition date equals source reference date 2026-09-30; identity mapping does not approve temporal compatibility"
+    }
+  ],
+  "handoff": [
+    "Retain original raw files and acquisition times; output files are not committed",
+    "T14 must verify checksums and bind snapshot/classification versions to actual APPROVED DB IDs",
+    "Apply REGION_INDUSTRY/REGION/GLOBAL count impacts; accepted rows alone are not a complete public count",
+    "Conflicting duplicate keys and unrepresentable identifiers are quarantined as source-position quality issues, not blindly inserted",
+    "Internal MONTH/DEFAULT publication, concurrency and rollback remain T14; no API developer tasks changed"
+  ],
+  "observations": [
+    "Full regression includes isolated MySQL container tests; no T13 CLI changes to development DB",
+    "Heap was explicitly limited; disk partitions and JSONL consume additional disk space",
+    "Local final-v2 evidence supersedes intermediate local validation runs"
+  ]
+}
