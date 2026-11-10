@@ -1,6 +1,6 @@
 # 백엔드 개발 문서
 
-> 이 브랜치의 상태: T12 전국 원본 수집에 이어 T13 파싱·정제·품질 검증 CLI를 추가했다. 수집/검증 명령은 DB를 초기화하지 않는다. 실제 통계 적재·집계·게시와 공개 API 전환은 후속 작업이다.
+> 이 브랜치의 상태: T12 수집·T13 검증·T14 적재/집계/게시와 T15 조회 기준·가용성 판정을 제공한다. T17·T18의 사실 조회 및 공개 현황 API 연결은 후속 작업이다.
 
 <a id="문서-바로가기"></a>
 
@@ -12,6 +12,7 @@
 | [전국 인구·업소 원본 수집](data/national-data-download.md) | T12 전국 CLI·다운로드/재사용·검증·T13 인계 |
 | [전국 인구·업소 정제·검증](data/national-data-validation.md) | T13 실행·숫자/중복/시점·원본 위치·집계 영향·T14 인계 |
 | [전국 통계 적재·집계·게시](data/national-statistics-import.md) | T14 청크 적재·재시도·품질 집계·승인·MONTH/DEFAULT·복구 |
+| [현황 조회 기준·가용성 판정](data/summary-availability.md) | T15 DEFAULT·읽기 스냅샷·0/null·품질 상태·T17/18 인계 |
 | [FE 인계 · 현재 지원 API 안내](api/frontend-api-guide.md) | 실제 호출 가능한 API·main/develop 차이·응답·접속·오류·미구현 목록 |
 | [T08~T10 전국 목록 API 개발 인계](api/nationwide-reference-api-handoff.md) | 수정 위치·게시본 조회·H10/업종 전환·계약 협의·구현 순서·검수표 |
 | [전국 기준정보 로컬 적재 묶음](../data/reference/national-202609-sejong-hint-v1/README.md) | 세종 권고 반영 JSON·해시·로컬 적재/승인/게시 |
