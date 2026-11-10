@@ -5,11 +5,9 @@
 
 [문서 목록](README.md) · [프로젝트 README](../README.md)
 
-전국 H10 목록을 개발하는 팀원은 환경 설정 후 [세종 권고 반영 전국 기준정보 적재 안내](../data/reference/national-202609-sejong-hint-v1/README.md)를 따른다. 아래 서울 기준정보 적재는 기존 서울 API 재현 이력이며 전국 서비스의 기본 적재 과정이 아니다.
-
 **이 문서는 실행 안내서다. 작성하면서 개발 DB에 적재한 것은 아니다.** 아래 적재 명령을 직접 실행하면 연결된 개발 DB에 실제 데이터가 저장된다.
 
-Flyway·수동 적재 코드는 저장소에 반영됐다. 새로 클론한 팀원은 실행하려는 브랜치의 구현 범위를 [현재 지원 API 안내](api/frontend-api-guide.md)에서 확인한다. 파일이 없다면 DB 설정 전에 코드 반영 상태부터 확인한다.
+현재 로컬 작업에는 미커밋 구현이 포함되어 있다. 새로 클론한 팀원은 Flyway·수동 적재 코드가 반영된 브랜치를 받아야 한다. 파일이 없다면 DB 설정 전에 코드 반영 상태부터 확인한다.
 
 ## 전체 흐름
 
@@ -19,7 +17,7 @@ Flyway·수동 적재 코드는 저장소에 반영됐다. 새로 클론한 팀�
 | 2 | 비밀번호 설정 | Docker와 Spring의 환경변수 준비 |
 | 3 | MySQL 실행 | DB 접속 가능 |
 | 4 | Spring Boot 실행 | Flyway 테이블 생성, health 응답 UP |
-| 5 | 테이블 확인 | 업무 테이블 12개·V1/V2 성공 이력 |
+| 5 | 테이블 확인 | 업무 테이블 3개·V1 성공 이력 |
 | 6 | 자동 테스트 | 임시 DB 검증 성공 |
 | 7 | 개발 DB에 수동 적재 | 신규 25개 구·425개 동·100개 업종 |
 | 8 | SQL로 결과 확인 | 건수·지원 업종·공식 코드 상태 확인 |
@@ -68,10 +66,7 @@ docker compose version
 
 Java는 25여야 하며, Docker는 Client뿐 아니라 **Server 정보도 보여야 한다.**
 
-<a id="cmd에서-다른-java가-선택될-때"></a>
-
-<details>
-<summary>CMD에서 다른 Java가 선택될 때</summary>
+### CMD에서 다른 Java가 선택될 때
 
 현재 PC에 설치된 JDK 경로 예시다. 다른 PC에서는 실제 JDK 25 경로로 바꾼다.
 
@@ -83,8 +78,6 @@ gradlew.bat --version
 ```
 
 `set`은 현재 CMD 창의 환경변수를 설정한다. 위 명령은 Windows 전체 설정을 변경하지 않으며 새 CMD에서는 다시 설정해야 할 수 있다.
-
-</details>
 
 ## 2. 비밀번호 준비
 
@@ -111,10 +104,7 @@ MYSQL_ROOT_PASSWORD=
 
 빈칸을 그대로 두면 Compose가 실행되지 않는다. 실제 비밀번호는 문서·Git에 넣지 않는다.
 
-<a id="같은-값을-두-곳에-설정하는-이유"></a>
-
-<details>
-<summary>같은 값을 두 곳에 설정하는 이유</summary>
+### 같은 값을 두 곳에 설정하는 이유
 
 | 실행 대상 | 비밀번호를 읽는 곳 |
 |---|---|
@@ -125,8 +115,6 @@ MYSQL_ROOT_PASSWORD=
 **Spring Boot는 기본적으로 `.env`를 자동으로 읽지 않는다.** IntelliJ·CMD의 `MYSQL_PASSWORD`는 `.env`와 같은 값이어야 한다.
 
 이미 초기화된 DB는 `.env`를 수정해도 계정 비밀번호가 자동 변경되지 않는다. 비밀번호 오류 때문에 기존 볼륨을 삭제하지 않는다.
-
-</details>
 
 ## 3. Docker로 MySQL 실행
 
@@ -172,11 +160,11 @@ docker compose logs --tail 100 mysql
 ### 실행하면서 자동으로 일어나는 일
 
 1. Spring Boot가 개발용 MySQL에 연결한다.
-2. Flyway가 미적용 V1·V2를 순서대로 실행한다.
-3. 기준정보 3개·통계 및 이력 9개 테이블과 적용 이력이 생성된다.
+2. Flyway가 미적용 V1을 실행한다.
+3. 기준정보 테이블과 적용 이력이 생성된다.
 4. 웹 서버가 8080 포트로 실행된다.
 
-**Flyway는 테이블 구조를 만들 뿐 기준정보·통계 원본 행을 넣지는 않는다.** 이미 적용된 버전은 중복 실행하지 않는다.
+**Flyway는 테이블 구조를 만들 뿐 기준정보 행을 넣지는 않는다.** 이미 적용된 V1은 중복 실행하지 않는다.
 
 ### 서버 상태 확인
 
@@ -192,7 +180,7 @@ curl http://localhost:8080/actuator/health
 {"status":"UP"}
 ```
 
-기능 API는 [기준정보 조회 문서](api/reference-api.md)에서 확인한다. 루트 `/`에 별도 화면이 없으므로 404가 나오는 것은 서버 실행 실패가 아니다.
+현재 기능 API는 아직 없으므로 `/`에서 404가 나오는 것은 서버 실행 실패가 아니다.
 
 ## 5. 테이블 생성 확인
 
@@ -218,8 +206,7 @@ ORDER BY installed_rank;
 
 - 선택된 DB가 `pickplace`다.
 - `district`, `administrative_dong`, `business_type`, `flyway_schema_history`가 보인다.
-- V2의 통계 6종·적재 배치·게시 포인터·품질 이슈도 보인다. [전체 목록](database/statistics-schema-design.md#테이블-목록과-유일성)을 참고한다.
-- Flyway 이력에 V1·V2가 있고 각각 `success`는 `1`이다.
+- Flyway 이력에 V1이 있고 `success`는 `1`이다.
 
 미적재 상태의 건수도 확인할 수 있다.
 
@@ -251,12 +238,9 @@ gradlew.bat build --no-daemon
 
 `build`는 컴파일·패키징·테스트를 수행한다. `--no-daemon`은 빌드 후 지속 실행되는 Gradle 데몬을 유지하지 않도록 요청하는 옵션이다.
 
-정상 결과는 **`BUILD SUCCESSFUL`**이다. 초기 T07 단계는 34건, 2026-11-05의 최신 develop·T11 통합 검증은 115건이 통과했다. 이후 테스트 추가에 따라 건수는 달라질 수 있으며 [T11 검증 기록](database/statistics-schema-design.md#최신-develop-통합-검증)을 함께 확인한다.
+정상 결과는 **`BUILD SUCCESSFUL`**이다. 작성 시점에는 34건이 통과했으며 이후 테스트 추가에 따라 건수는 달라질 수 있다.
 
-<a id="테스트-성공과-개발-db-적재는-다르다"></a>
-
-<details>
-<summary>테스트 성공과 개발 DB 적재는 다르다</summary>
+### 테스트 성공과 개발 DB 적재는 다르다
 
 | 구분 | 개발용 DB | 자동 테스트 DB |
 |---|---|---|
@@ -268,8 +252,6 @@ gradlew.bat build --no-daemon
 테스트는 개발 DB에 기준정보를 넣지 않는다. 일반 Spring 서버나 IDE 비밀번호 설정도 테스트 실행에 필요하지 않다.
 
 종료 시 `Shutdown` 로그는 테스트용 서버·DB 연결을 정리하는 정상 과정일 수 있다. 성공 여부는 빌드 결과와 `build/reports/tests/test/index.html`로 판단한다.
-
-</details>
 
 ## 7. 개발 DB에 기준정보 적재
 
@@ -307,10 +289,7 @@ Reference import committed: version=seoul-reference-20262-mois-20261012-v1, inse
 
 `committed`는 **DB 트랜잭션 저장**을 뜻하며 Git 커밋이 아니다. 적재 명령은 Git 커밋·푸시를 하지 않는다.
 
-<a id="재실행실패-시-동작"></a>
-
-<details>
-<summary>재실행·실패 시 동작</summary>
+### 재실행·실패 시 동작
 
 - 같은 원본이면 신규 건수는 **0 / 0 / 0**이며 기존 값·수집/저장 시각을 유지한다.
 - 팀에서 바꾼 업종 표시명·지원 여부·정렬순서도 유지한다.
@@ -325,8 +304,6 @@ Reference import committed: version=seoul-reference-20262-mois-20261012-v1, inse
 ```cmd
 set "MYSQL_PASSWORD="
 ```
-
-</details>
 
 ## 8. SQL로 최종 확인
 
@@ -418,10 +395,7 @@ docker compose down
 
 **`docker compose down -v`는 데이터 볼륨을 삭제한다.** 비밀번호·Flyway 오류 해결을 위해 실행하지 않는다. 다음 날은 MySQL과 일반 서버를 켜면 되며, 정상 적재된 기준정보를 매번 넣을 필요는 없다.
 
-<a id="10-자주-막히는-부분"></a>
-
-<details>
-<summary>10. 자주 막히는 부분</summary>
+## 10. 자주 막히는 부분
 
 | 증상 | 먼저 확인할 내용 |
 |---|---|
@@ -440,15 +414,13 @@ docker compose down
 
 비밀번호를 바꿔도 기존 DB 계정은 자동 변경되지 않는다. 실제 비밀값이 담길 수 있는 `docker compose config` 전체 출력이나 IDE 실행 설정을 그대로 공유하지 않는다.
 
-</details>
-
 ## 완료 체크리스트
 
 - [ ] JDK 25·Docker 실행 확인
 - [ ] `.env`와 Spring 실행 환경변수 준비
 - [ ] MySQL healthy·DB 접속 확인
 - [ ] 일반 서버 health 응답 UP
-- [ ] 업무 테이블 12개·V1/V2 성공 이력 확인
+- [ ] 업무 테이블 3개·V1 성공 이력 확인
 - [ ] 자동 테스트 BUILD SUCCESSFUL
 - [ ] 수동 적재 완료 로그 확인
 - [ ] 개발 DB의 25 / 425 / 100건 확인

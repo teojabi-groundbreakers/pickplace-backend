@@ -13,9 +13,7 @@ public enum ErrorCode {
 	BUSINESS_TYPE_NOT_SUPPORTED(HttpStatus.UNPROCESSABLE_CONTENT, "아직 지원하지 않는 업종입니다."),
 	QUARTER_NOT_SUPPORTED(HttpStatus.UNPROCESSABLE_CONTENT, "지원하지 않는 분기입니다."),
 	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."),
-	DATA_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "현재 데이터를 조회할 수 없습니다. 잠시 후 다시 시도해 주세요."),
-	// DB는 정상이지만 전국 지역 기준정보가 아직 게시되지 않은 상태다. DB 장애(DATA_SERVICE_UNAVAILABLE)와 구분한다.
-	REFERENCE_DATA_NOT_READY(HttpStatus.SERVICE_UNAVAILABLE, "지역 기준정보가 아직 준비되지 않았습니다. 잠시 후 다시 시도해 주세요.");
+	DATA_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "현재 데이터를 조회할 수 없습니다. 잠시 후 다시 시도해 주세요.");
 
 	private final HttpStatus status;
 	private final String message;

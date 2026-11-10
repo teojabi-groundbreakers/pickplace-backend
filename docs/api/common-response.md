@@ -6,9 +6,6 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 
 ## 1. 성공 응답
 
-<details>
-<summary>응답 JSON 예시 1</summary>
-
 ```json
 {
   "data": { "status": "UP" },
@@ -16,15 +13,10 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 }
 ```
 
-</details>
-
 - `data`: API마다 내용이 다르다. 목록 API는 `data.items` 배열을 쓰고, 결과가 없으면 `"items": []`이다.
 - `meta.requestId`: 요청 추적용 ID. 아래 3절 참고.
 
 ## 2. 오류 응답
-
-<details>
-<summary>응답 JSON 예시 2</summary>
 
 ```json
 {
@@ -36,8 +28,6 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
   "meta": { "requestId": "3f2a9c1e-8b4d-4e2f-9a1b-7c6d5e4f3a2b" }
 }
 ```
-
-</details>
 
 - `code`: FE가 분기할 때 쓰는 고정 코드.
 - `message`: 화면에 그대로 보여줄 수 있는 한국어 문구.
@@ -58,7 +48,6 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 | 422 | `QUARTER_NOT_SUPPORTED` | 지원 기간 밖의 분기 | 명세 초안 |
 | 500 | `INTERNAL_ERROR` | 예상하지 못한 서버 오류 (서버 반환값 검증 실패 포함) | 명세 초안 |
 | 503 | `DATA_SERVICE_UNAVAILABLE` | DB 연결·조회 실패 (빈 결과로 위장하지 않음) | 명세 초안 |
-| 503 | `REFERENCE_DATA_NOT_READY` | DB는 정상이지만 전국 지역 기준정보가 아직 게시되지 않음 | **추가안(확정 전)** · 전국 지역 API 계약 v0.3 |
 
 그 밖에 Spring이 4xx로 판단한 요청 오류(예: 415 지원하지 않는 Content-Type)는 해당 HTTP 상태와 `INVALID_REQUEST` 코드로 응답한다.
 
@@ -72,8 +61,6 @@ Spring이 오류와 함께 제공하는 안내 헤더(405의 `Allow`, 415의 `Ac
 | `INVALID_FORMAT` | 타입이 맞지 않음 (예: 숫자 자리에 문자) |
 | `INVALID_VALUE` | 검증 규칙 위반 (예: 자릿수·패턴 불일치) |
 | `NOT_FOUND` | 형식은 맞지만 등록되지 않은 값 (예: 없는 자치구 코드) |
-
-전국 지역 목록 API(`/api/regions/*`)는 정해지지 않은 쿼리 파라미터를 받으면 `field: "query"`, `reason: "INVALID_VALUE"`로 알린다. 사용자가 보낸 파라미터 이름을 응답에 되돌려주지 않기 위해서다.
 
 ## 3. 요청 ID (`X-Request-Id`)
 
@@ -98,19 +85,11 @@ requestId=3f2a9c1e-... method=GET path=/api/health status=200 durationMs=3
 
 정상 응답(두 경로 공통):
 
-<details>
-<summary>응답 JSON 예시 3</summary>
-
 ```json
 { "data": { "status": "UP" }, "meta": { "requestId": "..." } }
 ```
 
-</details>
-
 DB 장애 시 `/api/health/ready`:
-
-<details>
-<summary>응답 JSON 예시 4</summary>
 
 ```json
 {
@@ -122,8 +101,6 @@ DB 장애 시 `/api/health/ready`:
   "meta": { "requestId": "..." }
 }
 ```
-
-</details>
 
 DB가 멈춰도 `/api/health`는 200이다. 서버 프로세스 자체는 살아 있기 때문이다.
 

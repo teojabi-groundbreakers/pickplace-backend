@@ -67,7 +67,7 @@ class ReferenceSchemaMigrationTests {
 				SELECT district_name FROM district WHERE district_code = '11110'
 				""", String.class)).isEqualTo("테스트구");
 		assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM flyway_schema_history", Integer.class))
-				.isEqualTo(5);
+				.isEqualTo(1);
 	}
 
 	@Test
