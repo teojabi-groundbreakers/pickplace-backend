@@ -43,3 +43,15 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// 원본 전체 검수는 일반 테스트와 분리한다. 로컬 파일과 격리 Docker MySQL을 명시적으로 사용한다.
+tasks.register('verifyNationalStatistics', JavaExec) {
+	group = 'verification'
+	description = 'T13 전국 원본을 격리 MySQL에 실제 적재하고 게시·재실행을 검증한다.'
+	dependsOn testClasses
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.pickplace.backend.ingestion.statistics.service.RealStatisticsImportVerification'
+	maxHeapSize = '512m'
+	args projectDir.absolutePath, providers.gradleProperty('statisticsEvidenceFile').getOrElse(
+		new File(projectDir.parentFile, 'data-validation/2026-11-10/t14-national/real-verification.json').absolutePath)
+}

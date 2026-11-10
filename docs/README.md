@@ -11,6 +11,7 @@
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
 | [전국 인구·업소 원본 수집](data/national-data-download.md) | T12 전국 CLI·다운로드/재사용·검증·T13 인계 |
 | [전국 인구·업소 정제·검증](data/national-data-validation.md) | T13 실행·숫자/중복/시점·원본 위치·집계 영향·T14 인계 |
+| [전국 통계 적재·집계·게시](data/national-statistics-import.md) | T14 청크 적재·재시도·품질 집계·승인·MONTH/DEFAULT·복구 |
 | [FE 인계 · 현재 지원 API 안내](api/frontend-api-guide.md) | 실제 호출 가능한 API·main/develop 차이·응답·접속·오류·미구현 목록 |
 | [T08~T10 전국 목록 API 개발 인계](api/nationwide-reference-api-handoff.md) | 수정 위치·게시본 조회·H10/업종 전환·계약 협의·구현 순서·검수표 |
 | [전국 기준정보 로컬 적재 묶음](../data/reference/national-202609-sejong-hint-v1/README.md) | 세종 권고 반영 JSON·해시·로컬 적재/승인/게시 |

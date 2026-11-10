@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StatisticsSchemaUpgradeTests {
 
     @Test
-    void upgradesV1ThroughV5WithoutChangingExistingReferenceOrStatisticsData() {
+    void upgradesV1ThroughV6WithoutChangingExistingReferenceOrStatisticsData() {
         try (MySQLContainer mysql = new MySQLContainer("mysql:8.4.11").withDatabaseName("pickplace_upgrade_test")) {
             mysql.start();
             var source = new DriverManagerDataSource(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
@@ -130,7 +130,7 @@ class StatisticsSchemaUpgradeTests {
             assertThat(v4.migrate().migrationsExecuted).isZero();
             assertThat(v4.validateWithResult().validationSuccessful).isTrue();
             var previousChecksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
-            var v5 = Flyway.configure().dataSource(source).cleanDisabled(true).load();
+            var v5 = Flyway.configure().dataSource(source).target("5").cleanDisabled(true).load();
             assertThat(v5.migrate().migrationsExecuted).isEqualTo(1);
             assertThat(jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history WHERE version IN ('1','2','3','4') ORDER BY installed_rank"))
                     .isEqualTo(previousChecksums);
@@ -142,6 +142,17 @@ class StatisticsSchemaUpgradeTests {
             assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_summary_publication", Integer.class)).isZero();
             assertThat(v5.migrate().migrationsExecuted).isZero();
             assertThat(v5.validateWithResult().validationSuccessful).isTrue();
+            var v5Checksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
+            var v6 = Flyway.configure().dataSource(source).cleanDisabled(true).load();
+            assertThat(v6.migrate().migrationsExecuted).isEqualTo(1);
+            assertThat(jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history WHERE version IN ('1','2','3','4','5') ORDER BY installed_rank"))
+                    .isEqualTo(v5Checksums);
+            assertThat(jdbc.queryForList("SELECT operation_key FROM national_statistics_mutex ORDER BY operation_key", String.class))
+                    .containsExactly("IMPORT_START", "SUMMARY_PUBLICATION");
+            assertThat(jdbc.queryForObject("SELECT resident_population FROM dong_resident_quarter", Long.class)).isZero();
+            assertThat(jdbc.queryForMap("SELECT * FROM region_stat_mapping")).isEqualTo(originalMapping);
+            assertThat(v6.migrate().migrationsExecuted).isZero();
+            assertThat(v6.validateWithResult().validationSuccessful).isTrue();
         }
     }
 }
