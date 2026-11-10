@@ -1,0 +1,16 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: ${STATISTICS_JDBC_URL}
+    username: ${STATISTICS_DB_USER}
+    password: ${STATISTICS_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 4
+      connection-timeout: 5000
+      data-source-properties:
+        rewriteBatchedStatements: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none

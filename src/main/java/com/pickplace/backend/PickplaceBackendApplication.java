@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.pickplace.backend.ingestion.download.cli.NationalDataDownloadCommand;
 import com.pickplace.backend.ingestion.validation.cli.NationalDataValidationCommand;
+import com.pickplace.backend.ingestion.statistics.cli.NationalStatisticsRunner;
 
 @SpringBootApplication
 public class PickplaceBackendApplication {
@@ -22,8 +23,11 @@ public class PickplaceBackendApplication {
 			if (exitCode != 0) System.exit(exitCode);
 			return;
 		}
+		if (NationalStatisticsRunner.isRequested(args)) {
+			NationalStatisticsRunner.validateArguments(new org.springframework.boot.DefaultApplicationArguments(args));
+		}
 		var context = SpringApplication.run(PickplaceBackendApplication.class, args);
-		if (context.getEnvironment().matchesProfiles("reference-import", "national-reference")) {
+		if (context.getEnvironment().matchesProfiles("reference-import", "national-reference", "national-statistics")) {
 			context.close();
 		}
 	}

@@ -2,6 +2,8 @@
 
 구현일: 2026-11-09 · `feature/national-statistics-schema` · Flyway V5.
 
+후속 T14는 V5를 유지하고 V6에 첫 적재·게시 경합을 보호하는 mutex 테이블만 추가한다. 실행 명령·재시도·승인·게시 절차는 [T14 적재 안내](../data/national-statistics-import.md)를 참고한다.
+
 주민등록 **월말 인구**와 소진공 **배포본 수록 업소**의 저장 구조다. 서울 분기 통계·CS 업종과 의미를 섞지 않으며 V1~V4 SQL·기존 테이블·이력은 변경하지 않는다.
 
 설계 원문: [전국 통계·적재 이력 설계 v0.2](https://app.notion.com/p/40c2114f823a81b1a2abeef62c225ff1). 실행 기준은 [V5 SQL](../../src/main/resources/db/migration/V5__create_national_statistics_tables.sql)이다. [T06 기준정보](nationwide-reference-schema.md)·[데이터 정의서](https://app.notion.com/p/3fa2114f823a818c9bd8e2664cbcd618)를 함께 참고한다.

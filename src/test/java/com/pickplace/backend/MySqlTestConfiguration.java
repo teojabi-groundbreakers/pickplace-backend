@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.testcontainers.mysql.MySQLContainer;
 
 @TestConfiguration(proxyBeanMethods = false)
-class MySqlTestConfiguration {
+public class MySqlTestConfiguration {
 
 	@Bean
 	@ServiceConnection

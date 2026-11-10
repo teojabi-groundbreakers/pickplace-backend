@@ -2,7 +2,7 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 지역·지원 업종 목록 API, 전국 인구·업소 원본 수집·정제·품질 검증과 통합 테스트입니다. 통계 DB 적재·현황 API와 AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 지역·지원 업종 목록 API, 전국 인구·업소 원본 수집·정제·품질 검증, 통계 DB 청크 적재·집계·승인·게시 CLI와 통합 테스트입니다. 공개 현황 조회 API와 AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 빠른 시작 · 문서 선택
 
@@ -12,6 +12,7 @@
 | FE가 현재 API 연결 | [지원 API·요청/응답·브랜치 차이](docs/api/frontend-api-guide.md) |
 | 전국 인구·업소 원본 수집 | [T12 전국 CLI·기존 원본 재사용·검증](docs/data/national-data-download.md) |
 | 전국 인구·업소 정제·검증 | [T13 실행·판정·집계 영향·T14 인계](docs/data/national-data-validation.md) |
+| 전국 통계 적재·집계·게시 | [T14 배치·승인·월/기본 게시·복구](docs/data/national-statistics-import.md) |
 | 설계·적재·검증 자료 탐색 | [백엔드 문서 목록](docs/README.md) |
 | 전국 H10 기준정보 구조 | [T06 H10 스키마·전환 범위](docs/database/h10-reference-schema.md) |
 | 전국 인구·업소 기준정보 | [T06 V4 원천·업종 스키마](docs/database/nationwide-reference-schema.md) |

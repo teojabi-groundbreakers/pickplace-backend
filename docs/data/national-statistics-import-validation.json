@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-11-10T02:48:26.283369+00:00",
+  "scope": "T14 national statistics import, aggregation, approval and publication CLI; no public summary HTTP API",
+  "baseCommit": "4192eb78b97150fcf7f465f22045b9aa9ad38a4b",
+  "branch": "feature/national-statistics-import",
+  "tests": {
+    "tests": 389,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 30,
+    "newT14Tests": 27,
+    "command": "gradlew.bat check bootJar --console=plain --init-script <local Mockito temporary-directory init script>",
+    "result": "PASSED"
+  },
+  "realData": {
+    "verifiedAt": "2026-11-10T02:19:24.313238300Z",
+    "scope": "Isolated MySQL; no development DB changes",
+    "reference": {
+      "mappingId": 1,
+      "classificationId": 1,
+      "snapshotSha256": "0b5430750eed5ea951ee9161589e92e07df5fb5beea6c0cc36e651d5982bc1a9"
+    },
+    "populationImportMillis": 1888,
+    "storeImportMillis": 1672531,
+    "populationBatch": {
+      "batch_id": 1,
+      "status": "SUCCEEDED",
+      "source_row_count": 3619,
+      "accepted_row_count": 3618,
+      "held_row_count": 1,
+      "rejected_row_count": 0,
+      "duplicate_row_count": 0
+    },
+    "storeBatch": {
+      "batch_id": 2,
+      "status": "SUCCEEDED",
+      "source_row_count": 2753778,
+      "accepted_row_count": 2753104,
+      "held_row_count": 674,
+      "rejected_row_count": 0,
+      "duplicate_row_count": 0
+    },
+    "counts": {
+      "population_facts": 3619,
+      "store_facts": 2753778,
+      "quality_issues": 675,
+      "coverage_rows": 3558,
+      "industry_counts": 878705,
+      "accepted_count_sum": 2753104
+    },
+    "summaryId": 1,
+    "pointers": [
+      {
+        "publication_key": "DEFAULT",
+        "reference_month": "202609",
+        "summary_release_id": 1,
+        "revision": 1,
+        "published_at": "2026-11-10T02:47:45.511534"
+      },
+      {
+        "publication_key": "MONTH:202609",
+        "reference_month": "202609",
+        "summary_release_id": 1,
+        "revision": 1,
+        "published_at": "2026-11-10T02:47:45.499939"
+      }
+    ],
+    "idempotentReuse": true,
+    "businessTypes": [
+      {
+        "businessTypeCode": "I21201",
+        "businessTypeName": "카페",
+        "supported": true
+      },
+      {
+        "businessTypeCode": "I21007",
+        "businessTypeName": "김밥/만두/분식",
+        "supported": true
+      },
+      {
+        "businessTypeCode": "I21001",
+        "businessTypeName": "빵/도넛",
+        "supported": true
+      }
+    ],
+    "explain": [
+      {
+        "id": 1,
+        "select_type": "SIMPLE",
+        "table": "store_industry_count",
+        "partitions": null,
+        "type": "const",
+        "possible_keys": "PRIMARY,fk_ncount_batch,fk_ncount_batch_class,fk_ncount_industry",
+        "key": "PRIMARY",
+        "key_len": "50",
+        "ref": "const,const,const,const",
+        "rows": 1,
+        "filtered": 100.0,
+        "Extra": null
+      }
+    ],
+    "sampleCount": {
+      "accepted_store_count": 80,
+      "count_quality_status": "VALID"
+    },
+    "singleSqlLookupMicros": 1070,
+    "storeBoundaryHolds": [
+      {
+        "region_code": "2771038000",
+        "affected_rows": 674
+      }
+    ],
+    "result": "PASSED"
+  },
+  "realEvidence": {
+    "path": "../data-validation/2026-11-10/t14-national/real-verification.json",
+    "sha256": "7ab91ce9f66e8155bc00105782d82e2c72e23638b7dd4738676d04fcf427ceae"
+  },
+  "environment": {
+    "java": "Temurin 25.0.4.1",
+    "javaMaxHeapMiB": 512,
+    "mysql": "8.4.11",
+    "database": "isolated Testcontainers pickplace_test; development DB untouched",
+    "bufferPoolMiBSequence": [
+      128,
+      512,
+      4096
+    ],
+    "notes": [
+      "During this first full run only the isolated verification database buffer pool was increased, with durability and constraints unchanged.",
+      "Current verification helper starts with 4096 MiB. This full run used a changing buffer pool and concurrent regression tests; durations are observations, not a controlled benchmark.",
+      "realData.verifiedAt is the run start timestamp. SQL lookup timing is a single warm lookup, not API latency or a load test.",
+      "Verification containers are destroyed automatically after completion; these records do not mean the development database was loaded."
+    ]
+  },
+  "checks": [
+    "T12 raw and receipt hashes, T13 rows/issues/report, approved region/classification connection",
+    "500-row atomic facts/issues chunks; partial failure retained and new attempt on retry",
+    "97 accepted + 3 affected rows remain held, warning-only coordinates do not lower counts",
+    "GLOBAL impact blocks new release without changing previous default",
+    "V1-V6 migration, old data and SQL checksums preserved",
+    "MONTH/DEFAULT independent updates, explicit synchronization, stale revisions rejected",
+    "First publication/import concurrency and event failure rollback",
+    "Full dataset aggregate sum equals accepted facts; same input reused without extra batches or publication events"
+  ]
+}
