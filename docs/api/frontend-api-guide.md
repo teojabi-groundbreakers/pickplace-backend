@@ -1,12 +1,12 @@
 # FE 인계 · 현재 지원 API 안내
 
-확인일: 2026-11-10 · 코드 기준: develop `9d955c9` / main `b1002dd` · T15 작업 브랜치의 내부 판정 구현은 별도
+확인일: 2026-11-11 · 코드 기준: develop `df81d2b` / main `b1002dd` · T20 작업 브랜치의 서울 상세 적재는 별도
 
 [노션 최신 개발 문서 안내](https://app.notion.com/p/40a2114f823a8133b662fb5aa49b457c) · [지역·업종 정식 명세](https://app.notion.com/p/4122114f823a81988d0ee0c9bf88c5bb)
 
-> **develop에는 HTTP API 8개가 구현되어 있다.** 전국 지역 3개·지원 업종 1개, 상태 2개, 임시 유지 중인 서울 목록 2개다. 현황·추이·지도·AI 공개 API는 아직 구현되지 않았다. T13/T14의 원본 검증·DB 적재 CLI가 생겨도 FE에서 호출할 HTTP API가 자동으로 생기는 것은 아니다.
+> **develop에는 HTTP API 9개가 구현되어 있다.** 전국 지역 3개·지원 업종 1개, 상태 2개, 임시 서울 목록 2개와 인구·업소 현황 1개다. 추이·지도·AI 공개 API는 아직 구현되지 않았다. 적재 CLI가 생겨도 FE에서 호출할 API가 자동으로 추가되는 것은 아니다.
 
-T15의 DEFAULT 조회 기준·지표 판정은 내부 재사용 기능이다. 신규 공개 URL은 없으며 [T15 구현·T17/18 인계](../data/summary-availability.md)를 참고한다. FE는 현황 API가 구현·배포되기 전까지 설계 경로를 지원 API로 간주하지 않는다.
+현황 API는 [요청·응답·오류 명세](summary-api.md)를 따른다. T20 서울 상세 통계는 독립 적재 경로이며 현재 현황 응답에 매출·길단위/직장인구·시설·개폐업 필드를 추가하지 않는다. 코드 병합과 공유 서버 배포·FE 연결 완료는 구분한다.
 
 ## 지원 API
 
@@ -18,6 +18,7 @@ T15의 DEFAULT 조회 기준·지표 판정은 내부 재사용 기능이다. �
 | 시·도별 화면 그룹 | GET | `/api/regions/groups` | provinceCode H10 필수 | 가능 | 미반영 |
 | 그룹별 읍·면·행정동 | GET | `/api/regions/localities` | groupCode H10 필수 | 가능 | 미반영 |
 | 지원 업종 | GET | `/api/business-types` | 없음 | **소진공 코드** | 이전 서울 CS 계약 |
+| 인구·업소 현황 | GET | `/api/regions/{regionCode}/summary` | businessTypeCode 쿼리 필수 | 가능 | 미반영 |
 | 서울 자치구 · 임시 유지 | GET | `/api/districts` | 없음 | 가능 | 가능 |
 | 자치구별 서울 행정동 · 임시 유지 | GET | `/api/districts/{districtCode}/administrative-dongs` | districtCode 경로 값 | 가능 | 가능 |
 
@@ -337,7 +338,7 @@ VITE_DEMO_MODE=false
 | 4 | regionCode/regionName을 화면 내부 Option으로 변환. business-types는 소진공 코드·표시명 사용 |
 | 5 | 빈 결과·503·404·타임아웃을 각 상태로 표시 |
 | 6 | 부모 변경 시 하위 선택/현황 해제·이전 요청 취소. autoSelect 권고 정책 적용 |
-| 7 | 현황·추이·지도·AI는 구현 안내 전까지 별도 Mock 상태로 관리 |
+| 7 | 현황은 실제 실행 서버·게시 상태 확인 후 연결. 추이·지도·AI는 구현 안내 전까지 별도 Mock 상태로 관리 |
 
 기존 requestJson은 body 전체를 isCatalog/isAnalysis로 검증하고 오류의 최상위 code를 읽는다. 새 API에는 공통 응답을 읽는 어댑터가 필요하다. 기존 분석 API까지 일괄 변경하는 것은 후속 계약과 함께 진행한다.
 
@@ -363,7 +364,6 @@ VITE_DEMO_MODE=false
 | 경로·기능 | 상태 |
 | --- | --- |
 | GET /api/catalog | 기존 FE 초안. BE 미구현, 개별 목록 전환 제안 |
-| GET /api/regions/{regionCode}/summary?businessTypeCode=... | 승인 DEFAULT 현황 명세, HTTP 구현은 후속 |
 | 추이·개별 시설/지도 경계·AI 분석 | 별도 데이터·명세·구현이 필요한 후속 범위 |
 | 공개 LEGACY·과거 월 선택 | 첫 MVP 제외. 내부 이력·MONTH 포인터와 구분 |
 
@@ -389,12 +389,12 @@ Mock으로 화면 개발을 진행할 수는 있지만 실서버 지원으로 �
 
 | 기준 | 확인한 커밋 | 지원 범위 |
 | --- | --- | --- |
-| 원격 develop | `4192eb7` | 상태2 + 전국 지역3 + 소진공 업종1 + 임시 서울 목록2. T13 포함 |
+| 원격 develop | `df81d2b` | 상태2 + 전국 지역3 + 소진공 업종1 + 임시 서울 목록2 + 인구·업소 현황1 |
 | 원격 main | `b1002dd` | 실수 병합 취소로 기존 v0.2.0 파일 상태 복원. 전국 전환 미포함 |
 
 브랜치 병합과 실제 서버 배포는 다르다. FE가 접속할 서버의 실행 커밋과 실제 기준정보 게시 상태를 BE 담당자에게 확인한다.
 
-2026-11-10에 develop 통합 상태의 `clean check bootJar`, 전체 362건 통과를 확인했다. 이는 공유 서버 배포·FE 통합 검수 결과가 아니다. T14의 추가 검증은 해당 적재 문서에 따로 기록하며, 적재 CLI를 공개 HTTP API로 표시하지 않는다.
+PR #28의 `4424d42` 기준 전체 자동 테스트 462건 및 실제 전국 자료의 서울·부산·제주 정상 현황 3건 대조 기록이 있다. 이는 공유 서버 배포·FE 통합 검수 결과가 아니다. T20의 상세 적재 검증은 [별도 적재 문서](../data/seoul-detail-import.md)에서 구분하며 공개 API 지원 확대라고 표시하지 않는다.
 
 ### 관련 자료·갱신 원칙
 

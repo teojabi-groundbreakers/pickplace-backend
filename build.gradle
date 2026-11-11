@@ -55,3 +55,16 @@ tasks.register('verifyNationalStatistics', JavaExec) {
 	args projectDir.absolutePath, providers.gradleProperty('statisticsEvidenceFile').getOrElse(
 		new File(projectDir.parentFile, 'data-validation/2026-11-10/t14-national/real-verification.json').absolutePath)
 }
+
+// 전체 서울 보유 원본 검수는 일반 테스트와 분리해 명시적으로 실행한다.
+tasks.register('verifyRegionalDetail', JavaExec) {
+	group = 'verification'
+	description = '서울 행정동 상세 통계를 격리 MySQL에 적재·검증한다.'
+	dependsOn testClasses
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.pickplace.backend.ingestion.statistics.service.RealDetailImportVerification'
+	maxHeapSize = '768m'
+	doFirst {
+		args providers.gradleProperty('detailCatalog').get(), providers.gradleProperty('detailEvidence').get()
+	}
+}

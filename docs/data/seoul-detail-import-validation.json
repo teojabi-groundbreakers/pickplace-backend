@@ -1,0 +1,795 @@
+{
+  "verifiedAt": "2026-11-11T01:11:40.365306+00:00",
+  "branch": "feature/seoul-detail-ingestion",
+  "baseCommit": "df81d2b3c75e39a9de8257b30a0df061f2e7e5ad",
+  "workingTreeNotCommitted": true,
+  "automatedTests": {
+    "tests": 490,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "isolated": {
+    "startedAt": "2026-11-11T00:48:28.311562700Z",
+    "scope": "isolated MySQL; existing development DB unchanged",
+    "result": "PASSED",
+    "files": [
+      {
+        "manifest": "sales-2021.manifest.json",
+        "counts": {
+          "batch_id": 1,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 70071,
+          "accepted_row_count": 69622,
+          "held_row_count": 449,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 21881,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-2022.manifest.json",
+        "counts": {
+          "batch_id": 2,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 69440,
+          "accepted_row_count": 68990,
+          "held_row_count": 449,
+          "invalid_row_count": 1,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 21343,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-2023.manifest.json",
+        "counts": {
+          "batch_id": 3,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 68643,
+          "accepted_row_count": 68208,
+          "held_row_count": 435,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 23237,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-2024.manifest.json",
+        "counts": {
+          "batch_id": 4,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 67900,
+          "accepted_row_count": 67478,
+          "held_row_count": 421,
+          "invalid_row_count": 1,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 20476,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-2025.manifest.json",
+        "counts": {
+          "batch_id": 5,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 67113,
+          "accepted_row_count": 66695,
+          "held_row_count": 418,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 20575,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-20261.manifest.json",
+        "counts": {
+          "batch_id": 6,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 16659,
+          "accepted_row_count": 16553,
+          "held_row_count": 106,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 7949,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "sales-20262.manifest.json",
+        "counts": {
+          "batch_id": 7,
+          "dataset_code": "SALES",
+          "status": "READY",
+          "source_row_count": 16659,
+          "accepted_row_count": 16551,
+          "held_row_count": 108,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 5557,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-2021.manifest.json",
+        "counts": {
+          "batch_id": 8,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 140395,
+          "accepted_row_count": 139441,
+          "held_row_count": 954,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 11394,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-2022.manifest.json",
+        "counts": {
+          "batch_id": 9,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 140621,
+          "accepted_row_count": 139658,
+          "held_row_count": 963,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 11403,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-2023.manifest.json",
+        "counts": {
+          "batch_id": 10,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 141235,
+          "accepted_row_count": 140275,
+          "held_row_count": 960,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 13965,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-2024.manifest.json",
+        "counts": {
+          "batch_id": 11,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 141001,
+          "accepted_row_count": 140041,
+          "held_row_count": 960,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 11665,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-2025.manifest.json",
+        "counts": {
+          "batch_id": 12,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 141218,
+          "accepted_row_count": 140257,
+          "held_row_count": 961,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 11371,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-20262.manifest.json",
+        "counts": {
+          "batch_id": 13,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 35301,
+          "accepted_row_count": 30708,
+          "held_row_count": 227,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 4366
+        },
+        "elapsedMillis": 3127,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "store-20261.manifest.json",
+        "counts": {
+          "batch_id": 14,
+          "dataset_code": "STORE",
+          "status": "READY",
+          "source_row_count": 35313,
+          "accepted_row_count": 35070,
+          "held_row_count": 243,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 3561,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20243.manifest.json",
+        "counts": {
+          "batch_id": 15,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 177,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20244.manifest.json",
+        "counts": {
+          "batch_id": 16,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 160,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20251.manifest.json",
+        "counts": {
+          "batch_id": 17,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 162,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20252.manifest.json",
+        "counts": {
+          "batch_id": 18,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 151,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20253.manifest.json",
+        "counts": {
+          "batch_id": 19,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 154,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20254.manifest.json",
+        "counts": {
+          "batch_id": 20,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 144,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20261.manifest.json",
+        "counts": {
+          "batch_id": 21,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 141,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "flow-20262.manifest.json",
+        "counts": {
+          "batch_id": 22,
+          "dataset_code": "FLOW",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 132,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20243.manifest.json",
+        "counts": {
+          "batch_id": 23,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 153,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20244.manifest.json",
+        "counts": {
+          "batch_id": 24,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 142,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20251.manifest.json",
+        "counts": {
+          "batch_id": 25,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 150,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20252.manifest.json",
+        "counts": {
+          "batch_id": 26,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 148,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20253.manifest.json",
+        "counts": {
+          "batch_id": 27,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 150,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20254.manifest.json",
+        "counts": {
+          "batch_id": 28,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 152,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20261.manifest.json",
+        "counts": {
+          "batch_id": 29,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 148,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "worker-20262.manifest.json",
+        "counts": {
+          "batch_id": 30,
+          "dataset_code": "WORKER",
+          "status": "READY",
+          "source_row_count": 414,
+          "accepted_row_count": 412,
+          "held_row_count": 2,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 134,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20243.manifest.json",
+        "counts": {
+          "batch_id": 31,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 145,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20244.manifest.json",
+        "counts": {
+          "batch_id": 32,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 134,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20251.manifest.json",
+        "counts": {
+          "batch_id": 33,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 125,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20252.manifest.json",
+        "counts": {
+          "batch_id": 34,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 156,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20253.manifest.json",
+        "counts": {
+          "batch_id": 35,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 150,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20254.manifest.json",
+        "counts": {
+          "batch_id": 36,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 124,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20261.manifest.json",
+        "counts": {
+          "batch_id": 37,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 125,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      },
+      {
+        "manifest": "facility-20262.manifest.json",
+        "counts": {
+          "batch_id": 38,
+          "dataset_code": "FACILITY",
+          "status": "READY",
+          "source_row_count": 425,
+          "accepted_row_count": 422,
+          "held_row_count": 3,
+          "invalid_row_count": 0,
+          "duplicate_row_count": 0
+        },
+        "elapsedMillis": 124,
+        "internalPublication": "APPROVED_AND_PUBLISHED"
+      }
+    ],
+    "completedFiles": 38,
+    "idempotentReuse": true,
+    "counts": {
+      "batches": 38,
+      "facts": 1157315,
+      "issues": 12086,
+      "publications": 68,
+      "events": 68,
+      "readable_rows": 1149595
+    },
+    "byDataset": [
+      {
+        "dataset_code": "SALES",
+        "source_rows": 376485,
+        "accepted": 374097,
+        "held": 2386,
+        "invalid": 2,
+        "duplicates": 0
+      },
+      {
+        "dataset_code": "STORE",
+        "source_rows": 775084,
+        "accepted": 765450,
+        "held": 5268,
+        "invalid": 0,
+        "duplicates": 4366
+      },
+      {
+        "dataset_code": "FLOW",
+        "source_rows": 3400,
+        "accepted": 3376,
+        "held": 24,
+        "invalid": 0,
+        "duplicates": 0
+      },
+      {
+        "dataset_code": "WORKER",
+        "source_rows": 3312,
+        "accepted": 3296,
+        "held": 16,
+        "invalid": 0,
+        "duplicates": 0
+      },
+      {
+        "dataset_code": "FACILITY",
+        "source_rows": 3400,
+        "accepted": 3376,
+        "held": 24,
+        "invalid": 0,
+        "duplicates": 0
+      }
+    ],
+    "holds": [
+      {
+        "dataset_code": "SALES",
+        "reason_code": "MAPPING_UNRESOLVED",
+        "rows_count": 2386
+      },
+      {
+        "dataset_code": "SALES",
+        "reason_code": "QUALITY_CHECK_FAILED",
+        "rows_count": 2
+      },
+      {
+        "dataset_code": "STORE",
+        "reason_code": "MAPPING_UNRESOLVED",
+        "rows_count": 5268
+      },
+      {
+        "dataset_code": "FLOW",
+        "reason_code": "MAPPING_UNRESOLVED",
+        "rows_count": 24
+      },
+      {
+        "dataset_code": "WORKER",
+        "reason_code": "MAPPING_UNRESOLVED",
+        "rows_count": 16
+      },
+      {
+        "dataset_code": "FACILITY",
+        "reason_code": "MAPPING_UNRESOLVED",
+        "rows_count": 24
+      }
+    ],
+    "nationalAndLegacyPublicationsUnchanged": true,
+    "finishedAt": "2026-11-11T00:52:09.933933100Z"
+  },
+  "development": {
+    "database": "pickplace",
+    "batchStatus": "READY",
+    "batches": 38,
+    "factRows": 1157315,
+    "sourceRows": 1161681,
+    "accepted": 1149595,
+    "held": 7718,
+    "invalid": 2,
+    "duplicates": 4366,
+    "publishedBatches": 0,
+    "sameInputReused": 38,
+    "oldTableChecksumsUnchanged": 21,
+    "byDataset": [
+      {
+        "held": 2386,
+        "batches": 7,
+        "dataset": "SALES",
+        "invalid": 2,
+        "accepted": 374097,
+        "duplicates": 0,
+        "sourceRows": 376485
+      },
+      {
+        "held": 5268,
+        "batches": 7,
+        "dataset": "STORE",
+        "invalid": 0,
+        "accepted": 765450,
+        "duplicates": 4366,
+        "sourceRows": 775084
+      },
+      {
+        "held": 24,
+        "batches": 8,
+        "dataset": "FLOW",
+        "invalid": 0,
+        "accepted": 3376,
+        "duplicates": 0,
+        "sourceRows": 3400
+      },
+      {
+        "held": 16,
+        "batches": 8,
+        "dataset": "WORKER",
+        "invalid": 0,
+        "accepted": 3296,
+        "duplicates": 0,
+        "sourceRows": 3312
+      },
+      {
+        "held": 24,
+        "batches": 8,
+        "dataset": "FACILITY",
+        "invalid": 0,
+        "accepted": 3376,
+        "duplicates": 0,
+        "sourceRows": 3400
+      }
+    ],
+    "sampleChecks": [
+      {
+        "dataset": "FACILITY",
+        "period": "20262",
+        "sourceRowNumber": 19,
+        "checkedFields": 20,
+        "result": "PASSED"
+      },
+      {
+        "dataset": "FLOW",
+        "period": "20262",
+        "sourceRowNumber": 385,
+        "checkedFields": 22,
+        "result": "PASSED"
+      },
+      {
+        "dataset": "SALES",
+        "period": "20262",
+        "sourceRowNumber": 16652,
+        "checkedFields": 48,
+        "result": "PASSED"
+      },
+      {
+        "dataset": "STORE",
+        "period": "20262",
+        "sourceRowNumber": 6784,
+        "checkedFields": 7,
+        "result": "PASSED"
+      },
+      {
+        "dataset": "WORKER",
+        "period": "20262",
+        "sourceRowNumber": 52,
+        "checkedFields": 21,
+        "result": "PASSED"
+      }
+    ]
+  },
+  "remainingReviews": [
+    "CS100 to SEMAS semantic mapping not applied",
+    "Sales aggregation interpretation, flow interpretation and source rate denominator remain UNVERIFIED",
+    "No existing public API or AI contract expansion",
+    "Production approval/publication not executed"
+  ],
+  "codeHashes": {
+    "build.gradle": "1982c8f55cffb444eba26e3c66b3396f1e4506337c83649f8eb90ee1a3765ba8",
+    "src/main/java/com/pickplace/backend/ingestion/detail/cli/RegionalDetailRunner.java": "37225079c850e925294b99373659f0f008869c99f117b3332be97d4f69ef6581",
+    "src/main/java/com/pickplace/backend/ingestion/detail/model/DetailImportManifest.java": "f98af919452f4887c523dc87362acc4bb71971f871dfac435d4707eea2fbb77b",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/DetailBatchService.java": "d82e933b6692a5114be29ce1075111287be0071d19999812b9e8b1f32b18fde7",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/DetailCatalogImporter.java": "daf1205317a608caf5b08471a914765437f004200c771c3a48f40d380eafd3e8",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/DetailInputLoader.java": "c7eeaa8efd8ca89790588386b6fa60901ad90e9cef734690b84627e1fbc9a143",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/DetailRowValidator.java": "0ee36f99e0fcbaaae7954915e2987819647a9af8ee7d3186cbe620234dee8751",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/RegionalDetailImporter.java": "987e87a1dd40f516d437fd8763bd328f88d5e3a501485572b487a46d69565579",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/RegionalSourceAdapter.java": "ad27bf4fb29d92690d6718089f4b1c582d691f717aab52ace30c07e2503b8e2f",
+    "src/main/java/com/pickplace/backend/ingestion/detail/service/SeoulDongSourceAdapter.java": "7411379237c524d79a3aa63656501cc24c8f1ec3e390d05d9be214b4c88fdcd1",
+    "src/main/java/com/pickplace/backend/PickplaceBackendApplication.java": "83626c08ae8f3ac15d44ac1fae5b110be49dea2f2fd7ba70323b71b92fd38714",
+    "src/main/resources/application-regional-detail.yaml": "4d510eccba8179cf453bb5466fcd49c16047a4e162612d2e55c794d9cf2a4bbc",
+    "src/main/resources/db/migration/V7__create_regional_detail_statistics.sql": "fe4d598d3a68e60464a8e7754e3de81a17fae7450d9bfcbe8998ebca41b0e777",
+    "tools/prepare_seoul_detail.py": "3bf84a5eb3086bbe5f05c1fc0d802d76f4fc2a5b0277aed8dd7e340da202ba94"
+  }
+}

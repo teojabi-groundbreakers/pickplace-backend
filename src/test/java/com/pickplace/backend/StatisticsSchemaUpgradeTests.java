@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StatisticsSchemaUpgradeTests {
 
     @Test
-    void upgradesV1ThroughV6WithoutChangingExistingReferenceOrStatisticsData() {
+    void upgradesV1ThroughV7WithoutChangingExistingReferenceOrStatisticsData() {
         try (MySQLContainer mysql = new MySQLContainer("mysql:8.4.11").withDatabaseName("pickplace_upgrade_test")) {
             mysql.start();
             var source = new DriverManagerDataSource(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
@@ -143,7 +143,7 @@ class StatisticsSchemaUpgradeTests {
             assertThat(v5.migrate().migrationsExecuted).isZero();
             assertThat(v5.validateWithResult().validationSuccessful).isTrue();
             var v5Checksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
-            var v6 = Flyway.configure().dataSource(source).cleanDisabled(true).load();
+            var v6 = Flyway.configure().dataSource(source).target("6").cleanDisabled(true).load();
             assertThat(v6.migrate().migrationsExecuted).isEqualTo(1);
             assertThat(jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history WHERE version IN ('1','2','3','4','5') ORDER BY installed_rank"))
                     .isEqualTo(v5Checksums);
@@ -153,6 +153,16 @@ class StatisticsSchemaUpgradeTests {
             assertThat(jdbc.queryForMap("SELECT * FROM region_stat_mapping")).isEqualTo(originalMapping);
             assertThat(v6.migrate().migrationsExecuted).isZero();
             assertThat(v6.validateWithResult().validationSuccessful).isTrue();
+            var v6Checksums = jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history ORDER BY installed_rank");
+            var v7 = Flyway.configure().dataSource(source).target("7").cleanDisabled(true).load();
+            assertThat(v7.migrate().migrationsExecuted).isEqualTo(1);
+            assertThat(jdbc.queryForList("SELECT version, checksum FROM flyway_schema_history WHERE version IN ('1','2','3','4','5','6') ORDER BY installed_rank")).isEqualTo(v6Checksums);
+            assertThat(jdbc.queryForMap("SELECT * FROM source_region_reference")).isEqualTo(originalSource);
+            assertThat(jdbc.queryForMap("SELECT * FROM region_stat_mapping")).isEqualTo(originalMapping);
+            assertThat(jdbc.queryForObject("SELECT resident_population FROM dong_resident_quarter", Long.class)).isZero();
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM regional_statistic_batch", Integer.class)).isZero();
+            assertThat(v7.migrate().migrationsExecuted).isZero();
+            assertThat(v7.validateWithResult().validationSuccessful).isTrue();
         }
     }
 }
