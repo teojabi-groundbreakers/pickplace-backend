@@ -7,6 +7,7 @@ import json
 import os
 import pathlib
 import zipfile
+from datetime import datetime
 
 
 def read(path):
@@ -18,9 +19,10 @@ def sha(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def save(path, value):
+def save(path, value, *, trailing_newline=False):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+    content = json.dumps(value, ensure_ascii=False, indent=2)
+    path.write_text(content + ("\n" if trailing_newline else ""), encoding="utf-8")
 
 
 def receipt(path):
@@ -40,6 +42,62 @@ def collected(meta):
         if meta.get(field):
             return meta[field]
     raise ValueError("원천 수집 시각이 없습니다")
+
+
+def store_key(row):
+    return str(row["adstrd_cd"]), str(row["svc_induty_cd"])
+
+
+def prepare_store_partitions(data, out, quarter_file, template):
+    partitions = sorted((data / "점포업종별JSON").glob("CS??????.json"))
+    if len(partitions) != 100:
+        raise ValueError("점포 업종별 원본 100개와 각 메타데이터가 필요합니다.")
+
+    rows_by_period = {"20261": {}, "20262": {}}
+    parents = []
+    for path in partitions:
+        meta = receipt(path)
+        parents.append(dict(path=str(path.resolve()), sha256=meta["sha256"], metadata=meta))
+        for number, row in enumerate(read(path)["DATA"], 1):
+            period = str(row["stdr_yyqu_cd"])
+            if period not in rows_by_period:
+                continue
+            key = store_key(row)
+            if key[1] != path.stem or key in rows_by_period[period]:
+                raise ValueError(f"점포 업종 불일치 또는 중복 키: {path}, {number}")
+            rows_by_period[period][key] = dict(row, _source_artifact=path.name, _source_row_number=number)
+
+    original = receipt(quarter_file)
+    expected = int(original["expectedRows"])
+    corrected = rows_by_period["20262"]
+    if len(corrected) != expected or len(template["DATA"]) != expected:
+        raise ValueError(f"2026Q2 점포 원본과 정정본의 기대 건수 불일치: {expected}")
+    for row in template["DATA"]:
+        key = store_key(row)
+        replacement = corrected.get(key, {})
+        source_fields = {field: value for field, value in replacement.items()
+                         if field not in ("_source_artifact", "_source_row_number")}
+        if row != source_fields:
+            raise ValueError(f"2026Q2 점포 원천 필드 불일치: {key}")
+
+    timestamps = [collected(parent["metadata"]) for parent in parents]
+    collected_at = max(timestamps, key=lambda value: datetime.fromisoformat(value.replace("Z", "+00:00")))
+    files = []
+    for period, keys in rows_by_period.items():
+        if not keys:
+            raise ValueError(f"점포 업종별 원본에 대상 분기 없음: {period}")
+        suffix = "-from-partitions" if period == "20262" else ""
+        path = out / f"store-{period}{suffix}.json"
+        # 이미 적재한 정정 배치와 같은 파일을 생성해 재실행 시 재사용한다.
+        save(path, {"DESCRIPTION": template["DESCRIPTION"], "DATA": list(keys.values())},
+             trailing_newline=period == "20262")
+        meta = dict(sha256=sha(path), collectedAt=collected_at, expectedRows=len(keys),
+                    derivation=f"FILTER_{period}_FROM_ALL_INDUSTRY_PARTITIONS", parents=parents)
+        if period == "20262":
+            meta["previousQuarterFileSha256"] = original["sha256"]
+        save(path.with_name(path.name + ".meta.json"), meta)
+        files.append(path)
+    return files
 
 
 def generate(data, reference, out):
@@ -63,7 +121,8 @@ def generate(data, reference, out):
     catalog = []
     ids = dict(sales="OA-22175", store="OA-22172", flow="OA-22178", worker="OA-22184", facility="OA-22169")
     for dataset in ids:
-        template = read(data / "분기별JSON" / f"{dataset}-20262.json")
+        quarter_file = data / "분기별JSON" / f"{dataset}-20262.json"
+        template = read(quarter_file)
         aliases = {}
         for key, label in template["DESCRIPTION"].items():
             canonical = key.lower()
@@ -85,24 +144,11 @@ def generate(data, reference, out):
         else:
             files.extend(sorted(p for p in (data / "분기이력JSON").glob(f"{dataset}-*.json") if not p.name.endswith(".meta.json")))
         files.extend(sorted(p for p in (data / "분기별JSON").glob(f"{dataset}-*.json") if not p.name.endswith(".meta.json")))
-        # 분할 원본에서는 2026Q1만 추출해 연도별 원본과 중복 적재하지 않는다.
         if dataset == "store":
-            parents, rows = [], []
-            for path in sorted((data / "점포업종별JSON").glob("CS*.json")):
-                if path.name.endswith(".meta.json"):
-                    continue
-                meta = receipt(path)
-                for number, row in enumerate(read(path)["DATA"], 1):
-                    if str(row["stdr_yyqu_cd"]) == "20261":
-                        rows.append({**row, "_source_artifact": path.name, "_source_row_number": number})
-                parents.append(dict(path=str(path.resolve()), sha256=sha(path), metadata=meta))
-            if rows:
-                path = out / "store-20261.json"
-                save(path, {"DESCRIPTION": template["DESCRIPTION"], "DATA": rows})
-                save(path.with_name(path.name + ".meta.json"), dict(sha256=sha(path), collectedAt=max(collected(p["metadata"]) for p in parents),
-                     expectedRows=len(rows), derivation="FILTER_20261_FROM_ALL_INDUSTRY_PARTITIONS", parents=parents))
-                files.append(path)
-                aliases.update({"_source_artifact": "_source_artifact", "_source_row_number": "_source_row_number"})
+            # 일괄 다운로드에서 누락된 2026Q2를 업종별 원본으로 복원한다.
+            files.remove(quarter_file)
+            files.extend(prepare_store_partitions(data, out, quarter_file, template))
+            aliases.update({"_source_artifact": "_source_artifact", "_source_row_number": "_source_row_number"})
         for path in files:
             meta = receipt(path)
             if path.suffix == ".zip":
