@@ -80,6 +80,8 @@ public class RegionalDetailImporter {
                         require(
                                 ledger.source == valid + hold + invalid + ledger.duplicates,
                                 "원천 행 회계 불일치");
+                        if (NationalStoreQuarterAdapter.ID.equals(input.manifest().adapter()))
+                            require(valid == ledger.source, "전국 분기 업소 집계에 보류·오류·중복이 있습니다.");
                         var report = new LinkedHashMap<String, Object>();
                         report.put("sourceRows", ledger.source);
                         report.put("accepted", valid);

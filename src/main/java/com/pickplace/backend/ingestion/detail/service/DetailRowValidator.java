@@ -65,18 +65,33 @@ public class DetailRowValidator {
                 },
                 id);
         var mappings = new HashMap<String, DetailImportManifest.RegionMapping>();
+        boolean national = NationalStoreQuarterAdapter.ID.equals(m.adapter());
+        Set<String> industries = national ? approvedNationalIndustries(release) : Set.of();
         for (var map : mapper.readValue(input.mappingJson(), Mappings.class).regions()) {
             Node node = nodes.get(map.targetCode());
             require(
                     node != null
-                            && "서울특별시".equals(node.province())
+                            && (national || "서울특별시".equals(node.province()))
                             && node.name() != null
                             && sameLocalityName(node.name(), map.sourceName())
                             && verified.contains(map.sourceCode() + ":" + map.targetCode()),
-                    "기존 검증 대응·공식 명칭과 다른 서울 대응표: " + map.sourceCode());
+                    "기존 검증 대응·공식 명칭과 다른 대응표: " + map.sourceCode());
             mappings.put(map.sourceCode(), map);
         }
-        return new Reference(id, Map.copyOf(nodes), Map.copyOf(mappings));
+        return new Reference(id, Map.copyOf(nodes), Map.copyOf(mappings), industries);
+    }
+
+    private Set<String> approvedNationalIndustries(Map<String, Object> release) {
+        var id = mapper.readTree(release.get("validation_report").toString()).path("classificationId");
+        require(id.isIntegralNumber() && id.canConvertToLong(), "승인 업종 분류 연결이 필요합니다.");
+        var codes = jdbc.queryForList("""
+                SELECT c.industry_code FROM national_industry_code c
+                JOIN national_industry_release r ON r.classification_id=c.classification_id
+                WHERE r.classification_id=? AND r.status='APPROVED' AND c.industry_level='SMALL'
+                  AND c.is_supported=TRUE AND c.support_release_status='APPROVED'
+                """, String.class, id.longValue());
+        require(!codes.isEmpty(), "승인된 지원 업종이 없습니다.");
+        return Set.copyOf(codes);
     }
 
     public Row validate(
@@ -89,8 +104,12 @@ public class DetailRowValidator {
                 hash =
                         NationalReferenceLoader.sha256(
                                 payload.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        if (!source.matches("[0-9]{8}")
-                || (!"NONE".equals(m.industryScheme()) && !industry.matches("CS[0-9]{6}")))
+        boolean validIndustry = switch (m.industryScheme()) {
+            case "NONE" -> true;
+            case "SEMAS_SMALL" -> ref.nationalIndustries().contains(industry);
+            default -> industry.matches("CS[0-9]{6}");
+        };
+        if (!source.matches("[0-9]{8}") || !validIndustry)
             return new Row(
                     quarter,
                     source,
@@ -209,7 +228,8 @@ public class DetailRowValidator {
     public record Reference(
             long releaseId,
             Map<String, Node> nodes,
-            Map<String, DetailImportManifest.RegionMapping> mappings) {}
+            Map<String, DetailImportManifest.RegionMapping> mappings,
+            Set<String> nationalIndustries) {}
 
     public record Node(
             String province,

@@ -61,6 +61,16 @@ public class DetailInputLoader {
                             && "SEOUL_ADSTRD8".equals(m.regionScheme())
                             && java.util.Set.of("NONE", "SEOUL_CS100").contains(m.industryScheme()),
                     "서울 어댑터의 원천·분류 체계 오류");
+        if (NationalStoreQuarterAdapter.ID.equals(m.adapter()))
+            require("SEMAS_STORE".equals(m.sourceSystem())
+                            && "STORE_SNAPSHOT".equals(m.datasetCode())
+                            && "SEMAS_ADSTRD8".equals(m.regionScheme())
+                            && "SEMAS_SMALL".equals(m.industryScheme())
+                            && "UTF-8".equals(m.encoding())
+                            && m.periods().size() == 1
+                            && m.metrics().equals(java.util.List.of(new DetailImportManifest.Metric(
+                                    NationalStoreQuarterAdapter.FIELD, "COUNT", "DISTINCT_STORE_ID", "VERIFIED"))),
+                    "전국 업소 집계 어댑터의 원천·지표 정의 오류");
         require(
                 m.metrics().stream().map(DetailImportManifest.Metric::field).distinct().count()
                         == m.metrics().size(),
