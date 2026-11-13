@@ -48,6 +48,8 @@ public class RegionQueryRepository {
 	private static final String LIST_COLUMNS =
 			"SELECT n.region_code, n.display_name, n.selection_role, n.selection_parent_code, n.auto_select_group ";
 
+	private static final String FIND_SQL = LIST_COLUMNS + SELECTABLE_FROM_WHERE + " AND n.region_code = ?";
+
 	// 시·도는 코드순이 계약이다.
 	private static final String PROVINCES_SQL = LIST_COLUMNS + SELECTABLE_FROM_WHERE + " ORDER BY n.region_code";
 
@@ -84,6 +86,12 @@ public class RegionQueryRepository {
 	public boolean existsSelectableRegion(long releaseId, String regionCode, SelectionLevel level) {
 		Integer count = jdbc.queryForObject(EXISTS_SQL, Integer.class, releaseId, level.name(), regionCode);
 		return count != null && count > 0;
+	}
+
+	// 해당 릴리스에서 이 코드가 그 단계로 화면에 보이면 표시명까지 돌려준다. 아니면 비어 있다.
+	public Optional<RegionItem> findSelectableRegion(long releaseId, String regionCode, SelectionLevel level) {
+		// (release_id, region_code)가 기본키라 0행 또는 1행이다.
+		return jdbc.query(FIND_SQL, REGION_ITEM_MAPPER, releaseId, level.name(), regionCode).stream().findFirst();
 	}
 
 	// 해당 릴리스의 시·도 목록을 코드순으로 돌려준다.
