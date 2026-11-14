@@ -18,6 +18,7 @@ public class RegionService {
 	private static final String APPROVED = "APPROVED";
 	private static final String PROVINCE_CODE_FIELD = "provinceCode";
 	private static final String GROUP_CODE_FIELD = "groupCode";
+	private static final String REGION_CODE_FIELD = "regionCode";
 	private static final String REASON_NOT_FOUND = "NOT_FOUND";
 
 	private final RegionQueryRepository regionQueryRepository;
@@ -40,6 +41,16 @@ public class RegionService {
 	// 그룹에 속한 읍·면·동 목록을 이름순으로 돌려준다. 화면에 보이는 그룹이 아니면 404다.
 	public RegionList getLocalities(String groupCode) {
 		return getChildren(groupCode, GROUP_CODE_FIELD, SelectionLevel.GROUP, SelectionLevel.LOCALITY);
+	}
+
+	// 현재 게시본에서 화면에 보이는 읍·면·동이면 게시 릴리스 번호와 표시명을 돌려준다. 아니면 404다.
+	// 다른 기능(추이 조회 등)이 지역 선택 규칙을 다시 만들지 않고 이 확인을 그대로 쓰게 하려고 공개한다.
+	public SelectedLocality getSelectableLocality(String regionCode) {
+		PublishedRegionRelease release = currentRelease();
+		RegionItem locality = regionQueryRepository.findSelectableRegion(release.releaseId(), regionCode, SelectionLevel.LOCALITY)
+				.orElseThrow(() -> new ApiException(ErrorCode.REGION_NOT_FOUND,
+						List.of(new ErrorDetail(REGION_CODE_FIELD, REASON_NOT_FOUND))));
+		return new SelectedLocality(release.releaseId(), locality.regionCode(), locality.regionName());
 	}
 
 	// 부모가 현재 게시본에서 요청한 단계로 보이는지 확인한 뒤 그 하위 목록을 돌려준다.

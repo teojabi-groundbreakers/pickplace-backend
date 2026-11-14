@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pickplace.backend.common.error.ApiException;
 import com.pickplace.backend.common.error.ErrorCode;
+import com.pickplace.backend.common.response.ErrorDetail;
 
 // 게시된 지역 릴리스에 연결된 승인 업종 분류에서 지원 소분류 목록을 만든다.
 // 읽기 전용 트랜잭션 하나로 묶어 한 요청의 쿼리들이 같은 DB 시점의 자료를 보게 한다.
@@ -15,6 +16,9 @@ import com.pickplace.backend.common.error.ErrorCode;
 public class BusinessTypeService {
 
 	private static final String APPROVED = "APPROVED";
+	private static final String BUSINESS_TYPE_CODE_FIELD = "businessTypeCode";
+	private static final String REASON_NOT_FOUND = "NOT_FOUND";
+	private static final String REASON_NOT_SUPPORTED = "NOT_SUPPORTED";
 
 	private final BusinessTypeQueryRepository businessTypeQueryRepository;
 
@@ -28,6 +32,19 @@ public class BusinessTypeService {
 		// 분류 번호는 여기서 한 번만 정하고 아래 조회에 그대로 넘긴다.
 		long classificationId = currentClassificationId();
 		return businessTypeQueryRepository.findSupportedBusinessTypes(classificationId);
+	}
+
+	// 현재 승인 분류의 지원 소분류이면 그 항목을 돌려준다. 분류에 없으면 404, 등록됐지만 지원하지 않으면 422다.
+	// 다른 기능(추이 조회 등)이 업종 확인 규칙을 다시 만들지 않고 이 확인을 그대로 쓰게 하려고 공개한다.
+	public BusinessTypeItem getSupportedBusinessType(String businessTypeCode) {
+		BusinessTypeItem item = businessTypeQueryRepository.findSmallBusinessType(currentClassificationId(), businessTypeCode)
+				.orElseThrow(() -> new ApiException(ErrorCode.BUSINESS_TYPE_NOT_FOUND,
+						List.of(new ErrorDetail(BUSINESS_TYPE_CODE_FIELD, REASON_NOT_FOUND))));
+		if (!item.supported()) {
+			throw new ApiException(ErrorCode.BUSINESS_TYPE_NOT_SUPPORTED,
+					List.of(new ErrorDetail(BUSINESS_TYPE_CODE_FIELD, REASON_NOT_SUPPORTED)));
+		}
+		return item;
 	}
 
 	// 지금 게시본에 연결된 승인 업종 분류 번호를 돌려준다. 아직 게시 전이면 503 REFERENCE_DATA_NOT_READY다.

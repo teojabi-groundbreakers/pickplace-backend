@@ -43,6 +43,15 @@ public class BusinessTypeQueryRepository {
 			ORDER BY display_order, industry_code
 			""";
 
+	// 소분류 하나를 찾는다. supported는 목록 API와 같은 기준(지원 표시 + 승인된 지원 설정)이다.
+	private static final String SMALL_SQL = """
+			SELECT industry_code, display_name, (is_supported AND support_release_status = 'APPROVED') AS supported
+			FROM national_industry_code
+			WHERE classification_id = ?
+			  AND industry_level = 'SMALL'
+			  AND industry_code = ?
+			""";
+
 	private final JdbcTemplate jdbc;
 	private final JsonMapper jsonMapper;
 
@@ -71,6 +80,13 @@ public class BusinessTypeQueryRepository {
 		return jdbc.query(SUPPORTED_SQL, (rs, rowNum) -> new BusinessTypeItem(
 				rs.getString("industry_code"), rs.getString("display_name"), rs.getBoolean("is_supported")),
 				classificationId);
+	}
+
+	// 한 분류본에서 소분류 코드 하나를 찾는다. 그 분류본의 소분류가 아니면 비어 있다.
+	public Optional<BusinessTypeItem> findSmallBusinessType(long classificationId, String businessTypeCode) {
+		return jdbc.query(SMALL_SQL, (rs, rowNum) -> new BusinessTypeItem(
+				rs.getString("industry_code"), rs.getString("display_name"), rs.getBoolean("supported")),
+				classificationId, businessTypeCode).stream().findFirst();
 	}
 
 	// 검증 보고서에서 분류 번호를 꺼낸다. 번호가 없거나 양의 정수가 아니면 null이다.
