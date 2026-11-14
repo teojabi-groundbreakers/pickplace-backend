@@ -121,9 +121,12 @@ GET /api/regions/{regionCode}/trends?datasetCode={자료}&{업종 파라미터}&
 | `CURRENT_UNAVAILABLE` | `null` | `null` | 이 분기 값이 정의 미확인(`UNVERIFIED`)이라 증감을 계산하지 않음 |
 | `BASELINE_MISSING` | `null` | `null` | 비교 기준 분기가 게시됐지만 이 지역(·업종) 값이 없음 |
 | `BASELINE_UNAVAILABLE` | `null` | `null` | 비교 기준 분기가 미게시이거나 보류·정의 미확인 |
-| `NOT_COMPARABLE` | `null` | `null` | 두 분기의 원천·업종·지역 경계(대응 릴리스)·지표 정의·단위 중 하나가 다름 |
+| `NOT_COMPARABLE` | `null` | `null` | 두 분기의 원천·업종·지역 경계(대응 릴리스)·지표 코드·단위·집계 방식·정의 상태 중 하나가 다름. 또는 분기별 새 관측인지 확인할 수 없는 자료(`WORKER`·`FACILITY`) |
 
 - 증감률(%) = (이번 값 − 기준값) ÷ 기준값 × 100.
+- `WORKER`(직장인구)·`FACILITY`(시설)는 원천이 이전 분기 값을 그대로 쓰는 경우를 구분할 표시가 없어, 원천 값은 그대로 주고 증감은 항상 `NOT_COMPARABLE`이다. 반복된 값이 0%로 보이지 않게 하기 위해서다. 분기별 새 관측 여부를 확인할 수 있게 되면 다시 검토한다.
+- 기준정보 릴리스(대응 릴리스)가 다르면 지역 경계가 같다는 근거가 확보될 때까지 비교하지 않는다.
+- `changes.*.status` 값은 공개 응답에서 따로 정한 목록이다. 내부 계산기의 상태 이름이 바뀌어도 응답 값이 함께 바뀌지 않는다.
 - 범위 첫 분기도 비교할 수 있도록 서버가 요청 범위보다 4분기 앞까지 읽는다. 그 분기들은 비교 기준으로만 쓰고 응답 `periods`에는 넣지 않는다.
 - 같은 분기의 원천 증감 지표(예: 원천 개·폐업률)가 있어도 다시 계산하지 않는다. 증감은 같은 지표의 분기 간 차이만 계산한다.
 
@@ -132,16 +135,20 @@ GET /api/regions/{regionCode}/trends?datasetCode={자료}&{업종 파라미터}&
 | status | reasonCode | 의미 |
 |---|---|---|
 | `AVAILABLE` | `null` | 게시된 정상 행이 있음. 지표마다 다시 상태가 있다 |
-| `NO_DATA` | `SOURCE_REGION_ABSENT` | 그 분기 원천이 이 지역을 수록하지 않음(예: 서울 자료의 서울 밖 지역, 전국 업소의 공통 수록 범위 밖) |
+| `NO_DATA` | `SOURCE_REGION_ABSENT` | 그 분기 배치의 지역 대응표에 이 지역이 없음(예: 서울 자료의 서울 밖 지역, 전국 업소의 공통 수록 범위 밖) |
 | `NO_DATA` | `SOURCE_ROW_ABSENT` | 원천 수록 지역이지만 이 지역(·업종) 행이 없음(예: 직장인구가 없는 동) |
 | `NO_DATA` | `SOURCE_VALUE_MISSING` | 행은 있지만 모든 값이 비어 있음 |
 | `UNAVAILABLE` | `NOT_PUBLISHED` | 그 분기가 아직 게시되지 않음. 원천에 자료가 없다는 뜻이 아니다 |
-| `UNAVAILABLE` | `MAPPING_UNRESOLVED` | 원천 지역 → H10 대응이 확정되지 않아 보류 |
 | `UNAVAILABLE` | `BOUNDARY_REVIEW_PENDING` | 그 분기의 행정구역 경계 검토가 끝나지 않아 보류 |
 | `UNAVAILABLE` | `BOUNDARY_MISMATCH` | 원천 분기와 지역 경계가 맞지 않거나, 대응표를 만든 기준정보에서 이 지역이 현행이 아님 |
 | `UNAVAILABLE` | `QUALITY_CHECK_FAILED` | 숫자 오류·중복 충돌 등 품질 검증 실패로 제외 |
 
-보류 사유가 여러 개면 `MAPPING_UNRESOLVED` → `BOUNDARY_REVIEW_PENDING` → `BOUNDARY_MISMATCH` → `QUALITY_CHECK_FAILED` → `SOURCE_VALUE_MISSING` 순서의 첫 사유를 준다.
+보류 사유가 여러 개면 `BOUNDARY_REVIEW_PENDING` → `BOUNDARY_MISMATCH` → `QUALITY_CHECK_FAILED` → `SOURCE_VALUE_MISSING` 순서의 첫 사유를 준다.
+
+**반환할 수 있는 보류 사유의 범위**
+- 보류 사유는 H10(`region_code`)이 정해진 원천 행에서만 읽는다. 원천 지역 → H10 대응이 확정되지 않은 행은 `region_code`가 비어 있어 특정 H10에 연결할 수 없으므로, 지역 조회 응답에 `MAPPING_UNRESOLVED`는 나오지 않는다. 그런 원천 지역에 해당하는 H10은 대응표에 없어 `SOURCE_REGION_ABSENT`로 나온다.
+- 원천 키 오류(`INVALID_SOURCE_KEY`)·중복 충돌 등 그 밖의 원천 사유는 `QUALITY_CHECK_FAILED`로 묶는다.
+- 알려진 한계: 전국 업소 비교 집계에서 공식 관할 범위 변경 등으로 **제외된 지역**(원천에는 수록됨)도 지금은 대응표에 없어 `SOURCE_REGION_ABSENT`로 나온다. 적재 쪽에서 제외 사유를 보존하면 조회에서 원천 미수록과 구분한다.
 
 ### 지표 상태
 
@@ -176,7 +183,7 @@ GET /api/regions/{regionCode}/trends?datasetCode={자료}&{업종 파라미터}&
 - 입력 오류는 미정의·중복 파라미터 → 지역 형식 → 자료 → 업종 → 시작 분기 → 종료 분기 → 범위 순서로 하나만 알린다. 이 검사는 DB를 읽기 전에 하므로 DB 장애 중에도 잘못된 요청은 400이다.
 - 지역이 목록에 있는데 통계가 없다고 404로 바꾸지 않는다. 그런 경우는 200과 분기별 `NO_DATA`다.
 - 범위 안 분기가 하나도 게시되지 않아도 503이 아니라 200이고, 모든 분기가 `NOT_PUBLISHED`다.
-- 범위 앞 비교 기준 분기의 지표 정의가 달라도 오류가 아니라 그 증감만 `NOT_COMPARABLE`이다.
+- 범위 앞 비교 기준 분기의 지표 정의(단위·집계 방식·정의 상태)가 달라도 오류가 아니라 그 증감만 `NOT_COMPARABLE`이다.
 - 성공·오류 응답 모두 `Cache-Control: no-store`이다.
 
 ## 내부 동작

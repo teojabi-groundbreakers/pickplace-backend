@@ -46,7 +46,12 @@ public record TrendResponse(Data data, Meta meta) {
 	}
 
 	// 증감 하나다. 비교할 수 없으면 두 값이 null이고 status로 이유를 알린다. 기준값이 0이면 증감률만 null이다.
-	public record Change(BigDecimal absoluteChange, BigDecimal changeRatePercent, QuarterlyChangeCalculator.ChangeStatus status) {
+	public record Change(BigDecimal absoluteChange, BigDecimal changeRatePercent, ChangeStatus status) {
+	}
+
+	// 공개 응답의 증감 상태 값이다. 내부 계산기의 상태 이름이 바뀌어도 FE 응답이 바로 바뀌지 않도록 따로 정해 둔다.
+	public enum ChangeStatus {
+		AVAILABLE, ZERO_BASELINE, CURRENT_MISSING, CURRENT_UNAVAILABLE, BASELINE_MISSING, BASELINE_UNAVAILABLE, NOT_COMPARABLE
 	}
 
 	public record Meta(String requestId) {
@@ -83,7 +88,20 @@ public record TrendResponse(Data data, Meta meta) {
 
 	// 증감 하나를 응답 항목으로 바꾼다.
 	private static Change change(QuarterlyChangeCalculator.Change change) {
-		return new Change(change.absoluteChange(), change.changeRatePercent(), change.status());
+		return new Change(change.absoluteChange(), change.changeRatePercent(), changeStatus(change.status()));
+	}
+
+	// 계산기 상태를 공개 상태로 바꾼다. 계산기에 상태가 추가되면 여기서 컴파일 오류가 나 공개 계약을 먼저 정하게 된다.
+	private static ChangeStatus changeStatus(QuarterlyChangeCalculator.ChangeStatus status) {
+		return switch (status) {
+			case AVAILABLE -> ChangeStatus.AVAILABLE;
+			case ZERO_BASELINE -> ChangeStatus.ZERO_BASELINE;
+			case CURRENT_MISSING -> ChangeStatus.CURRENT_MISSING;
+			case CURRENT_UNAVAILABLE -> ChangeStatus.CURRENT_UNAVAILABLE;
+			case BASELINE_MISSING -> ChangeStatus.BASELINE_MISSING;
+			case BASELINE_UNAVAILABLE -> ChangeStatus.BASELINE_UNAVAILABLE;
+			case NOT_COMPARABLE -> ChangeStatus.NOT_COMPARABLE;
+		};
 	}
 
 	// 분기 결과 하나를 응답 항목으로 바꾼다. 지표 순서는 metrics 목록 순서를 따른다.

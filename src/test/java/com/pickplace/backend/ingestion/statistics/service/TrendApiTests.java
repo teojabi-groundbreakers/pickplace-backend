@@ -75,6 +75,8 @@ class TrendApiTests {
 	private static final String CAFE = "CS100010";
 	private static final String SNACK = "CS100008";
 	private static final String LISTED_METRIC = "listed_store_count";
+	private static final String FLOW_METRIC = "tot_flpop_co";
+	private static final String FACILITY_METRIC = "viatr_fclty_co";
 	private static final String CAFE_SEMAS = "I21201";
 	private static final String BAKERY_SEMAS = "I21001";
 
@@ -435,14 +437,14 @@ class TrendApiTests {
 	// 범위 첫 분기의 전년 동기는 응답 범위 밖(4분기 앞)이어도 비교 기준으로 읽고, 그 분기는 응답에 넣지 않는지 확인한다.
 	@Test
 	void sameQuarterLastYearReadsBaselineOutsideRequestedRange() throws Exception {
-		long batch = workerBatch(List.of("20252", "20262"), List.of(workerRow("20252", 10), workerRow("20262", 15)), "VERIFIED");
+		long batch = storeBatch(List.of("20252", "20262"), List.of(storeRow("20252", CAFE, 10), storeRow("20262", CAFE, 15)));
 		publish(batch, "20252");
 		publish(batch, "20262");
 
-		trend("datasetCode=WORKER&fromQuarter=20262&toQuarter=20262")
+		trend("datasetCode=STORE&industryCode=" + CAFE + "&fromQuarter=20262&toQuarter=20262")
 				.andExpect(jsonPath("$.data.periods", hasSize(1)))
-				.andExpect(change(0, WORKER_METRIC, "sameQuarterLastYear", 5, 50.00, "AVAILABLE"))
-				.andExpect(change(0, WORKER_METRIC, "previousQuarter", null, null, "BASELINE_UNAVAILABLE"));
+				.andExpect(change(0, STORE_METRIC, "sameQuarterLastYear", 5, 50.00, "AVAILABLE"))
+				.andExpect(change(0, STORE_METRIC, "previousQuarter", null, null, "BASELINE_UNAVAILABLE"));
 	}
 
 	// 직전 분기가 게시됐지만 이 지역·업종 행이 없으면 비교 기준 결측(BASELINE_MISSING)으로 미게시와 구분되는지 확인한다.
@@ -460,25 +462,66 @@ class TrendApiTests {
 	// 정의가 확인되지 않은(UNVERIFIED) 지표는 값은 보여주되 증감은 계산하지 않는지 확인한다.
 	@Test
 	void unverifiedMetricHasNoComputedChange() throws Exception {
-		long batch = workerBatch(List.of("20261", "20262"), List.of(workerRow("20261", 5), workerRow("20262", 7)), "SOURCE_ONLY");
+		long batch = batch("FLOW", "NONE", List.of("20261", "20262"), List.of(flowRow("20261", 5), flowRow("20262", 7)),
+				List.of(new Metric(FLOW_METRIC, "SOURCE_COUNT", "SOURCE_DEFINED", "SOURCE_ONLY")));
 		publish(batch, "20261");
 		publish(batch, "20262");
 
-		trend("datasetCode=WORKER&fromQuarter=20262&toQuarter=20262")
-				.andExpect(value(0, WORKER_METRIC, 7, "UNVERIFIED", "SOURCE_DEFINITION_UNREVIEWED"))
-				.andExpect(change(0, WORKER_METRIC, "previousQuarter", null, null, "CURRENT_UNAVAILABLE"));
+		trend("datasetCode=FLOW&fromQuarter=20262&toQuarter=20262")
+				.andExpect(value(0, FLOW_METRIC, 7, "UNVERIFIED", "SOURCE_DEFINITION_UNREVIEWED"))
+				.andExpect(change(0, FLOW_METRIC, "previousQuarter", null, null, "CURRENT_UNAVAILABLE"));
 	}
 
 	// 비교 기준 분기의 지표 정의가 다르면(단위 변경) 응답 오류 없이 그 증감만 비교 불가(NOT_COMPARABLE)인지 확인한다.
 	@Test
 	void changedDefinitionInBaselineQuarterIsNotComparable() throws Exception {
-		publish(batch("WORKER", "NONE", List.of("20261"), List.of(workerRow("20261", 5)),
-				List.of(new Metric(WORKER_METRIC, "COUNT", "SOURCE_DEFINED", "VERIFIED"))), "20261");
-		publish(workerBatch(List.of("20262"), List.of(workerRow("20262", 7)), "VERIFIED"), "20262");
+		publish(batch("STORE", "SEOUL_CS100", List.of("20261"), List.of(storeRow("20261", CAFE, 5)),
+				List.of(new Metric(STORE_METRIC, "STORE", "SOURCE_DEFINED", "VERIFIED"))), "20261");
+		publish(storeBatch(List.of("20262"), List.of(storeRow("20262", CAFE, 7))), "20262");
 
-		trend("datasetCode=WORKER&fromQuarter=20262&toQuarter=20262")
+		trend("datasetCode=STORE&industryCode=" + CAFE + "&fromQuarter=20262&toQuarter=20262")
 				.andExpect(status().isOk())
-				.andExpect(change(0, WORKER_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"));
+				.andExpect(value(0, STORE_METRIC, 7, "AVAILABLE", null))
+				.andExpect(change(0, STORE_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"));
+	}
+
+	// 단위·정의 상태가 같아도 기준 분기의 집계 방식(aggregation)만 다르면 증감을 계산하지 않는지 확인한다.
+	@Test
+	void changedAggregationInBaselineQuarterIsNotComparable() throws Exception {
+		publish(batch("STORE", "SEOUL_CS100", List.of("20261"), List.of(storeRow("20261", CAFE, 5)),
+				List.of(new Metric(STORE_METRIC, "COUNT", "DISTINCT_STORE_ID", "VERIFIED"))), "20261");
+		publish(storeBatch(List.of("20262"), List.of(storeRow("20262", CAFE, 7))), "20262");
+
+		trend("datasetCode=STORE&industryCode=" + CAFE + "&fromQuarter=20262&toQuarter=20262")
+				.andExpect(status().isOk())
+				.andExpect(value(0, STORE_METRIC, 7, "AVAILABLE", null))
+				.andExpect(change(0, STORE_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"));
+	}
+
+	// 직장인구·시설은 분기마다 새로 관측된 값인지 확인할 수 없어, 원천 값은 그대로 주되 증감은 계산하지 않는지 확인한다.
+	// 같은 값이 반복돼도 0%로 보이지 않고, 값이 바뀌어도 증감을 만들지 않아야 한다.
+	@Test
+	void workerAndFacilityKeepValuesButChangesAreNotComparable() throws Exception {
+		long worker = workerBatch(List.of("20252", "20261", "20262"),
+				List.of(workerRow("20252", 5324), workerRow("20261", 5324), workerRow("20262", 5400)), "VERIFIED");
+		publish(worker, "20252");
+		publish(worker, "20261");
+		publish(worker, "20262");
+		long facility = batch("FACILITY", "NONE", List.of("20261", "20262"),
+				List.of(facilityRow("20261", 3), facilityRow("20262", 3)),
+				List.of(new Metric(FACILITY_METRIC, "FACILITY", "SOURCE_DEFINED", "VERIFIED")));
+		publish(facility, "20261");
+		publish(facility, "20262");
+
+		trend("datasetCode=WORKER&fromQuarter=20261&toQuarter=20262")
+				.andExpect(value(0, WORKER_METRIC, 5324, "AVAILABLE", null))
+				.andExpect(change(0, WORKER_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"))
+				.andExpect(value(1, WORKER_METRIC, 5400, "AVAILABLE", null))
+				.andExpect(change(1, WORKER_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"))
+				.andExpect(change(1, WORKER_METRIC, "sameQuarterLastYear", null, null, "NOT_COMPARABLE"));
+		trend("datasetCode=FACILITY&fromQuarter=20262&toQuarter=20262")
+				.andExpect(value(0, FACILITY_METRIC, 3, "AVAILABLE", null))
+				.andExpect(change(0, FACILITY_METRIC, "previousQuarter", null, null, "NOT_COMPARABLE"));
 	}
 
 	// 범위는 시작·종료 포함 최대 8분기까지 받는지 확인한다(20243~20262 = 8분기).
@@ -659,6 +702,26 @@ class TrendApiTests {
 		row.put("adstrd_cd", SOURCE_REGION);
 		row.put("adstrd_cd_nm", SOURCE_NAME);
 		row.put(WORKER_METRIC, value);
+		return row;
+	}
+
+	// 길단위인구 원천 행 하나를 만든다.
+	private Map<String, Object> flowRow(String quarter, Object value) {
+		var row = new LinkedHashMap<String, Object>();
+		row.put("stdr_yyqu_cd", quarter);
+		row.put("adstrd_cd", SOURCE_REGION);
+		row.put("adstrd_cd_nm", SOURCE_NAME);
+		row.put(FLOW_METRIC, value);
+		return row;
+	}
+
+	// 시설 원천 행 하나를 만든다.
+	private Map<String, Object> facilityRow(String quarter, Object value) {
+		var row = new LinkedHashMap<String, Object>();
+		row.put("stdr_yyqu_cd", quarter);
+		row.put("adstrd_cd", SOURCE_REGION);
+		row.put("adstrd_cd_nm", SOURCE_NAME);
+		row.put(FACILITY_METRIC, value);
 		return row;
 	}
 

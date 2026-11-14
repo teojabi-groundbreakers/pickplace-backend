@@ -54,6 +54,12 @@ public class TrendService {
 	static final String BOUNDARY_MISMATCH = "BOUNDARY_MISMATCH";
 	static final String QUALITY_CHECK_FAILED = "QUALITY_CHECK_FAILED";
 
+	// 분기마다 새로 관측된 값인지 확인할 수 없는 자료(직장인구·시설)의 증감이다. 원천 값은 그대로 주고 증감만 막는다.
+	// 반복된 값이 0%로 보이거나, 갱신 주기가 다른 값의 차이가 실제 변화처럼 보이지 않게 하기 위해서다.
+	private static final QuarterlyChangeCalculator.Changes NOT_COMPARABLE_CHANGES = new QuarterlyChangeCalculator.Changes(
+			new QuarterlyChangeCalculator.Change(null, null, QuarterlyChangeCalculator.ChangeStatus.NOT_COMPARABLE),
+			new QuarterlyChangeCalculator.Change(null, null, QuarterlyChangeCalculator.ChangeStatus.NOT_COMPARABLE));
+
 	// 보류 사유가 여러 개면 앞쪽을 알린다. 현황 API의 사유 우선순위와 같은 순서다.
 	private static final List<String> WITHHELD_PRIORITY = List.of(
 			MAPPING_UNRESOLVED, BOUNDARY_REVIEW_PENDING, BOUNDARY_MISMATCH, QUALITY_CHECK_FAILED, SOURCE_VALUE_MISSING);
@@ -163,8 +169,10 @@ public class TrendService {
 		Map<String, MetricValue> values = new LinkedHashMap<>();
 		for (MetricDefinition metric : metrics) {
 			JsonNode item = state.storedMetric(metric.metricCode());
-			var changes = QuarterlyChangeCalculator.calculate(Quarters.toCalculatorQuarter(quarter),
-					observations(metric.metricCode(), states, dataset, industryCode));
+			var changes = dataset.changesComparable()
+					? QuarterlyChangeCalculator.calculate(Quarters.toCalculatorQuarter(quarter),
+							observations(metric.metricCode(), states, dataset, industryCode))
+					: NOT_COMPARABLE_CHANGES;
 			if (item == null) {
 				values.put(metric.metricCode(), new MetricValue(null, METRIC_NO_DATA, SOURCE_FIELD_ABSENT, changes));
 				continue;
@@ -186,7 +194,8 @@ public class TrendService {
 
 	// 한 분기·지표의 관측 상태를 정한다.
 	// 정의가 확인된(AVAILABLE) 값만 비교에 쓴다. 정의 미확인(UNVERIFIED) 값으로 증감을 만들면 의미를 단정하게 되기 때문이다.
-	// 비교 범위에는 원천·자료·업종 체계·업종·대응 릴리스(지역 경계)·지표 정의·단위를 넣어, 하나라도 다르면 비교하지 않게 한다.
+	// 비교 범위에는 원천·자료·업종 체계·업종·대응 릴리스(지역 경계)·지표 코드·단위·집계 방식·정의 상태를 넣어,
+	// 하나라도 다르면 비교하지 않게 한다. 집계 방식이 다르면 단위가 같아도 같은 기준의 숫자가 아니다.
 	private static Observation observation(String metricCode, QuarterState state, TrendDataset dataset, String industryCode) {
 		if (state.status() == PeriodStatus.NO_DATA) {
 			return new Observation(null, ObservationStatus.MISSING, null);
@@ -209,7 +218,7 @@ public class TrendService {
 		}
 		String scope = String.join("|", dataset.sourceSystem(), dataset.storedDatasetCode(), dataset.industryKind().scheme(),
 				industryCode, String.valueOf(state.publication().mappingReleaseId()), definition.metricCode(), definition.unit(),
-				definition.definitionStatus());
+				definition.aggregation(), definition.definitionStatus());
 		return new Observation(value, ObservationStatus.AVAILABLE, scope);
 	}
 
@@ -236,7 +245,7 @@ public class TrendService {
 	}
 
 	// 요청 범위 안 게시 배치들의 지표 정의를 분기 순서대로 모은다. 게시된 분기가 없으면 빈 목록이다.
-	// 같은 지표의 단위·정의 상태가 분기마다 다르면 한 추이로 비교할 수 없으므로 내부 오류로 알린다.
+	// 같은 지표의 단위·집계 방식·정의 상태가 분기마다 다르면 한 추이로 비교할 수 없으므로 내부 오류로 알린다.
 	// 범위 앞 비교 기준 분기는 응답에 나오지 않으므로 여기서 모으지 않고, 정의가 다르면 증감만 비교 불가가 된다.
 	private static List<MetricDefinition> metricDefinitions(List<String> requested, Map<String, QuarterState> states) {
 		Map<String, MetricDefinition> definitions = new LinkedHashMap<>();
@@ -259,7 +268,8 @@ public class TrendService {
 		}
 		Map<String, MetricDefinition> definitions = new LinkedHashMap<>();
 		for (JsonNode item : list) {
-			MetricDefinition definition = new MetricDefinition(text(item, "field"), text(item, "unit"), text(item, "definitionStatus"));
+			MetricDefinition definition = new MetricDefinition(text(item, "field"), text(item, "unit"), text(item, "aggregation"),
+					text(item, "definitionStatus"));
 			definitions.put(definition.metricCode(), definition);
 		}
 		return definitions;

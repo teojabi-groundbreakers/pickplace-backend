@@ -15,8 +15,8 @@ record TrendResult(
 		List<MetricDefinition> metrics,
 		List<QuarterTrend> periods) {
 
-	// 지표 하나의 단위와 정의 확인 상태다. 정의는 적재 배치에 고정된 값을 그대로 옮긴다.
-	record MetricDefinition(String metricCode, String unit, String definitionStatus) {
+	// 지표 하나의 단위·집계 방식·정의 확인 상태다. 정의는 적재 배치에 고정된 값을 그대로 옮긴다.
+	record MetricDefinition(String metricCode, String unit, String aggregation, String definitionStatus) {
 	}
 
 	// 한 분기의 결과다. AVAILABLE일 때만 values가 있고, 그 밖에는 null이며 reasonCode로 이유를 알린다.
