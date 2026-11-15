@@ -2,7 +2,7 @@
 
 공공데이터 기반 지역 상권 진단 서비스의 백엔드입니다. 데이터 적재·조회 API·AI 서버 연동을 담당합니다.
 
-현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 지역·지원 업종 목록 API, 전국 인구·업소 원본 수집·정제·품질 검증, 통계 DB 청크 적재·집계·승인·게시 CLI, DEFAULT 조회 기준·지표 가용성 판정, 지역·업종 현황 조회 API와 통합 테스트입니다. AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
+현재 구현 범위는 Spring Boot·MySQL 실행 환경, Flyway 기준정보·통계·적재 이력 테이블 생성, 지역·업종 수동 초기 적재, 공통 응답·예외 처리·서버 상태 API, 지역·지원 업종 목록 API, 전국 인구·업소 원본 수집·정제·품질 검증, 통계 DB 청크 적재·집계·승인·게시 CLI, DEFAULT 조회 기준·지표 가용성 판정, 지역·업종 현황 조회 API, 전국 수록 업소·서울 행정동 상세 통계 분기별 추이·증감 조회 API(제안)와 통합 테스트입니다. AI 연동은 후속 작업입니다. 개발 DB의 실제 데이터 반영 여부는 별도로 확인해야 합니다.
 
 ## 빠른 시작 · 문서 선택
 
@@ -158,9 +158,10 @@ curl http://localhost:8080/api/regions/provinces
 curl "http://localhost:8080/api/regions/groups?provinceCode=1100000000"
 curl "http://localhost:8080/api/regions/localities?groupCode=1111000000"
 curl "http://localhost:8080/api/regions/1111051500/summary?businessTypeCode=I21201"
+curl "http://localhost:8080/api/regions/1111051500/trends?datasetCode=LISTED_STORE&businessTypeCode=I21201&fromQuarter=20262&toQuarter=20263"
 ```
 
-전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다. 현황(`/api/regions/{regionCode}/summary`)은 기본 현황 묶음을 게시하기 전에는 503 `SUMMARY_DATA_NOT_READY`가 정상입니다.
+전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다. 현황(`/api/regions/{regionCode}/summary`)은 기본 현황 묶음을 게시하기 전에는 503 `SUMMARY_DATA_NOT_READY`가 정상입니다. 추이(`/api/regions/{regionCode}/trends`)는 상세 통계를 게시하기 전에는 200과 모든 분기 `NOT_PUBLISHED`가 정상입니다.
 
 `/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 서울 기준정보를 적재하기 전에는 자치구 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. 전국 지역 목록과 지원 업종 목록은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 

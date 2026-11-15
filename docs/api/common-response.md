@@ -49,7 +49,7 @@ PickPlace 백엔드의 모든 `/api` 응답이 따르는 형식이다. 기준은
 | HTTP | code | 의미 | 상태 |
 |---|---|---|---|
 | 400 | `INVALID_REQUEST` | 필수값 누락, 타입 불일치, JSON 형식 오류 등 일반 입력 오류 | **추가안(확정 전)** |
-| 400 | `INVALID_QUARTER` | 분기 형식 오류 (`YYYYQ`, Q는 1~4) | 명세 초안 |
+| 400 | `INVALID_QUARTER` | 분기 형식 오류 (`YYYYQ`, Q는 1~4). 추이 API에서는 종료가 시작보다 앞이거나 범위 초과도 포함 | 명세 초안 |
 | 400 | `INVALID_REGION_CODE` | 지역 코드 형식 오류 | 명세 초안 |
 | 404 | `NOT_FOUND` | 존재하지 않는 주소 | **추가안(확정 전)** |
 | 404 | `REGION_NOT_FOUND` | 형식은 맞지만 등록되지 않은 지역 코드 | 명세 초안 |
@@ -76,7 +76,7 @@ Spring이 오류와 함께 제공하는 안내 헤더(405의 `Allow`, 415의 `Ac
 | `NOT_FOUND` | 형식은 맞지만 등록되지 않은 값 (예: 없는 자치구 코드) |
 | `NOT_SUPPORTED` | 등록됐지만 서비스에서 지원하지 않는 값 (예: 미지원 업종) |
 
-전국 지역 목록 API(`/api/regions/*`), 지원 업종 목록 API(`/api/business-types`), 현황 API(`/api/regions/{regionCode}/summary`)는 정해지지 않은 쿼리 파라미터를 받으면 `field: "query"`, `reason: "INVALID_VALUE"`로 알린다. 사용자가 보낸 파라미터 이름을 응답에 되돌려주지 않기 위해서다.
+전국 지역 목록 API(`/api/regions/*`), 지원 업종 목록 API(`/api/business-types`), 현황 API(`/api/regions/{regionCode}/summary`), 추이 API(`/api/regions/{regionCode}/trends`)는 정해지지 않은 쿼리 파라미터를 받으면 `field: "query"`, `reason: "INVALID_VALUE"`로 알린다. 사용자가 보낸 파라미터 이름을 응답에 되돌려주지 않기 위해서다.
 
 ## 3. 요청 ID (`X-Request-Id`)
 
