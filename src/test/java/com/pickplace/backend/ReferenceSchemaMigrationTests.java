@@ -61,13 +61,14 @@ class ReferenceSchemaMigrationTests {
 
 	@Test
 	void repeatedMigrationDoesNotReapplySqlOrChangeExistingData() {
+		Integer migrationCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM flyway_schema_history", Integer.class);
 		assertThat(flyway.migrate().migrationsExecuted).isZero();
 		assertThat(flyway.migrate().migrationsExecuted).isZero();
 		assertThat(jdbcTemplate.queryForObject("""
 				SELECT district_name FROM district WHERE district_code = '11110'
 				""", String.class)).isEqualTo("테스트구");
 		assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM flyway_schema_history", Integer.class))
-				.isEqualTo(7);
+				.isEqualTo(migrationCount);
 	}
 
 	@Test
