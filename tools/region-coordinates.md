@@ -12,6 +12,14 @@ python tools/prepare_region_coordinates.py `
 python -m unittest discover -s tools -p test_region_coordinates.py
 ```
 
+Flyway V8을 먼저 적용한 뒤, DB 비밀번호를 `MYSQL_PASSWORD` 환경 변수에 설정하고 다음 명령으로 검토용 좌표를 적재한다.
+
+```powershell
+python tools/import_region_coordinates.py --input data/validated/region-coordinates-review.json
+```
+
+기본 연결은 `127.0.0.1:3307/pickplace`, 계정은 `pickplace_app`이다. 다른 환경은 `--host`, `--port`, `--database`, `--user`로 지정한다. 입력의 지역 코드·이름 전체가 게시된 선택 지역과 일치할 때만 한 트랜잭션으로 저장한다. 같은 기준정보·입력 해시의 중복 배치는 거부한다. 게시 포인터는 변경하지 않는다.
+
 원본은 [vuski/admdongkor의 2026-10-01 경계](https://github.com/vuski/admdongkor/tree/master/ver20261001)를 사용했다. 원본과 결과는 저장소에 포함하지 않는다. 결과에는 경계와 기준정보 파일의 SHA-256, 기준일, 좌표계, 계산 방법, 출처를 기록한다. GeoJSON에 좌표계 선언이 없으면 표준 GeoJSON 경위도로 처리하며, 그 밖의 좌표계는 거부한다.
 
 경계가 없거나 중복·오류인 지역은 좌표를 비워 둔다. 경계에 지역명이나 상위 코드가 있을 경우 기준정보와 다르면 결과를 비워 재검토한다. 결과는 `REVIEW_ONLY`이며 자동으로 DB에 저장하거나 게시하지 않는다. 2026-10-01 경계에서는 분동된 평택 고덕1·2동과 강원 접경 5개 면이 누락된다. 후속 경계 확보 전에는 시설 좌표나 다른 지역 좌표로 임의 대체하지 않는다.

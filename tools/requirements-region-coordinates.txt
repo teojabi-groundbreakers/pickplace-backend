@@ -1,2 +1,3 @@
 pyproj==3.8.0
 shapely==2.2.0
+PyMySQL==1.1.2
