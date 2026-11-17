@@ -24,7 +24,7 @@
 
 성공하면 `{data,meta}` 봉투의 `data`에 `request:{regionCode,industryCode}`, `asOf`, `basePeriod`, `statistics:{version,metrics}`, `ai:{state,reason,transportStatus,result}`를 담는다. `asOf`는 서버 시계의 **한국 날짜(Asia/Seoul)**, `basePeriod`는 그 날짜에 **달력상 마지막으로 완료된 분기**다. 실제 자료가 확보·게시된 최신 분기와 같다는 뜻은 아니다. 선택 코드 형식 오류는 400, 게시 기준정보·요약본 미준비는 기존 오류 계약에 따라 503으로 구분한다.
 
-현재 `statistics.version`은 실제 게시 요약 월과 개정 번호에서 만들지만, T17 공개 지표 조회가 없으므로 `metrics`는 빈 객체다. `PublishedSummarySnapshotReader`는 `SummaryContextService.withContext` 안에서 게시본을 검증한 뒤 불변 스냅샷을 반환한다. 해당 트랜잭션은 AI 호출 전에 종료된다. 승인된 분기 매출과 서울 CS 업종 대응표가 아직 없으므로 `mapping=null`, `history=[]`를 전달하고 `ai.state=SKIPPED`, `ai.reason=mapping_unverified`, `transportStatus=null`, `result=null`을 반환한다. 가짜 매출·승인 시점이나 분기 통계를 생성하지 않는다.
+`statistics.version`은 실제 게시 요약 월과 개정 번호에서 만든다. `PublishedSummarySnapshotReader`는 `SummaryContextService.withContext` 안에서 게시본을 검증하고, 같은 읽기 시점에서 현황 API와 같은 판정(`SummaryService.decide`)으로 `registeredPopulation`·`listedStoreCount`를 계산해 불변 스냅샷으로 반환한다. 공개 응답의 `statistics`는 현황 API와 같은 지표 모양(값·단위·상태·사유·출처)과 기준월·게시 시각이며, 자세한 내용은 [지역·업종 분석 API](analysis-api.md)를 따른다. 해당 트랜잭션은 AI 호출 전에 종료된다. 승인된 분기 매출과 서울 CS 업종 대응표가 아직 없으므로 `mapping=null`, `history=[]`를 전달하고 `ai.state=SKIPPED`, `ai.reason=mapping_unverified`, `transportStatus=null`, `result=null`을 반환한다. 가짜 매출·승인 시점이나 분기 통계를 생성하지 않는다.
 
 나중에 실제 자료가 연결되면 `AVAILABLE` 응답의 `ai.result`는 AI 서버가 보낸 JSON 중 범위·시점·형식을 검증하고 허용된 필드만 남긴 값이다. `SKIPPED`와 `FAILED`에서는 `result=null`이고, `transportStatus`는 실제 AI 호출 결과가 있을 때만 채운다. FE는 `state`와 `reason`을 함께 확인한다.
 
@@ -64,7 +64,7 @@
 
 1. 서울 원천 행정동 8자리와 FE H10, 서울 CS 업종과 FE 소진공 업종을 **승인된 시점별 대응 자료**로 확인한다. 자릿수 절단·이름 일치로 변환하지 않는다.
 2. 승인·게시 가능한 분기별 매출 이력과 실제 최초 공개·정정·확보 시점, 통화 및 집계 정의를 확보하고, 검증 가능한 DB 조회 어댑터를 구현한다. 현재 DB의 전국 인구·업소 스냅샷을 매출 이력으로 대체하지 않는다.
-3. T17 통계·품질 근거 조회와 T18 현황 HTTP 계약을 구현하고 공개 AI API의 빈 `metrics`를 실제로 검증된 지표로 교체한다. 새 지표가 추가될 때 FE의 값·null·사유 표시를 함께 검증한다.
+3. 공개 AI API의 기본 통계는 현황 판정으로 채웠다([지역·업종 분석 API](analysis-api.md)). 새 지표가 추가될 때 FE의 값·null·사유 표시를 함께 검증한다.
 4. 모델 파일·버전·공개 범위·사용 승인과 AI 서버 내부 네트워크를 준비한다. 사용자에게 제공할 수 있는 지표와 초안 정책의 제한을 확정한다.
 5. 실제 격리 DB와 실제 AI 서버를 사용한 경계·승인·시간·오류·부분 실패 통합 테스트 및 FE 계약 테스트를 수행한다.
 

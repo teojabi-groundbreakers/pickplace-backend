@@ -44,10 +44,16 @@ public record SummaryResponse(Data data, Meta meta) {
 		var data = new Data(
 				new Region(selection.regionCode(), selection.regionName()),
 				new BusinessType(selection.businessTypeCode(), selection.businessTypeName()),
-				new Metrics(metric(result.population(), PERSON, context.population()),
-						metric(result.stores(), STORE, context.stores())));
+				metrics(result));
 		var meta = new Meta(RequestIds.current(), context.summary().referenceMonth(), context.summary().publishedAt().toString());
 		return new SummaryResponse(data, meta);
+	}
+
+	// 판정 결과의 두 지표를 응답 항목으로 바꾼다. 분석 API도 현황 API와 같은 지표 모양을 쓰도록 공개한다.
+	public static Metrics metrics(SummaryResult result) {
+		SummaryReadContext context = result.context();
+		return new Metrics(metric(result.population(), PERSON, context.population()),
+				metric(result.stores(), STORE, context.stores()));
 	}
 
 	// 지표 판정 하나를 단위·출처와 함께 응답 항목으로 바꾼다.

@@ -14,6 +14,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.pickplace.backend.ai.AiPredictionRequest;
 import com.pickplace.backend.ai.AiPredictionResult;
 import com.pickplace.backend.summary.MetricDecision;
+import com.pickplace.backend.summary.SummaryService;
 
 /**
  * 게시 통계와 AI 결과를 조합한다. Spring Bean은 AnalysisConfiguration에서 연결한다.
@@ -78,10 +79,15 @@ public final class AnalysisOrchestrator {
     }
 
     /** 기존 통계는 AI 결과의 성공 여부와 관계없이 보존한다. */
-    public record Statistics(String version, Map<String, MetricDecision> metrics) {
+    public record Statistics(String version, Map<String, MetricDecision> metrics, SummaryService.SummaryResult summary) {
         public Statistics {
             if (version == null || version.isBlank()) throw new IllegalArgumentException("statistics version required");
             metrics = Map.copyOf(Objects.requireNonNull(metrics));
+        }
+
+        // 현황 판정 결과(단위·출처·기준월 포함)가 없는 통계다. 조합 로직 단위 테스트와 연구용 조합에서 쓴다.
+        public Statistics(String version, Map<String, MetricDecision> metrics) {
+            this(version, metrics, null);
         }
     }
 
