@@ -12,14 +12,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-// 전국 지역 목록·지원 업종 목록 응답을 브라우저가 저장해 두고 다시 쓰지 않게 Cache-Control: no-store를 붙인다.
-// 게시본이 바뀐 뒤에도 예전 지역·업종 목록이 화면에 남는 일을 막기 위해서다.
+// 전국 지역 목록·지원 업종 목록·현황·추이·분석 응답을 브라우저가 저장해 두고 다시 쓰지 않게 Cache-Control: no-store를 붙인다.
+// 게시본이 바뀐 뒤에도 예전 목록·통계나 이전 AI 결과가 화면에 남는 일을 막기 위해서다.
 // 오류 응답에도 같은 헤더가 붙도록 Controller가 아닌 필터에서 요청 처리 전에 넣는다.
 @Component
 public class NoStoreCacheControlFilter extends OncePerRequestFilter {
 
 	// 이 경로 자체이거나 그 아래 경로에만 붙인다. 서울 목록 API(/api/districts 등)는 기존 동작을 바꾸지 않는다.
-	private static final List<String> NO_STORE_PATHS = List.of("/api/regions", "/api/business-types");
+	private static final List<String> NO_STORE_PATHS = List.of("/api/regions", "/api/business-types", "/api/ai/analyses");
 	private static final String NO_STORE = "no-store";
 
 	// 대상 경로가 아닌 요청은 건드리지 않는다.

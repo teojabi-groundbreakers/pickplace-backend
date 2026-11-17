@@ -158,10 +158,11 @@ curl http://localhost:8080/api/regions/provinces
 curl "http://localhost:8080/api/regions/groups?provinceCode=1100000000"
 curl "http://localhost:8080/api/regions/localities?groupCode=1111000000"
 curl "http://localhost:8080/api/regions/1111051500/summary?businessTypeCode=I21201"
+curl -X POST http://localhost:8080/api/ai/analyses -H "Content-Type: application/json" -d "{\"regionCode\":\"1111051500\",\"industryCode\":\"I21201\"}"
 curl "http://localhost:8080/api/regions/1111051500/trends?datasetCode=LISTED_STORE&businessTypeCode=I21201&fromQuarter=20262&toQuarter=20263"
 ```
 
-전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다. 현황(`/api/regions/{regionCode}/summary`)은 기본 현황 묶음을 게시하기 전에는 503 `SUMMARY_DATA_NOT_READY`가 정상입니다. 추이(`/api/regions/{regionCode}/trends`)는 상세 통계를 게시하기 전에는 200과 모든 분기 `NOT_PUBLISHED`가 정상입니다.
+전국 지역 목록(`/api/regions/*`)은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`가 정상입니다. 현황(`/api/regions/{regionCode}/summary`)은 기본 현황 묶음을 게시하기 전에는 503 `SUMMARY_DATA_NOT_READY`가 정상입니다. 추이(`/api/regions/{regionCode}/trends`)는 상세 통계를 게시하기 전에는 200과 모든 분기 `NOT_PUBLISHED`가 정상입니다. 분석(`/api/ai/analyses`)은 현황과 같이 기본 현황 묶음이 있어야 200이며, 승인된 코드 대응·매출 이력이 없어 AI는 `SKIPPED`가 정상입니다.
 
 `/api/health`는 서버 생존, `/api/health/ready`는 DB 연결까지 확인합니다. 서울 기준정보를 적재하기 전에는 자치구 목록이 빈 목록이고, 행정동 목록은 자치구가 없으므로 404입니다. 전국 지역 목록과 지원 업종 목록은 전국 기준정보를 게시하기 전에는 503 `REFERENCE_DATA_NOT_READY`입니다. API 문서 화면은 `http://localhost:8080/swagger-ui.html`입니다. `/`처럼 없는 주소는 공통 오류 형식의 404가 정상입니다.
 

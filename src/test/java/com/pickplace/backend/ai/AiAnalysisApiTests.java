@@ -22,8 +22,10 @@ import com.pickplace.backend.analysis.AnalysisConfiguration;
 import com.pickplace.backend.analysis.PublishedSummarySnapshotReader;
 import com.pickplace.backend.common.error.ApiException;
 import com.pickplace.backend.common.error.ErrorCode;
+import com.pickplace.backend.summary.MetricDecision;
 import com.pickplace.backend.summary.SummaryContextService;
 import com.pickplace.backend.summary.SummaryReadContext;
+import com.pickplace.backend.summary.SummaryService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,6 +48,8 @@ class AiAnalysisApiTests {
 
     @Autowired MockMvc http;
     @MockitoBean SummaryContextService summaries;
+    // 현황 판정은 현황 API 테스트에서 실제 DB로 확인하므로, 여기서는 판정 결과만 정해 둔다.
+    @MockitoBean SummaryService summaryService;
     @MockitoBean AiPredictClient aiClient;
 
     @TestConfiguration(proxyBeanMethods = false)
@@ -64,6 +68,9 @@ class AiAnalysisApiTests {
             Function<SummaryReadContext, ?> callback = call.getArgument(2);
             return callback.apply(context());
         }).when(summaries).withContext(anyString(), anyString(), any());
+        org.mockito.Mockito.when(summaryService.decide(any())).thenAnswer(call -> new SummaryService.SummaryResult(
+                call.getArgument(0), MetricDecision.available(100),
+                MetricDecision.withoutValue(MetricDecision.Reason.COUNT_INCOMPLETE)));
     }
 
     @Test
@@ -76,7 +83,10 @@ class AiAnalysisApiTests {
                 .andExpect(jsonPath("$.data.asOf").value("2026-11-13"))
                 .andExpect(jsonPath("$.data.basePeriod").value("2026Q3"))
                 .andExpect(jsonPath("$.data.statistics.version").value("national-summary-202610-r2"))
-                .andExpect(jsonPath("$.data.statistics.metrics").isEmpty())
+                .andExpect(jsonPath("$.data.statistics.referenceMonth").value("202610"))
+                .andExpect(jsonPath("$.data.statistics.metrics.registeredPopulation.value").value(100))
+                .andExpect(jsonPath("$.data.statistics.metrics.listedStoreCount.status").value("UNAVAILABLE"))
+                .andExpect(jsonPath("$.data.statistics.metrics.listedStoreCount.reasonCode").value("COUNT_INCOMPLETE"))
                 .andExpect(jsonPath("$.data.ai.state").value("SKIPPED"))
                 .andExpect(jsonPath("$.data.ai.reason").value("mapping_unverified"))
                 .andExpect(jsonPath("$.data.ai.transportStatus").value(org.hamcrest.Matchers.nullValue()))
