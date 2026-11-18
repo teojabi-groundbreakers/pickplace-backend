@@ -55,6 +55,8 @@ import com.pickplace.backend.reference.nationwide.NationalReferenceImporter;
 import com.pickplace.backend.reference.nationwide.NationalReferenceLoader;
 import com.pickplace.backend.reference.nationwide.NationalReferencePublisher;
 import com.pickplace.backend.trend.TrendQueryRepository;
+import com.pickplace.backend.analysis.SeoulPublishedStatisticsRepository;
+import java.time.LocalDate;
 
 import tools.jackson.databind.json.JsonMapper;
 
@@ -102,6 +104,8 @@ class TrendApiTests {
 	// 조회 도중 다른 게시가 일어나는 상황을 만들기 위해 실제 조회기를 감싼다. 평소 동작은 그대로다.
 	@MockitoSpyBean
 	private TrendQueryRepository repository;
+	@Autowired
+	private SeoulPublishedStatisticsRepository aiSourceRepository;
 
 	@TempDir
 	private Path temp;
@@ -207,6 +211,27 @@ class TrendApiTests {
 		trend("datasetCode=STORE&industryCode=CS100005&fromQuarter=20262&toQuarter=20262")
 				.andExpect(period(0, "20262", "NO_DATA", "SOURCE_ROW_ABSENT"))
 				.andExpect(jsonPath("$.data.periods[0].values").value(nullValue()));
+	}
+
+	@Test
+	void aiSourceReadRequiresPublishedSeoulQuarterAndExactSourceCodes() throws Exception {
+		long batch = storeBatch(List.of(storeRow("20262", CAFE, 5), storeRow("20262", SNACK, 9)));
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2099, 1, 1))).isEmpty();
+		publish(batch, "20262");
+		var rows = aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2099, 1, 1));
+		assertThat(rows).hasSize(1);
+		assertThat(rows.getFirst().dataset()).isEqualTo("STORE");
+		assertThat(rows.getFirst().quarter()).isEqualTo("20262");
+		assertThat(rows.getFirst().sourceIndustryCode()).isEqualTo(CAFE);
+		assertThat(rows.getFirst().rowStatus()).isEqualTo("VALID");
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2025, 1, 1))).isEmpty();
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, "CS100005", "20261", "20262", LocalDate.of(2099, 1, 1))).isEmpty();
+		// 저장 시각은 UTC DATETIME이다. 한국 날짜가 바뀌는 15:00 UTC 직전까지만 해당 분석일에 쓸 수 있다.
+		jdbc.update("UPDATE regional_statistic_batch SET approved_at='2026-11-18 14:59:59' WHERE batch_id=?", batch);
+		jdbc.update("UPDATE regional_statistic_publication SET published_at='2026-11-18 14:59:59' WHERE batch_id=?", batch);
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2026, 11, 18))).hasSize(1);
+		jdbc.update("UPDATE regional_statistic_publication SET published_at='2026-11-18 15:00:00' WHERE batch_id=?", batch);
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2026, 11, 18))).isEmpty();
 	}
 
 	// 한 지표만 비어 있으면 분기는 AVAILABLE이고 그 지표만 null·NO_DATA, 다른 지표 값은 유지되는지 확인한다.
