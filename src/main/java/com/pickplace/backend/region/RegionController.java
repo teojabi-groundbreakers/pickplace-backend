@@ -8,16 +8,18 @@ import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pickplace.backend.common.error.ApiException;
 import com.pickplace.backend.common.error.ErrorCode;
+import com.pickplace.backend.common.response.ApiResponse;
 import com.pickplace.backend.common.response.ErrorDetail;
 
 @RestController
-@RequestMapping("/api/regions")
+@RequestMapping("/api")
 public class RegionController {
 
 	// 공식 행정기관 코드(H10)는 ASCII 숫자 10자리다. 앞뒤 공백 제거·숫자 변환·자릿수 보정은 하지 않는다.
@@ -36,14 +38,14 @@ public class RegionController {
 	}
 
 	// GET /api/regions/provinces: 게시된 시·도 목록을 코드순으로 돌려준다.
-	@GetMapping("/provinces")
+	@GetMapping("/regions/provinces")
 	public RegionListResponse getProvinces(HttpServletRequest request) {
 		validateQuery(request, Set.of());
 		return RegionListResponse.of(regionService.getProvinces());
 	}
 
 	// GET /api/regions/groups?provinceCode=: 시·도에 속한 화면 그룹(구·시·군, 세종 등)을 이름순으로 돌려준다.
-	@GetMapping("/groups")
+	@GetMapping("/regions/groups")
 	public RegionListResponse getGroups(@RequestParam String provinceCode, HttpServletRequest request) {
 		validateQuery(request, Set.of(PROVINCE_CODE_FIELD));
 		validateRegionCode(PROVINCE_CODE_FIELD, provinceCode);
@@ -51,11 +53,18 @@ public class RegionController {
 	}
 
 	// GET /api/regions/localities?groupCode=: 화면 그룹에 속한 읍·면·동을 이름순으로 돌려준다.
-	@GetMapping("/localities")
+	@GetMapping("/regions/localities")
 	public RegionListResponse getLocalities(@RequestParam String groupCode, HttpServletRequest request) {
 		validateQuery(request, Set.of(GROUP_CODE_FIELD));
 		validateRegionCode(GROUP_CODE_FIELD, groupCode);
 		return RegionListResponse.of(regionService.getLocalities(groupCode));
+	}
+
+	@GetMapping("/administrative-dongs/{dongCode}/map")
+	public ApiResponse<RegionMapLocation> getMapLocation(@PathVariable String dongCode, HttpServletRequest request) {
+		validateQuery(request, Set.of());
+		validateRegionCode("dongCode", dongCode);
+		return ApiResponse.ok(regionService.getMapLocation(dongCode));
 	}
 
 	// 정해지지 않은 파라미터나 같은 파라미터를 두 번 보낸 요청을 400 INVALID_REQUEST로 거절한다.

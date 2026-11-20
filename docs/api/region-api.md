@@ -131,3 +131,29 @@ curl -i "http://localhost:8080/api/regions/localities?groupCode=1111000000"
 ```
 
 전국 기준정보를 게시하기 전에는 세 경로 모두 503 `REFERENCE_DATA_NOT_READY`가 정상이다. 적재·승인·게시 방법은 `data/reference/national-202609-release-v1/README.md`를 따른다.
+
+
+## A7. 읍·면·동 지도 위치
+
+`GET /api/administrative-dongs/{dongCode}/map`
+
+`dongCode`는 전국 지역 목록에서 받은 H10 코드(ASCII 숫자 10자리)다. 쿼리 파라미터는 받지 않는다. 공통 응답의 `data`에는 다음 필드가 들어간다.
+
+| 필드 | 의미 |
+| --- | --- |
+| `regionCode`, `regionName` | 현재 게시본의 읍·면·동 코드와 표시명 |
+| `status`, `reasonCode` | `AVAILABLE`이면 사유는 `null`. `UNAVAILABLE`이면 아래 사유 코드 중 하나 |
+| `center.latitude`, `center.longitude`, `crs` | 경계 내부 대표점의 위도·경도와 `EPSG:4326`. 좌표 미제공 시 `center`와 `crs`는 `null` |
+| `areaSquareMeters` | 검증한 면적을 ㎡로 제공하기 위한 필드. 면적 출처가 연결되기 전까지 `null` |
+| `source` | 좌표 배치의 `boundaryDate`, `sourceUrl`, `licenseUrl`, `attribution`, `calculationMethod` |
+
+선택 가능한 지역이면 좌표 제공 여부와 관계없이 HTTP 200이다. FE는 `AVAILABLE`일 때만 마커를 표시한다. `COORDINATES_NOT_PUBLISHED`는 현재 지역 게시본에 사용할 지정 배치가 없다는 뜻이며, 이때 `source`도 `null`이다. `COORDINATE_NOT_FOUND`는 배치에 해당 동의 행이 없는 상태다. `MISSING_BOUNDARY`, `DUPLICATE_BOUNDARY`, `INVALID_BOUNDARY`, `REGION_MISMATCH`는 배치 검증에서 확인한 결측 사유다.
+
+| HTTP | 오류 코드 | 조건 |
+| --- | --- | --- |
+| 400 | `INVALID_REGION_CODE` | 코드 형식 오류 |
+| 400 | `INVALID_REQUEST` | 미정의 쿼리 파라미터 |
+| 404 | `REGION_NOT_FOUND` | 현재 게시본에서 선택할 수 없는 읍·면·동 코드 |
+| 503 | `REFERENCE_DATA_NOT_READY` | 전국 지역 기준정보 미게시 |
+
+배포 환경에서는 좌표의 공개 이용 조건과 출처 표기를 검토한 뒤 승인된 단일 배치의 ID를 `PICKPLACE_MAP_PUBLISHED_BATCH_ID`에 설정한다. 기본값은 `0`(비활성)이며, 설정한 배치가 현재 지역 게시본과 일치할 때만 사용한다. 원천·변환·검수 절차는 [행정동 좌표 준비](../../tools/region-coordinates.md)를 참고한다.
