@@ -34,6 +34,15 @@ public class NationalReferenceRunner implements ApplicationRunner {
                         result.releaseId(), result.classificationId(), result.inserted());
             }
             case "approve" -> publisher.approve(option(args, "version"), option(args, "actor"));
+            case "expand-industries" -> {
+                String version = option(args, "version");
+                String actor = option(args, "actor");
+                String reason = option(args, "reason");
+                int expectedSmallCount = Integer.parseInt(option(args, "expected-small-count"));
+                int changed = publisher.expandPublishedIndustries(version, expectedSmallCount);
+                log.info("Published industry scope expanded: version={}, total={}, changed={}, actor={}, reason={}",
+                        version, expectedSmallCount, changed, actor, reason);
+            }
             case "publish", "rollback" -> {
                 long revision = publisher.publish(option(args, "version"), Long.parseLong(option(args, "expected-revision")),
                         option(args, "actor"), option(args, "reason"), option(args, "action").equals("rollback"));

@@ -49,6 +49,41 @@ public class NationalReferencePublisher {
         });
     }
 
+    public int expandPublishedIndustries(String version, int expectedSmallCount) {
+        require(expectedSmallCount > 0, "Expected small industry count must be positive");
+        return transaction.execute(status -> {
+            var release = jdbc.queryForMap("SELECT release_id, status, validation_report FROM region_release "
+                    + "WHERE release_version = ? FOR UPDATE", version);
+            require("APPROVED".equals(release.get("status")), "Only approved releases are eligible");
+            long releaseId = ((Number) release.get("release_id")).longValue();
+            var current = jdbc.queryForList(
+                    "SELECT release_id FROM region_publication WHERE publication_key = ? FOR UPDATE", Long.class, KEY);
+            require(!current.isEmpty() && current.getFirst() == releaseId, "Target release is not currently published");
+
+            var classification = mapper.readTree(String.valueOf(release.get("validation_report"))).path("classificationId");
+            require(classification.isIntegralNumber() && classification.canConvertToLong() && classification.asLong() > 0,
+                    "Published release has no valid classification");
+            long classificationId = classification.asLong();
+            var approved = jdbc.queryForList("SELECT status FROM national_industry_release WHERE classification_id = ? FOR UPDATE",
+                    String.class, classificationId);
+            require(approved.equals(java.util.List.of("APPROVED")), "Classification is not approved");
+
+            int total = jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM national_industry_code WHERE classification_id = ? AND industry_level = 'SMALL'
+                    """, Integer.class, classificationId);
+            int valid = jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM national_industry_code WHERE classification_id = ? AND industry_level = 'SMALL'
+                        AND REGEXP_LIKE(industry_code, '^[A-Z][0-9]{5}$', 'c')
+                    """, Integer.class, classificationId);
+            require(total == expectedSmallCount && total == valid, "Small industry count or code format does not match");
+            // 서비스 선택 범위만 넓힌다. 분류본·지역 게시 포인터와 AI 승인 근거는 그대로 사용한다.
+            return jdbc.update("""
+                    UPDATE national_industry_code SET is_supported = TRUE, support_release_status = 'APPROVED'
+                    WHERE classification_id = ? AND industry_level = 'SMALL' AND is_supported = FALSE
+                    """, classificationId);
+        });
+    }
+
     public long publish(String version, long expectedRevision, String actor, String reason, boolean rollback) {
         require(expectedRevision >= 0 && actor != null && !actor.isBlank() && reason != null && !reason.isBlank(), "Publication metadata required");
         return transaction.execute(status -> {
