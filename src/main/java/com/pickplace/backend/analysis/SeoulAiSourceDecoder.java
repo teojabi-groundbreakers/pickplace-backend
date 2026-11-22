@@ -22,7 +22,8 @@ public final class SeoulAiSourceDecoder {
                 || !mapping.regionApproved() || !mapping.industryApproved()
                 || !row.regionCode().equals(mapping.regionCode())
                 || !row.sourceRegionCode().equals(mapping.sourceRegionCode())
-                || !row.sourceIndustryCode().equals(mapping.sourceIndustryCode())
+                || (!("RESIDENT".equals(row.dataset()) && "".equals(row.sourceIndustryCode()))
+                    && !row.sourceIndustryCode().equals(mapping.sourceIndustryCode()))
                 || !"VERIFIED".equals(row.mappingStatus()) || !"VALID".equals(row.temporalStatus())) return List.of();
         JsonNode metrics = json.readTree(row.metrics());
         if (!metrics.isObject()) throw new IllegalArgumentException("서울 원천 지표 형식 오류");
@@ -33,6 +34,7 @@ public final class SeoulAiSourceDecoder {
                 add(values, row, metrics, approvedEvidence, SeoulAiHistoryPlanner.Kind.STORE_COUNT, "similr_induty_stor_co", false);
                 add(values, row, metrics, approvedEvidence, SeoulAiHistoryPlanner.Kind.CLOSING_COUNT, "clsbiz_stor_co", false);
             }
+            case "RESIDENT" -> add(values, row, metrics, approvedEvidence, SeoulAiHistoryPlanner.Kind.RESIDENT_POPULATION, "tot_repop_co", true);
             default -> { return List.of(); }
         }
         return List.copyOf(values);
@@ -58,6 +60,7 @@ public final class SeoulAiSourceDecoder {
         BigDecimal number = amount.decimalValue();
         if (number.signum() < 0) return;
         String period = row.quarter().substring(0, 4) + "Q" + row.quarter().substring(4);
-        values.add(new SeoulAiHistoryPlanner.Value(kind, period, row.sourceRegionCode(), row.sourceIndustryCode(), number, proof));
+        values.add(new SeoulAiHistoryPlanner.Value(kind, period, row.sourceRegionCode(),
+                kind == SeoulAiHistoryPlanner.Kind.RESIDENT_POPULATION ? null : row.sourceIndustryCode(), number, proof));
     }
 }

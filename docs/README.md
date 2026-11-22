@@ -8,6 +8,7 @@
 
 | 문서 | 확인할 내용 |
 | --- | --- |
+| [지도·업종·AI 연동 개발 현황](release-integration-status.md) | 현재 적용 범위, FE 연결, 검증 결과와 실제 AI 점수 공개 후순위 |
 | [처음 실행부터 DB 적재까지](getting-started.md) | 기초 환경 준비부터 실제 데이터 적재·SQL 확인까지 따라가는 통합 안내 |
 | [전국 인구·업소 원본 수집](data/national-data-download.md) | T12 전국 CLI·다운로드/재사용·검증·T13 인계 |
 | [전국 인구·업소 정제·검증](data/national-data-validation.md) | T13 실행·숫자/중복/시점·원본 위치·집계 영향·T14 인계 |

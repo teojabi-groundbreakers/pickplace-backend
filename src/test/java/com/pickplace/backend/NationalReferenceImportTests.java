@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
+import com.pickplace.backend.analysis.AiInputApprovalRepository;
+import com.pickplace.backend.analysis.AiScopeReviewStager;
 import com.pickplace.backend.reference.nationwide.NationalReferenceImporter;
 import com.pickplace.backend.reference.nationwide.NationalReferenceLoader;
 import com.pickplace.backend.reference.nationwide.NationalReferencePublisher;
@@ -43,6 +45,8 @@ class NationalReferenceImportTests {
     @Autowired private NationalReferencePublisher publisher;
     @Autowired private NationalReferenceValidator validator;
     @Autowired private NationalReferenceLoader loader;
+    @Autowired private AiScopeReviewStager scopeStager;
+    @Autowired private AiInputApprovalRepository approvals;
     @TempDir Path temporary;
     private ObjectNode fixture;
 
@@ -57,7 +61,7 @@ class NationalReferenceImportTests {
     @AfterEach
     void cleanup() {
         assertThat(jdbc.queryForObject("SELECT DATABASE()", String.class)).isEqualTo("pickplace_test");
-        for (String table : List.of("region_publication_event", "region_publication", "region_stat_mapping", "region_navigation",
+        for (String table : List.of("ai_input_scope_review", "region_publication_event", "region_publication", "region_stat_mapping", "region_navigation",
                 "official_region_node", "region_source_artifact", "region_release", "source_region_reference", "service_region")) {
             jdbc.update("DELETE FROM " + table);
         }
@@ -65,6 +69,45 @@ class NationalReferenceImportTests {
             jdbc.update("DELETE FROM national_industry_code WHERE industry_level = ?", level);
         }
         jdbc.update("DELETE FROM national_industry_release");
+    }
+
+    @Test
+    void registersPartialScopeForReviewWithoutEnablingAi() {
+        var validFrom = java.time.LocalDate.parse("2025-04-01");
+        var validThrough = java.time.LocalDate.parse("2026-06-30");
+        var candidate = new AiScopeReviewStager.Candidate("test-coffee-v1", "national-test-v1", "semas-test-v1",
+                "1111051500", "I21201", "11110515", "CS100010", "커피 전문점",
+                AiInputApprovalRepository.IndustryMatch.PARTIAL, validFrom, validThrough, "검토된 범위");
+        importer.importSnapshot(loaded(fixture));
+        publisher.approve("national-test-v1", "reviewer");
+        assertThatThrownBy(() -> scopeStager.stage(candidate)).isInstanceOf(IllegalArgumentException.class);
+        publisher.publish("national-test-v1", 0, "reviewer", "test publication", false);
+
+        long id = scopeStager.stage(candidate);
+        assertThat(scopeStager.stage(candidate)).isEqualTo(id);
+        assertThat(jdbc.queryForObject("SELECT status FROM ai_input_scope_review WHERE review_id=?", String.class, id))
+                .isEqualTo("PENDING");
+        assertThat(jdbc.queryForObject("SELECT industry_match FROM ai_input_scope_review WHERE review_id=?", String.class, id))
+                .isEqualTo("PARTIAL");
+        assertThat(approvals.findScope("1111051500", "I21201", java.time.LocalDate.parse("2026-11-23"))).isEmpty();
+
+        var otherEvidence = new AiScopeReviewStager.Candidate("test-coffee-v1", "national-test-v1", "semas-test-v1",
+                "1111051500", "I21201", "11110515", "CS100010", "커피 전문점",
+                AiInputApprovalRepository.IndustryMatch.PARTIAL, validFrom, validThrough, "변경된 근거");
+        assertThatThrownBy(() -> scopeStager.stage(otherEvidence)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(jdbc.queryForObject("SELECT evidence FROM ai_input_scope_review WHERE review_id=?", String.class, id))
+                .isEqualTo("검토된 범위");
+
+        assertThat(scopeStager.approve(candidate, "reviewer")).isEqualTo(id);
+        var approval = approvals.findScope("1111051500", "I21201", java.time.LocalDate.now(java.time.ZoneId.of("Asia/Seoul")));
+        assertThat(approval).hasValueSatisfying(scope -> {
+            assertThat(scope.industryMatch()).isEqualTo(AiInputApprovalRepository.IndustryMatch.PARTIAL);
+            assertThat(scope.sourceIndustryName()).isEqualTo("커피 전문점");
+            assertThat(approvals.findMetricEvidence(id, java.time.LocalDate.now(java.time.ZoneId.of("Asia/Seoul")))).isEmpty();
+        });
+        assertThat(scopeStager.approve(candidate, "second-reviewer")).isEqualTo(id);
+        assertThat(jdbc.queryForObject("SELECT approved_by FROM ai_input_scope_review WHERE review_id=?", String.class, id))
+                .isEqualTo("reviewer");
     }
 
     @Test

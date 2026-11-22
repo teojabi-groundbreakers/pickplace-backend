@@ -44,11 +44,13 @@ public class SeoulPublishedStatisticsRepository {
                 JOIN regional_statistic_batch b ON b.batch_id=p.batch_id
                     AND b.source_system=p.source_system AND b.dataset_code=p.dataset_code AND b.period_type=p.period_type
                 JOIN regional_statistic_row r ON r.batch_id=p.batch_id AND r.period_key=p.period_key
-                WHERE p.source_system='SEOUL_COMMERCIAL' AND p.dataset_code IN ('SALES','STORE')
+                WHERE p.source_system='SEOUL_COMMERCIAL' AND p.dataset_code IN ('SALES','STORE','RESIDENT')
                   AND p.period_type='QUARTER' AND b.status='APPROVED'
-                  AND b.industry_scheme='SEOUL_CS100' AND b.approved_at < ? AND p.published_at < ?
+                  AND b.approved_at < ? AND p.published_at < ?
                   AND p.period_key BETWEEN ? AND ? AND r.region_code=?
-                  AND r.source_region_code=? AND r.source_industry_code=?
+                  AND r.source_region_code=?
+                  AND ((p.dataset_code IN ('SALES','STORE') AND b.industry_scheme='SEOUL_CS100' AND r.source_industry_code=?)
+                    OR (p.dataset_code='RESIDENT' AND b.industry_scheme='NONE' AND r.source_industry_code=''))
                 ORDER BY p.period_key,p.dataset_code,r.source_region_code
                 """, (rs, rowNum) -> new Row(rs.getString(1), rs.getString(2), rs.getLong(3), rs.getLong(4),
                 rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), rs.getString(10),

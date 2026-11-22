@@ -16,7 +16,8 @@ import tools.jackson.databind.json.JsonMapper;
 
 class SeoulAiInputPreparationServiceTests {
     private final SeoulPublishedStatisticsRepository repo = mock(SeoulPublishedStatisticsRepository.class);
-    private final SeoulAiInputPreparationService service = new SeoulAiInputPreparationService(repo, JsonMapper.builder().build());
+    private final AiInputApprovalRepository approvals = mock(AiInputApprovalRepository.class);
+    private final SeoulAiInputPreparationService service = new SeoulAiInputPreparationService(repo, approvals, JsonMapper.builder().build());
     private final LocalDate date = LocalDate.parse("2026-10-01");
     private final LocalDate asOf = LocalDate.parse("2026-11-19");
     private final LocalDate from = LocalDate.parse("2026-01-01"), to = LocalDate.parse("2026-12-31");
@@ -55,5 +56,25 @@ class SeoulAiInputPreparationServiceTests {
                 BigDecimal.TEN, proof("OA-22175", "batch:42"));
         assertThatThrownBy(() -> service.prepare(mapping, "20261", "20263", asOf, Map.of(), List.of(invalid)))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void missing_database_scope_approval_blocks_all_requests() {
+        when(approvals.findScope("1111051500", "I21201", asOf)).thenReturn(java.util.Optional.empty());
+        var result = service.prepareApproved("1111051500", "I21201", "20261", "20263", asOf);
+        assertThat(result.scope()).isNull();
+        assertThat(result.selections().values()).allSatisfy(item -> assertThat(item.reason()).isEqualTo("mapping_unverified"));
+        verifyNoInteractions(repo);
+    }
+
+    @Test
+    void non_seoul_region_is_reported_as_outside_current_analysis_scope() {
+        var result = service.prepareApproved("2611051000", "I21201", "20261", "20263", asOf);
+        assertThat(result.scope()).isNull();
+        assertThat(result.selections().values()).allSatisfy(item -> {
+            assertThat(item.reason()).isEqualTo("region_not_supported");
+            assertThat(item.request()).isNull();
+        });
+        verifyNoInteractions(repo, approvals);
     }
 }

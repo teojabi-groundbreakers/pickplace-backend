@@ -1,0 +1,14 @@
+{
+  "reviewVersion": "cheongunhyo-hair-salon-20261123-v1",
+  "regionVersion": "national-202609-sejong-hint-v1",
+  "classificationVersion": "semas-202609-service-v1",
+  "regionCode": "1111051500",
+  "businessTypeCode": "S20701",
+  "sourceRegionCode": "11110515",
+  "sourceIndustryCode": "CS200028",
+  "sourceIndustryName": "두발 미용업",
+  "industryMatch": "PARTIAL",
+  "validFrom": "2025-04-01",
+  "validThrough": "2026-06-30",
+  "evidence": "행정안전부 행정기관 이력과 서울시 상권 행정동 코드표(https://golmok.seoul.go.kr/images/adstrd_code.pdf)의 서울 종로구 청운효자동을 대조했다. 서울시 생활밀접업종 정의(https://golmok.seoul.go.kr/images/100_v3.pdf)에서 CS200028는 KSIC 96112이다. 202609 소진공 서울 원본(ZIP SHA-256 c83b30e7a1d1144864a91d0e1818abf360f565972878d6e3c88d75ceafe2286a)의 S20701 20115행 중 18306행이 이 KSIC를 가지며, 같은 KSIC 전체 18334행에는 다른 소진공 업종도 포함된다. 2025Q2~2026Q2 해당 서울 동·업종의 게시된 매출·점포 행을 확인했다. 이 기록은 서울 원천 범위의 부분 대응 검토 후보이며 분기 경계·지표별 AI 사용·공개 승인을 대신하지 않는다."
+}

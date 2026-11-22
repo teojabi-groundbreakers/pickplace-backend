@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,12 @@ public final class SeoulAiHistoryPlanner {
                 throw new IllegalArgumentException("중복된 분기·지표 원천: " + value.period() + "/" + value.kind());
             }
         }
-        var periods = byPeriod.keySet().stream().sorted(Comparator.reverseOrder()).toList();
+        // 공개 기준 분기는 최근 완료 분기와 직전 분기다. 이전 관측은 비교값과 성장 이력에 사용한다.
+        int currentQuarterMonth = (asOf.getMonthValue() - 1) / 3 * 3 + 1;
+        LocalDate lastComplete = asOf.withMonth(currentQuarterMonth).withDayOfMonth(1).minusDays(1);
+        String newest = lastComplete.getYear() + "Q" + ((lastComplete.getMonthValue() - 1) / 3 + 1);
+        String previous = shift(newest, -1);
+        var periods = List.of(newest, previous).stream().filter(byPeriod::containsKey).toList();
         var result = new LinkedHashMap<Metric, Selection>();
         for (Metric metric : Metric.values()) {
             result.put(metric, choose(metric, periods, byPeriod, mapping, asOf));

@@ -112,6 +112,18 @@ class SeoulAiHistoryPlannerTests {
     }
 
     @Test
+    void historical_inputs_do_not_become_public_base_quarters() {
+        var rows = List.of(value(STORE_COUNT, "2025Q2", "10"), value(RESIDENT_POPULATION, "2025Q2", "2500"),
+                value(AREA_SQUARE_METERS, "2025Q2", "1000000"),
+                value(SALES, "2025Q2", "100"), value(SALES, "2026Q2", "90"),
+                value(STORE_COUNT, "2026Q2", "10"), value(CLOSING_COUNT, "2026Q2", "1"));
+        var result = planner.prepare(mapping, rows, AS_OF);
+        assertThat(result.get(FIT).reason()).isEqualTo("insufficient_verified_data");
+        assertThat(result.get(RISK).basePeriod()).isEqualTo("2026Q2");
+        assertThat(result.get(RISK).request().history()).extracting(r -> r.period()).containsExactly("2025Q2", "2026Q2");
+    }
+
+    @Test
     void growth_request_keeps_source_sales_without_rescaling() {
         var rows = new ArrayList<SeoulAiHistoryPlanner.Value>();
         for (String period : List.of("2025Q3", "2025Q4", "2026Q1", "2026Q2", "2026Q3"))
