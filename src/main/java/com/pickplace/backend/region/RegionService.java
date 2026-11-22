@@ -2,6 +2,7 @@ package com.pickplace.backend.region;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,15 @@ public class RegionService {
 
 	private final RegionQueryRepository regionQueryRepository;
 
-	public RegionService(RegionQueryRepository regionQueryRepository) {
+	private final long publishedMapBatchId;
+
+	public RegionService(RegionQueryRepository regionQueryRepository,
+			@Value("${PICKPLACE_MAP_PUBLISHED_BATCH_ID:0}") long publishedMapBatchId) {
+		if (publishedMapBatchId < 0) {
+			throw new IllegalArgumentException("PICKPLACE_MAP_PUBLISHED_BATCH_ID must be non-negative");
+		}
 		this.regionQueryRepository = regionQueryRepository;
+		this.publishedMapBatchId = publishedMapBatchId;
 	}
 
 	// 시·도 목록을 코드순으로 돌려준다.
@@ -51,6 +59,19 @@ public class RegionService {
 				.orElseThrow(() -> new ApiException(ErrorCode.REGION_NOT_FOUND,
 						List.of(new ErrorDetail(REGION_CODE_FIELD, REASON_NOT_FOUND))));
 		return new SelectedLocality(release.releaseId(), locality.regionCode(), locality.regionName());
+	}
+
+	public RegionMapLocation getMapLocation(String dongCode) {
+		SelectedLocality locality = getSelectableLocality(dongCode);
+		// 같은 코드라도 현재 지역 게시본과 연결된 배치의 좌표만 사용한다.
+		if (publishedMapBatchId > 0) {
+			var location = regionQueryRepository.findMapLocation(publishedMapBatchId, locality);
+			if (location.isPresent()) {
+				return location.get();
+			}
+		}
+		return new RegionMapLocation(locality.regionCode(), locality.regionName(), RegionMapLocation.Status.UNAVAILABLE,
+				RegionMapLocation.Reason.COORDINATES_NOT_PUBLISHED, null, null, null, null);
 	}
 
 	// 부모가 현재 게시본에서 요청한 단계로 보이는지 확인한 뒤 그 하위 목록을 돌려준다.

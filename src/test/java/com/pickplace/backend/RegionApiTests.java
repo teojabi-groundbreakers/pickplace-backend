@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 // 테스트마다 넣은 행을 롤백해 다른 테스트와 서로 영향을 주지 않게 한다.
-@SpringBootTest
+@SpringBootTest(properties = "PICKPLACE_MAP_PUBLISHED_BATCH_ID=26001")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(MySqlTestConfiguration.class)
@@ -54,6 +54,7 @@ class RegionApiTests {
 	private static final String PROVINCES_URL = "/api/regions/provinces";
 	private static final String GROUPS_URL = "/api/regions/groups";
 	private static final String LOCALITIES_URL = "/api/regions/localities";
+	private static final String MAP_URL = "/api/administrative-dongs/{dongCode}/map";
 
 	private static final String SEOUL = "1100000000";
 	private static final String SEJONG = "3600000000";
@@ -120,6 +121,88 @@ class RegionApiTests {
 		data.insert(readyRelease, Region.province(BUSAN_PENDING, "부산광역시"));
 		approvedButUnpublishedRelease = data.release("test-v3", "APPROVED");
 		data.insert(approvedButUnpublishedRelease, Region.province(GYEONGBUK_UNPUBLISHED, "경상북도"));
+	}
+
+	@Test
+	void returnsPublishedMapPointAndAttribution() throws Exception {
+		insertMapBatch(publishedRelease);
+		jdbc.update("""
+				INSERT INTO region_map_coordinate VALUES (26001, ?, '1111051500', 'BOUNDARY_INTERIOR', 37.581, 126.971)
+				""", publishedRelease);
+
+		mockMvc.perform(get(MAP_URL, "1111051500"))
+				.andExpect(status().isOk())
+				.andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
+				.andExpect(jsonPath("$.data.regionCode").value("1111051500"))
+				.andExpect(jsonPath("$.data.regionName").value("청운효자동"))
+				.andExpect(jsonPath("$.data.status").value("AVAILABLE"))
+				.andExpect(jsonPath("$.data.reasonCode").value(nullValue()))
+				.andExpect(jsonPath("$.data.center.latitude").value(37.581))
+				.andExpect(jsonPath("$.data.center.longitude").value(126.971))
+				.andExpect(jsonPath("$.data.crs").value("EPSG:4326"))
+				.andExpect(jsonPath("$.data.areaSquareMeters").value(nullValue()))
+				.andExpect(jsonPath("$.data.source.boundaryDate").value("2026-10-01"))
+				.andExpect(jsonPath("$.data.source.attribution").value("test attribution"))
+				.andExpect(jsonPath("$.data.source.licenseUrl").value("https://example.test/license"))
+				.andExpect(jsonPath("$.meta.requestId").isNotEmpty());
+	}
+
+	@Test
+	void returnsUnavailabilityForMissingOrInvalidCoordinateRows() throws Exception {
+		insertMapBatch(publishedRelease);
+		jdbc.update("""
+				INSERT INTO region_map_coordinate VALUES (26001, ?, '4111151000', 'INVALID_BOUNDARY', NULL, NULL)
+				""", publishedRelease);
+
+		mockMvc.perform(get(MAP_URL, "4111151000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.status").value("UNAVAILABLE"))
+				.andExpect(jsonPath("$.data.reasonCode").value("INVALID_BOUNDARY"))
+				.andExpect(jsonPath("$.data.center").value(nullValue()));
+
+		mockMvc.perform(get(MAP_URL, "1111051500"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.reasonCode").value("COORDINATE_NOT_FOUND"))
+				.andExpect(jsonPath("$.data.center").value(nullValue()));
+	}
+
+	@Test
+	void hidesOtherReleaseCoordinates() throws Exception {
+		insertMapBatch(approvedButUnpublishedRelease);
+		mockMvc.perform(get(MAP_URL, "1111051500"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.reasonCode").value("COORDINATES_NOT_PUBLISHED"))
+				.andExpect(jsonPath("$.data.center").value(nullValue()))
+				.andExpect(jsonPath("$.data.source").value(nullValue()));
+	}
+
+	@Test
+	void validatesMapRequestsBeforeLookingUpCoordinates() throws Exception {
+		mockMvc.perform(get(MAP_URL, "11110515"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.error.code").value("INVALID_REGION_CODE"));
+		mockMvc.perform(get(MAP_URL, "1111051500").param("regionVersion", "old"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.error.code").value("INVALID_REQUEST"));
+		mockMvc.perform(get(MAP_URL, JONGNO))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.error.code").value("REGION_NOT_FOUND"));
+		mockMvc.perform(get(MAP_URL, "1111062000"))
+				.andExpect(status().isNotFound());
+		data.unpublish();
+		mockMvc.perform(get(MAP_URL, "1111051500"))
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(jsonPath("$.error.code").value("REFERENCE_DATA_NOT_READY"));
+	}
+
+	private void insertMapBatch(long releaseId) {
+		jdbc.update("""
+				INSERT INTO region_map_coordinate_batch
+				  (batch_id, region_release_id, snapshot_sha256, boundary_sha256, boundary_date, source_url,
+				   license_url, attribution, coordinate_crs, calculation_method, created_at)
+				VALUES (26001, ?, ?, ?, '2026-10-01', 'https://example.test/boundaries',
+				        'https://example.test/license', 'test attribution', 'EPSG:4326', 'interior', NOW(6))
+				""", releaseId, "a".repeat(64), "b".repeat(64));
 	}
 
 	// 시·도는 게시본의 화면 선택 대상만 코드순으로 나오고, 다른 버전·검토 전 시·도는 섞이지 않는지 확인한다.

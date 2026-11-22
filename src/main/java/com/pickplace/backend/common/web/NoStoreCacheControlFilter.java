@@ -19,7 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class NoStoreCacheControlFilter extends OncePerRequestFilter {
 
 	// 이 경로 자체이거나 그 아래 경로에만 붙인다. 서울 목록 API(/api/districts 등)는 기존 동작을 바꾸지 않는다.
-	private static final List<String> NO_STORE_PATHS = List.of("/api/regions", "/api/business-types", "/api/ai/analyses");
+	private static final List<String> NO_STORE_PATHS = List.of(
+			"/api/regions", "/api/administrative-dongs", "/api/business-types", "/api/ai/analyses");
 	private static final String NO_STORE = "no-store";
 
 	// 대상 경로가 아닌 요청은 건드리지 않는다.

@@ -65,10 +65,38 @@ public class RegionQueryRepository {
 			rs.getString("selection_parent_code"),
 			rs.getBoolean("auto_select_group"));
 
+	// LEFT JOIN으로 지정 배치가 없을 때와 개별 지역 좌표가 없을 때를 구분한다.
+	private static final String MAP_LOCATION_SQL = """
+			SELECT b.boundary_date, b.source_url, b.license_url, b.attribution, b.calculation_method,
+			       b.coordinate_crs, c.status, c.latitude, c.longitude
+			FROM region_map_coordinate_batch b
+			LEFT JOIN region_map_coordinate c
+			  ON c.batch_id = b.batch_id AND c.region_release_id = b.region_release_id AND c.region_code = ?
+			WHERE b.batch_id = ? AND b.region_release_id = ?
+			""";
+
 	private final JdbcTemplate jdbc;
 
 	public RegionQueryRepository(JdbcTemplate jdbc) {
 		this.jdbc = jdbc;
+	}
+
+	public Optional<RegionMapLocation> findMapLocation(long batchId, SelectedLocality locality) {
+		return jdbc.query(MAP_LOCATION_SQL, (rs, rowNum) -> {
+			String rowStatus = rs.getString("status");
+			var source = new RegionMapLocation.Source(rs.getDate("boundary_date").toString(),
+					rs.getString("source_url"), rs.getString("license_url"), rs.getString("attribution"),
+					rs.getString("calculation_method"));
+			if ("BOUNDARY_INTERIOR".equals(rowStatus)) {
+				var center = new RegionMapLocation.Center(rs.getBigDecimal("latitude"), rs.getBigDecimal("longitude"));
+				return new RegionMapLocation(locality.regionCode(), locality.regionName(), RegionMapLocation.Status.AVAILABLE,
+						null, center, rs.getString("coordinate_crs"), null, source);
+			}
+			var reason = rowStatus == null ? RegionMapLocation.Reason.COORDINATE_NOT_FOUND
+					: RegionMapLocation.Reason.valueOf(rowStatus);
+			return new RegionMapLocation(locality.regionCode(), locality.regionName(), RegionMapLocation.Status.UNAVAILABLE,
+					reason, null, null, null, source);
+		}, locality.regionCode(), batchId, locality.releaseId()).stream().findFirst();
 	}
 
 	// 지금 게시된 릴리스와 출처 정보를 돌려준다. 아직 게시된 적이 없으면 비어 있다.

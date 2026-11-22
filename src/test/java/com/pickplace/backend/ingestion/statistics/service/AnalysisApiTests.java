@@ -5,6 +5,7 @@ import static com.pickplace.backend.ingestion.statistics.service.StatisticsTestF
 import static com.pickplace.backend.ingestion.statistics.service.StatisticsTestFixture.prepare;
 import static com.pickplace.backend.ingestion.statistics.service.StatisticsTestFixture.store;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -179,6 +180,38 @@ class AnalysisApiTests {
 		analyze(BAKERY)
 				.andExpect(status().isUnprocessableContent())
 				.andExpect(jsonPath("$.error.code").value("BUSINESS_TYPE_NOT_SUPPORTED"));
+	}
+
+	@Test
+	void expandsPublishedSmallIndustriesAcrossSelectionSummaryAndAnalysis() throws Exception {
+		Bundle bundle = bundle("202609");
+		assertThatThrownBy(() -> regionPublisher.expandPublishedIndustries(bundle.regionVersion(), 2))
+				.isInstanceOf(IllegalArgumentException.class).hasMessageContaining("not currently published");
+		publishDefault(bundle);
+		jdbc.update("UPDATE national_industry_code SET is_supported = FALSE, support_release_status = NULL WHERE industry_code = ?",
+				BAKERY);
+
+		assertThatThrownBy(() -> regionPublisher.expandPublishedIndustries(bundle.regionVersion(), 1))
+				.isInstanceOf(IllegalArgumentException.class).hasMessageContaining("does not match");
+		analyze(BAKERY).andExpect(status().isUnprocessableContent());
+
+		assertThat(regionPublisher.expandPublishedIndustries(bundle.regionVersion(), 2)).isEqualTo(1);
+		assertThat(regionPublisher.expandPublishedIndustries(bundle.regionVersion(), 2)).isZero();
+		mockMvc.perform(get("/api/business-types"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.items.length()").value(2))
+				.andExpect(jsonPath("$.data.items[1].businessTypeCode").value(BAKERY));
+		mockMvc.perform(get("/api/regions/{regionCode}/summary", REGION).param("businessTypeCode", BAKERY))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.metrics.listedStoreCount.value").value(0))
+				.andExpect(jsonPath("$.data.metrics.listedStoreCount.status").value("AVAILABLE"));
+		analyze(BAKERY).andExpect(status().isOk())
+				.andExpect(metric("registeredPopulation", 100, "AVAILABLE", null))
+				.andExpect(metric("listedStoreCount", 0, "AVAILABLE", null))
+				.andExpect(jsonPath("$.data.ai.state").value("SKIPPED"))
+				.andExpect(jsonPath("$.data.ai.reason").value("mapping_unverified"));
+		assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_industry_code WHERE industry_level <> 'SMALL' AND is_supported",
+				Integer.class)).isZero();
 	}
 
 	// 분석을 요청한다.

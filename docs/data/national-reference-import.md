@@ -83,6 +83,16 @@ java -jar build\libs\pickplace-backend-0.2.0.jar --spring.profiles.active=local,
 
 복구는 `--action=rollback`과 이전에 게시된 승인 버전·현재 revision·사유를 지정한다. revision을 되감거나 승인본 내용을 수정하지 않고 새 이벤트를 만든다. 게시 행을 잠그고 포인터/event를 같은 트랜잭션에서 처리한다. 동시 최초 게시의 중복 키/잠금 충돌은 실패한 실행을 재검토한 뒤 다시 시도한다.
 
+## 4. 게시된 분류의 전체 소분류 활성화
+
+기존 승인본의 원천·분류 내용은 그대로 두고 서비스 지원 표시만 확대한다. 명령은 현재 지역 게시본과 연결된 승인 분류에서 실제 소분류 수와 API 코드 형식을 확인한다. 같은 설정으로 다시 실행하면 변경 건수가 0이다. 월별 집계는 전체 소분류로 이미 적재된 경우 재적재가 필요 없다.
+
+```cmd
+java -jar build\libs\pickplace-backend-0.2.0.jar --spring.profiles.active=local,national-reference --confirm=true --action=expand-industries --version=현재_게시_지역_버전 --expected-small-count=확인한_소분류_수 --actor=실행자 --reason=전체_소분류_선택_확대
+```
+
+이 조치는 업종 목록과 현황·분석 요청의 선택 범위를 확대한다. 업종의 AI 사용 승인이나 분기별 추이 자료 게시에는 별도 근거와 절차가 필요하다. 새로운 분류본으로 교체하면 그 분류본의 지원 범위를 검토한다.
+
 ## 검증과 후속 범위
 
 [T07 테스트](../../src/test/java/com/pickplace/backend/NationalReferenceImportTests.java)는 멱등성·소스/분류 충돌 롤백·미승인 공개 거부·선택/계층 검증·승인/게시/복구·동시 적재/게시·이벤트 실패 시 포인터 롤백을 검사한다.
