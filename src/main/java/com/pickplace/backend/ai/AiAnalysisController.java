@@ -37,7 +37,7 @@ public class AiAnalysisController {
         return ApiResponse.ok(AiAnalysisResponse.from(analyses.analyze(query)));
     }
 
-    private static void validate(AiAnalysisResponse.Request request) {
+    static void validate(AiAnalysisResponse.Request request) {
         if (request == null)
             throw error(ErrorCode.INVALID_REQUEST, "request", "REQUIRED");
         if (request.regionCode() == null || request.regionCode().isEmpty())

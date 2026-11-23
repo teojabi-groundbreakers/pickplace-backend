@@ -55,6 +55,10 @@ import com.pickplace.backend.reference.nationwide.NationalReferenceImporter;
 import com.pickplace.backend.reference.nationwide.NationalReferenceLoader;
 import com.pickplace.backend.reference.nationwide.NationalReferencePublisher;
 import com.pickplace.backend.trend.TrendQueryRepository;
+import com.pickplace.backend.analysis.SeoulPublishedStatisticsRepository;
+import com.pickplace.backend.analysis.AiInputApprovalRepository;
+import com.pickplace.backend.analysis.SeoulAiHistoryPlanner;
+import java.time.LocalDate;
 
 import tools.jackson.databind.json.JsonMapper;
 
@@ -102,6 +106,10 @@ class TrendApiTests {
 	// 조회 도중 다른 게시가 일어나는 상황을 만들기 위해 실제 조회기를 감싼다. 평소 동작은 그대로다.
 	@MockitoSpyBean
 	private TrendQueryRepository repository;
+	@Autowired
+	private SeoulPublishedStatisticsRepository aiSourceRepository;
+	@Autowired
+	private AiInputApprovalRepository aiApprovalRepository;
 
 	@TempDir
 	private Path temp;
@@ -114,7 +122,7 @@ class TrendApiTests {
 	void cleanup() {
 		assertThat(jdbc.queryForObject("SELECT DATABASE()", String.class)).isEqualTo("pickplace_test");
 		reset(repository);
-		for (String table : List.of("regional_statistic_publication_event", "regional_statistic_publication",
+		for (String table : List.of("ai_input_area_review", "ai_input_metric_review", "ai_input_scope_review", "regional_statistic_publication_event", "regional_statistic_publication",
 				"regional_statistic_issue", "regional_statistic_row", "regional_statistic_artifact", "regional_statistic_batch",
 				"national_summary_publication_event", "national_summary_publication", "national_summary_release",
 				"national_quality_issue", "store_industry_count", "store_region_coverage", "store_snapshot_entry",
@@ -207,6 +215,69 @@ class TrendApiTests {
 		trend("datasetCode=STORE&industryCode=CS100005&fromQuarter=20262&toQuarter=20262")
 				.andExpect(period(0, "20262", "NO_DATA", "SOURCE_ROW_ABSENT"))
 				.andExpect(jsonPath("$.data.periods[0].values").value(nullValue()));
+	}
+
+	@Test
+	void aiSourceReadRequiresPublishedSeoulQuarterAndExactSourceCodes() throws Exception {
+		long batch = storeBatch(List.of(storeRow("20262", CAFE, 5), storeRow("20262", SNACK, 9)));
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2099, 1, 1))).isEmpty();
+		publish(batch, "20262");
+		var rows = aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2099, 1, 1));
+		assertThat(rows).hasSize(1);
+		assertThat(rows.getFirst().dataset()).isEqualTo("STORE");
+		assertThat(rows.getFirst().quarter()).isEqualTo("20262");
+		assertThat(rows.getFirst().sourceIndustryCode()).isEqualTo(CAFE);
+		assertThat(rows.getFirst().rowStatus()).isEqualTo("VALID");
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2025, 1, 1))).isEmpty();
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, "CS100005", "20261", "20262", LocalDate.of(2099, 1, 1))).isEmpty();
+		// 저장 시각은 UTC DATETIME이다. 한국 날짜가 바뀌는 15:00 UTC 직전까지만 해당 분석일에 쓸 수 있다.
+		jdbc.update("UPDATE regional_statistic_batch SET approved_at='2026-11-18 14:59:59' WHERE batch_id=?", batch);
+		jdbc.update("UPDATE regional_statistic_publication SET published_at='2026-11-18 14:59:59' WHERE batch_id=?", batch);
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2026, 11, 18))).hasSize(1);
+		jdbc.update("UPDATE regional_statistic_publication SET published_at='2026-11-18 15:00:00' WHERE batch_id=?", batch);
+		assertThat(aiSourceRepository.find(REGION, SOURCE_REGION, CAFE, "20261", "20262", LocalDate.of(2026, 11, 18))).isEmpty();
+	}
+
+	@Test
+	void aiApprovalsRequireSeparateScopeAndMetricRecords() throws Exception {
+		long batch = storeBatch(List.of(storeRow("20262", CAFE, 5)));
+		publish(batch, "20262");
+		LocalDate future = LocalDate.of(2099, 1, 1);
+		assertThat(aiApprovalRepository.findScope(REGION, CAFE_SEMAS, future)).isEmpty();
+		jdbc.update("""
+			INSERT INTO ai_input_scope_review
+			(region_release_id,region_code,classification_id,business_type_code,source_region_code,source_industry_code,
+			 source_industry_name,industry_match,review_version,valid_from,valid_through,status,evidence,approved_at,approved_by)
+			SELECT p.release_id,?,CAST(JSON_UNQUOTE(JSON_EXTRACT(r.validation_report,'$.classificationId')) AS UNSIGNED),?, ?,?,
+			 '커피 전문점','PARTIAL','fixture-v1','2025-01-01','2026-12-31','APPROVED','test-only evidence',UTC_TIMESTAMP(6),'test'
+			FROM region_publication p JOIN region_release r ON r.release_id=p.release_id
+			WHERE p.publication_key='NATIONWIDE_SELECTION'
+			""", REGION, CAFE_SEMAS, SOURCE_REGION, CAFE);
+		var scope = aiApprovalRepository.findScope(REGION, CAFE_SEMAS, future).orElseThrow();
+		assertThat(scope.sourceIndustryName()).isEqualTo("커피 전문점");
+		assertThat(scope.industryMatch()).isEqualTo(AiInputApprovalRepository.IndustryMatch.PARTIAL);
+		assertThat(aiApprovalRepository.findScope(REGION, CAFE_SEMAS, LocalDate.of(2025, 1, 1))).isEmpty();
+		assertThat(aiApprovalRepository.findMetricEvidence(scope.reviewId(), future)).isEmpty();
+		jdbc.update("""
+			INSERT INTO ai_input_metric_review
+			(scope_review_id,batch_id,metric_kind,valid_from,valid_through,unit,boundary_verified,status,evidence,approved_at,approved_by)
+			VALUES (?,?,'STORE_COUNT','2026-01-01','2026-12-31','COUNT',TRUE,'APPROVED','test-only evidence',UTC_TIMESTAMP(6),'test')
+			""", scope.reviewId(), batch);
+		var evidence = aiApprovalRepository.findMetricEvidence(scope.reviewId(), future);
+		assertThat(evidence.get(batch)).containsKey(SeoulAiHistoryPlanner.Kind.STORE_COUNT);
+		assertThat(evidence.get(batch).get(SeoulAiHistoryPlanner.Kind.STORE_COUNT).version()).isEqualTo("batch:" + batch);
+		assertThat(aiApprovalRepository.findAreaEvidence(scope, "20261", "20263", future)).isEmpty();
+		jdbc.update("""
+			INSERT INTO ai_input_area_review
+			(scope_review_id,source_version,source_url,source_sha256,area_square_meters,valid_from,valid_through,
+			 source_published_at,collected_at,boundary_verified,status,evidence,approved_at,approved_by)
+			VALUES (?,'fixture-v1','https://data.seoul.go.kr/dataList/OA-22160/S/1/datasetView.do',?,2500000,
+			 '2026-01-01','2026-06-30','2026-07-01','2026-07-02',TRUE,'APPROVED','test-only evidence',UTC_TIMESTAMP(6),'test')
+			""", scope.reviewId(), "a".repeat(64));
+		var areas = aiApprovalRepository.findAreaEvidence(scope, "20261", "20263", future);
+		assertThat(areas).extracting(SeoulAiHistoryPlanner.Value::period).containsExactlyInAnyOrder("2026Q1", "2026Q2");
+		assertThat(areas.getFirst().amount()).isEqualByComparingTo("2500000");
+		assertThat(aiApprovalRepository.findAreaEvidence(scope, "20261", "20263", LocalDate.of(2025, 1, 1))).isEmpty();
 	}
 
 	// 한 지표만 비어 있으면 분기는 AVAILABLE이고 그 지표만 null·NO_DATA, 다른 지표 값은 유지되는지 확인한다.
