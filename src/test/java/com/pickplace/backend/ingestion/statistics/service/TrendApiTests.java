@@ -433,7 +433,7 @@ class TrendApiTests {
 	}
 
 	// 조회 도중 같은 분기가 새 배치로 다시 게시돼도, 한 응답은 처음 읽은 시점의 포인터와 값만 쓰는지 확인한다.
-	// 읽기 시점을 고정하지 않으면 포인터는 옛 배치, 값은 새 배치를 읽어 서로 맞지 않게 된다.
+	// 지역 조회 뒤 게시가 교체되어도 추이는 트랜잭션이 처음 읽은 배치를 사용해야 한다.
 	@Test
 	void republicationDuringRequestDoesNotMixBatches() throws Exception {
 		long first = workerBatch(List.of("20262"), List.of(workerRow("20262", 1)), "VERIFIED");
@@ -444,7 +444,7 @@ class TrendApiTests {
 			doAnswer(invocation -> {
 				executor.submit(() -> batches.publish(second, "20262", 1, first, "test", "republish")).get(10, TimeUnit.SECONDS);
 				return invocation.callRealMethod();
-			}).when(repository).findPublishedRows(any(), anyString(), anyString(), anyString(), anyString());
+			}).when(repository).findPeriodRows(any(), anyString(), anyString(), anyString(), anyString());
 
 			trend("datasetCode=WORKER&fromQuarter=20262&toQuarter=20262")
 					.andExpect(status().isOk())
@@ -453,6 +453,32 @@ class TrendApiTests {
 		reset(repository);
 		trend("datasetCode=WORKER&fromQuarter=20262&toQuarter=20262")
 				.andExpect(value(0, WORKER_METRIC, 2, "AVAILABLE", null));
+	}
+
+	@Test
+	void rejectsMultipleRowsForOnePublishedRegion() throws Exception {
+		long batch = workerBatch(List.of("20262"), List.of(workerRow("20262", 1)), "VERIFIED");
+		publish(batch, "20262");
+		// 서로 다른 원천 지역이 같은 H10에 대응된 비정상 상태를 만든다.
+		jdbc.update("""
+				INSERT INTO regional_statistic_row (
+				    batch_id, period_key, source_region_code, source_industry_code, mapping_release_id,
+				    region_code, mapping_status, temporal_status, row_status, reason_code, metrics,
+				    raw_payload, payload_sha256, source_row_number)
+				SELECT batch_id, period_key, '11110516', source_industry_code, mapping_release_id,
+				       region_code, mapping_status, temporal_status, row_status, reason_code, metrics,
+				       raw_payload, payload_sha256, source_row_number + 1
+				FROM regional_statistic_row WHERE batch_id = ?
+				""", batch);
+
+		String query = "datasetCode=WORKER&fromQuarter=20262&toQuarter=20262";
+		trend(query).andExpect(status().isInternalServerError());
+
+		jdbc.update("""
+				UPDATE regional_statistic_row SET row_status = 'HOLD', reason_code = 'BOUNDARY_REVIEW_PENDING'
+				WHERE batch_id = ? AND source_region_code = '11110516'
+				""", batch);
+		trend(query).andExpect(status().isInternalServerError());
 	}
 
 	// 전국 수록 업소는 소진공 업종 코드로 조회하고, 업종 표시명과 전 분기 대비 증감(절대·%)이 함께 나오는지 확인한다.

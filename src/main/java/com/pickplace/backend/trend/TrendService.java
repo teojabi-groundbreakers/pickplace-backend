@@ -17,9 +17,8 @@ import com.pickplace.backend.region.SelectedLocality;
 import com.pickplace.backend.trend.QuarterlyChangeCalculator.Observation;
 import com.pickplace.backend.trend.QuarterlyChangeCalculator.ObservationStatus;
 import com.pickplace.backend.trend.TrendDataset.IndustryKind;
+import com.pickplace.backend.trend.TrendQueryRepository.PeriodRow;
 import com.pickplace.backend.trend.TrendQueryRepository.Publication;
-import com.pickplace.backend.trend.TrendQueryRepository.PublishedRow;
-import com.pickplace.backend.trend.TrendQueryRepository.WithheldRow;
 import com.pickplace.backend.trend.TrendResult.MetricDefinition;
 import com.pickplace.backend.trend.TrendResult.MetricValue;
 import com.pickplace.backend.trend.TrendResult.PeriodStatus;
@@ -96,27 +95,27 @@ public class TrendService {
 		TrendDataset dataset = request.dataset();
 
 		Map<String, Publication> publications = new HashMap<>();
-		for (Publication publication : repository.findPublications(dataset, region.regionCode(), from, to)) {
-			checkPublication(dataset, publication);
-			publications.put(publication.quarter(), publication);
-		}
-		Map<String, PublishedRow> publishedRows = new HashMap<>();
-		for (PublishedRow row : repository.findPublishedRows(dataset, region.regionCode(), industryCode, from, to)) {
-			// 원천 지역과 H10은 1:1로 대응돼야 한다. 한 분기에 정상 행이 둘이면 어느 값을 보여줄지 정할 수 없다.
-			if (publishedRows.put(row.quarter(), row) != null) {
-				throw new IllegalStateException("한 지역·업종·분기에 게시된 정상 행이 여러 개입니다. quarter=" + row.quarter());
-			}
-		}
+		Map<String, String> metricsByQuarter = new HashMap<>();
 		Map<String, List<String>> withheldReasons = new HashMap<>();
-		for (WithheldRow row : repository.findWithheldRows(dataset, region.regionCode(), industryCode, from, to)) {
-			withheldReasons.computeIfAbsent(row.quarter(), quarter -> new ArrayList<>()).add(row.reasonCode());
+		for (PeriodRow row : repository.findPeriodRows(dataset, region.regionCode(), industryCode, from, to)) {
+			Publication publication = row.publication();
+			checkPublication(dataset, publication);
+			String quarter = publication.quarter();
+			publications.put(quarter, publication);
+			// 원천 지역과 H10은 1:1로 대응돼야 한다. 한 분기에 정상 행이 둘이면 어느 값을 보여줄지 정할 수 없다.
+			if (row.metrics() != null && metricsByQuarter.putIfAbsent(quarter, row.metrics()) != null) {
+				throw new IllegalStateException("한 지역·업종·분기에 게시된 정상 행이 여러 개입니다. quarter=" + quarter);
+			}
+			if (row.withheldReason() != null) {
+				withheldReasons.computeIfAbsent(quarter, key -> new ArrayList<>()).add(row.withheldReason());
+			}
 		}
 
 		// 분기마다 상태와 지표 정의·저장 값을 먼저 정한다. 비교 기준 분기도 같은 규칙으로 판정해야 증감이 공정하다.
 		Map<Long, Boolean> compatibleReleases = new HashMap<>();
 		Map<String, QuarterState> states = new HashMap<>();
 		for (String quarter : quarters) {
-			states.put(quarter, quarterState(quarter, region, publications.get(quarter), publishedRows.get(quarter),
+			states.put(quarter, quarterState(quarter, region, publications.get(quarter), metricsByQuarter.get(quarter),
 					withheldReasons.getOrDefault(quarter, List.of()), compatibleReleases));
 		}
 
@@ -129,7 +128,7 @@ public class TrendService {
 	}
 
 	// 한 분기의 상태를 정한다. 미게시 → 경계 불일치 → 정상 값 → 보류 사유 → 원천 지역 밖 → 행 없음 순서로 본다.
-	private QuarterState quarterState(String quarter, SelectedLocality region, Publication publication, PublishedRow row,
+	private QuarterState quarterState(String quarter, SelectedLocality region, Publication publication, String metrics,
 			List<String> withheld, Map<Long, Boolean> compatibleReleases) {
 		// 게시되지 않은 분기는 원천에 자료가 없는 것인지 아직 게시 전인지 알 수 없으므로 행 없음과 구분한다.
 		if (publication == null) {
@@ -140,13 +139,13 @@ public class TrendService {
 		if (!compatible) {
 			return QuarterState.unavailable(BOUNDARY_MISMATCH);
 		}
-		if (row != null) {
-			if (row.batchId() != publication.batchId() || !withheld.isEmpty()) {
+		if (metrics != null) {
+			if (!withheld.isEmpty()) {
 				// 같은 지역에 정상 행과 보류 행이 함께 있으면 원천 지역 둘이 한 H10에 붙은 것이다. 일부 값만 보여주지 않는다.
-				throw new IllegalStateException("게시 행과 포인터·보류 기록이 맞지 않습니다. quarter=" + quarter);
+				throw new IllegalStateException("정상 행과 보류 행이 함께 있습니다. quarter=" + quarter);
 			}
 			return new QuarterState(PeriodStatus.AVAILABLE, null, publication, definitions(publication),
-					jsonMapper.readTree(row.metrics()));
+					jsonMapper.readTree(metrics));
 		}
 		if (!withheld.isEmpty()) {
 			String reason = withheldReason(withheld);
