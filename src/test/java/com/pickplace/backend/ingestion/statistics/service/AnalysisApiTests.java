@@ -7,18 +7,28 @@ import static com.pickplace.backend.ingestion.statistics.service.StatisticsTestF
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,8 +41,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.pickplace.backend.MySqlTestConfiguration;
+import com.pickplace.backend.ai.AiAnalysisV2Controller;
+import com.pickplace.backend.ai.AiPredictClient;
+import com.pickplace.backend.ai.AiPredictionRequest;
+import com.pickplace.backend.analysis.PerIndicatorAnalysisService;
+import com.pickplace.backend.analysis.SeoulAiInputPreparationService;
+import com.pickplace.backend.summary.SummaryService;
 import com.pickplace.backend.ingestion.download.service.NationalRawValidator;
 import com.pickplace.backend.ingestion.statistics.service.NationalSummaryPublisher.Expected;
 import com.pickplace.backend.reference.nationwide.NationalReferenceImporter;
@@ -70,6 +87,10 @@ class AnalysisApiTests {
 	private NationalStatisticsImporter importer;
 	@Autowired
 	private NationalSummaryPublisher publisher;
+	@Autowired
+	private SummaryService summaries;
+	@Autowired
+	private SeoulAiInputPreparationService aiInputs;
 
 	@TempDir
 	private Path temp;
@@ -80,7 +101,8 @@ class AnalysisApiTests {
 	@AfterEach
 	void cleanup() {
 		assertThat(jdbc.queryForObject("SELECT DATABASE()", String.class)).isEqualTo("pickplace_test");
-		for (String table : List.of("regional_statistic_publication_event", "regional_statistic_publication",
+		for (String table : List.of("ai_input_area_review", "ai_input_metric_review", "ai_input_scope_review",
+				"regional_statistic_publication_event", "regional_statistic_publication",
 				"regional_statistic_issue", "regional_statistic_row", "regional_statistic_artifact", "regional_statistic_batch",
 				"national_summary_publication_event", "national_summary_publication", "national_summary_release",
 				"national_quality_issue", "store_industry_count", "store_region_coverage", "store_snapshot_entry",
@@ -212,6 +234,125 @@ class AnalysisApiTests {
 				.andExpect(jsonPath("$.data.ai.reason").value("mapping_unverified"));
 		assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM national_industry_code WHERE industry_level <> 'SMALL' AND is_supported",
 				Integer.class)).isZero();
+	}
+
+	@Test
+	@EnabledIfEnvironmentVariable(named = "PICKPLACE_TEST_FASTAPI_URL", matches = ".+")
+	void approvedPublishedRiskSampleReachesFastApiAndSurvivesAnOutage() throws Exception {
+		publishDefault(bundle("202609"));
+		long releaseId = jdbc.queryForObject("SELECT release_id FROM region_publication WHERE publication_key='NATIONWIDE_SELECTION'", Long.class);
+		long classificationId = jdbc.queryForObject("SELECT classification_id FROM national_summary_release", Long.class);
+		jdbc.update("""
+				INSERT INTO ai_input_scope_review (
+				    review_version,region_release_id,region_code,classification_id,business_type_code,source_region_code,
+				    source_industry_code,source_industry_name,industry_match,valid_from,valid_through,status,evidence,approved_at,approved_by)
+				VALUES ('t32-risk-sample',?,'1111051500',?,'I21201','11110515','CS100010','커피 전문점','PARTIAL',
+				        '2025-04-01','2026-06-30','APPROVED','test-only scope','2026-11-19 00:00:00','test')
+				""", releaseId, classificationId);
+		long scopeId = jdbc.queryForObject("SELECT review_id FROM ai_input_scope_review WHERE review_version='t32-risk-sample'", Long.class);
+
+		String key = System.getenv("PICKPLACE_TEST_FASTAPI_KEY");
+		var realClient = spy(new AiPredictClient(mapper, true, System.getenv("PICKPLACE_TEST_FASTAPI_URL"), key, 1000, 5000));
+		var realHttp = v2With(realClient);
+
+		requestV2(realHttp, CAFE)
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.statistics.metrics.registeredPopulation.value").value(100))
+				.andExpect(jsonPath("$.data.ai.state").value("SKIPPED"))
+				.andExpect(jsonPath("$.data.ai.reason").value("insufficient_verified_data"));
+		org.mockito.Mockito.verifyNoInteractions(realClient);
+
+		// 원본 대조값만 이 격리 DB에 복제한다. 승인 상태는 테스트 전용이다.
+		publishSeoulSample(releaseId, scopeId, "SALES", "20252", """
+				{"thsmon_selng_amt":{"status":"UNVERIFIED","reasonCode":"SOURCE_DEFINITION_UNREVIEWED","value":4603714789}}
+				""", "SALES");
+		publishSeoulSample(releaseId, scopeId, "SALES", "20262", """
+				{"thsmon_selng_amt":{"status":"UNVERIFIED","reasonCode":"SOURCE_DEFINITION_UNREVIEWED","value":4403365282}}
+				""", "SALES");
+		publishSeoulSample(releaseId, scopeId, "STORE", "20262", """
+				{"similr_induty_stor_co":{"status":"AVAILABLE","value":124},"clsbiz_stor_co":{"status":"AVAILABLE","value":7}}
+				""", "STORE_COUNT", "CLOSING_COUNT");
+
+		String available = requestV2(realHttp, CAFE)
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.data.ai.state").value("AVAILABLE"))
+				.andExpect(jsonPath("$.data.ai.metrics.risk.basePeriod").value("2026Q2"))
+				.andExpect(jsonPath("$.data.ai.metrics.risk.value").value(27.52))
+				.andExpect(jsonPath("$.data.ai.metrics.growth.reason").value("insufficient_verified_data"))
+				.andExpect(jsonPath("$.data.ai.metrics.fit.reason").value("insufficient_verified_data"))
+				.andExpect(jsonPath("$.data.ai.analysisScope.sourceIndustryName").value("커피 전문점"))
+				.andExpect(jsonPath("$.data.ai.analysisScope.referenceOnly").value(true))
+				.andReturn().getResponse().getContentAsString();
+		var captured = ArgumentCaptor.forClass(AiPredictionRequest.class);
+		verify(realClient).predict(captured.capture());
+		var request = captured.getValue();
+		assertThat(request.regionCode()).isEqualTo("11110515");
+		assertThat(request.regionCodeSystem()).isEqualTo("seoul-adstrd");
+		assertThat(request.industryCode()).isEqualTo("CS100010");
+		assertThat(request.basePeriod()).isEqualTo("2026Q2");
+		assertThat(request.history()).extracting(AiPredictionRequest.Observation::period).containsExactly("2025Q2", "2026Q2");
+		assertThat(request.history().getFirst().salesAmount()).isEqualByComparingTo(BigDecimal.valueOf(4_603_714_789L));
+		assertThat(request.history().getLast().salesAmount()).isEqualByComparingTo(BigDecimal.valueOf(4_403_365_282L));
+		assertThat(request.history().getLast().storeCount()).isEqualTo(124L);
+		assertThat(request.history().getLast().closingCount()).isEqualTo(7L);
+
+		try (var closedEndpoint = new Socket()) {
+			closedEndpoint.bind(new InetSocketAddress("127.0.0.1", 0));
+			var disconnected = new AiPredictClient(mapper, true,
+					"http://127.0.0.1:" + closedEndpoint.getLocalPort(), key, 500, 1500);
+			String failed = requestV2(v2With(disconnected), CAFE)
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.data.ai.state").value("FAILED"))
+					.andExpect(jsonPath("$.data.ai.metrics.risk.reason").value("ai_transport_failure"))
+					.andExpect(jsonPath("$.data.ai.metrics.risk.value").value(nullValue()))
+					.andReturn().getResponse().getContentAsString();
+			assertThat(mapper.readTree(failed).at("/data/statistics"))
+					.isEqualTo(mapper.readTree(available).at("/data/statistics"));
+		}
+	}
+
+	private MockMvc v2With(AiPredictClient client) {
+		var clock = Clock.fixed(Instant.parse("2026-11-24T03:00:00Z"), ZoneOffset.UTC);
+		var service = new PerIndicatorAnalysisService(aiInputs, client);
+		return MockMvcBuilders.standaloneSetup(new AiAnalysisV2Controller(summaries, service, clock)).build();
+	}
+
+	private ResultActions requestV2(MockMvc http, String industry) throws Exception {
+		return http.perform(post(ANALYSES_URL + "/v2").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"regionCode\":\"" + REGION + "\",\"industryCode\":\"" + industry + "\"}"));
+	}
+
+	private void publishSeoulSample(long releaseId, long scopeId, String dataset, String period, String metrics, String... kinds) {
+		String fingerprint = String.format(java.util.Locale.ROOT, "%064d", ++sequence);
+		jdbc.update("""
+				INSERT INTO regional_statistic_batch (
+				    source_system,dataset_code,period_type,period_keys,region_scheme,industry_scheme,mapping_release_id,
+				    fingerprint,attempt_no,status,definition_json,mapping_json,collected_at,started_at,finished_at,
+				    source_row_count,accepted_row_count,held_row_count,invalid_row_count,duplicate_row_count,
+				    validation_report,approved_at,approved_by)
+				VALUES ('SEOUL_COMMERCIAL',?,'QUARTER',JSON_ARRAY(?),'SEOUL_ADMIN8','SEOUL_CS100',?,
+				        ?,1,'APPROVED',JSON_OBJECT(),JSON_OBJECT(),'2026-11-12','2026-11-12','2026-11-12',
+				        1,1,0,0,0,JSON_OBJECT(),'2026-11-12','test')
+				""", dataset, period, releaseId, fingerprint);
+		long batch = jdbc.queryForObject("SELECT batch_id FROM regional_statistic_batch WHERE fingerprint=?", Long.class, fingerprint);
+		jdbc.update("""
+				INSERT INTO regional_statistic_row (
+				    batch_id,period_key,source_region_code,source_industry_code,mapping_release_id,region_code,
+				    mapping_status,temporal_status,row_status,metrics,raw_payload,payload_sha256,source_row_number)
+				VALUES (?,?,'11110515','CS100010',?,'1111051500','VERIFIED','VALID','VALID',?,JSON_OBJECT(),?,1)
+				""", batch, period, releaseId, metrics, fingerprint);
+		jdbc.update("""
+				INSERT INTO regional_statistic_publication
+				    (source_system,dataset_code,period_type,period_key,batch_id,revision,published_at)
+				VALUES ('SEOUL_COMMERCIAL',?,'QUARTER',?,?,1,'2026-11-12')
+				""", dataset, period, batch);
+		for (String kind : kinds) {
+			jdbc.update("""
+					INSERT INTO ai_input_metric_review (
+					    scope_review_id,batch_id,metric_kind,valid_from,valid_through,unit,boundary_verified,status,evidence,approved_at,approved_by)
+					VALUES (?,?,?,'2025-04-01','2026-06-30',?,TRUE,'APPROVED','test-only metric','2026-11-19','test')
+					""", scopeId, batch, kind, "SALES".equals(kind) ? "KRW" : "COUNT");
+		}
 	}
 
 	// 분석을 요청한다.
