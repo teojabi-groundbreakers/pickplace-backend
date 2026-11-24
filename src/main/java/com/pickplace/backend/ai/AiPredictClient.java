@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodySubscriber;
 import java.net.http.HttpResponse.BodySubscribers;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
@@ -103,17 +102,23 @@ public class AiPredictClient {
                 .header("X-API-Key", apiKey)
                 .POST(HttpRequest.BodyPublishers.ofByteArray(mapper.writeValueAsBytes(payload(request))))
                 .build();
-        CompletableFuture<HttpResponse<byte[]>> pending = http.sendAsync(outbound, response ->
-                response.statusCode() == 200 ? new LimitedBody(MAX_RESPONSE_BYTES) : ignoreErrorBody());
-        try {
-            // HttpRequest.timeout만으로 본문 수신 완료까지 제한하지 못할 수 있어 전체 대기 시간을 따로 제한한다.
-            HttpResponse<byte[]> response = pending.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+        CompletableFuture<AiPredictionResult> upstreamError = new CompletableFuture<>();
+        CompletableFuture<HttpResponse<byte[]>> pending = http.sendAsync(outbound, response -> {
             int code = response.statusCode();
-            if (code == 401 || code == 403) return fail(Status.AUTH_FAILURE, "ai_authentication_failed");
-            if (code == 422 || code == 400) return fail(Status.INVALID_AI_REQUEST, "ai_request_rejected");
-            if (code == 408 || code == 504) return fail(Status.TIMEOUT, "ai_timeout");
-            if (code >= 500) return fail(Status.UPSTREAM_UNAVAILABLE, "ai_server_unavailable");
-            if (code != 200) return fail(Status.INVALID_RESPONSE, "ai_unexpected_status");
+            if (code == 200) return new LimitedBody(MAX_RESPONSE_BYTES);
+            // 오류 상태를 먼저 확정한 뒤 본문 수신을 취소한다.
+            upstreamError.complete(httpError(code));
+            return BodySubscribers.replacing(new byte[0]);
+        });
+        try {
+            // 정상 응답에는 본문까지 제한 시간을 적용한다. 오류 응답은 헤더만으로 분류한다.
+            CompletableFuture.anyOf(upstreamError, pending).get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            var error = upstreamError.getNow(null);
+            if (error != null) {
+                pending.cancel(true);
+                return error;
+            }
+            HttpResponse<byte[]> response = pending.join();
             String contentType = response.headers().firstValue("Content-Type").orElse("").split(";", 2)[0].trim();
             if (!"application/json".equalsIgnoreCase(contentType)) return fail(Status.INVALID_RESPONSE, "ai_response_content_type");
             String raw = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
@@ -141,16 +146,12 @@ public class AiPredictClient {
         }
     }
 
-    private static BodySubscriber<byte[]> ignoreErrorBody() {
-        // 오류는 상태 코드로 판정한다. 느린 본문을 기다리면 이미 수신한 상태가 타임아웃으로 바뀐다.
-        return BodySubscribers.mapping(BodySubscribers.ofInputStream(), body -> {
-            try {
-                body.close();
-            } catch (IOException ignored) {
-                // 본문을 닫는 도중 연결이 종료돼도 수신한 HTTP 상태는 유효하다.
-            }
-            return new byte[0];
-        });
+    private static AiPredictionResult httpError(int code) {
+        if (code == 401 || code == 403) return fail(Status.AUTH_FAILURE, "ai_authentication_failed");
+        if (code == 422 || code == 400) return fail(Status.INVALID_AI_REQUEST, "ai_request_rejected");
+        if (code == 408 || code == 504) return fail(Status.TIMEOUT, "ai_timeout");
+        if (code >= 500) return fail(Status.UPSTREAM_UNAVAILABLE, "ai_server_unavailable");
+        return fail(Status.INVALID_RESPONSE, "ai_unexpected_status");
     }
 
     private ObjectNode payload(AiPredictionRequest request) {
