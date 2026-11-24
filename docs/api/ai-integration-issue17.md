@@ -125,3 +125,24 @@ FE에서 백엔드 v2를 연결할 때 `VITE_AI_ANALYSIS_V2_ENABLED=true`로 설
 - 도메인 테스트는 검증되지 않은 대응·원천·기간을 보류하고 AI 실패 시 통계를 보존한다.
 - 실제 기본 FastAPI를 loopback에 임시 실행해 Java 클라이언트와 HTTP 계약, 그리고 `POST /api/ai/analyses` 공개 컨트롤러부터 FastAPI까지의 응답 봉투를 확인했다. 실행된 실제 HTTP 테스트 2건은 모두 통과했다. 이때 가상 fixture를 테스트 목적으로 `official` 형식에 넣고 빈 모델을 사용했으므로 실제 공식 자료·예측 성능 검증이 아니다. 모델 파일 부재에 따라 성장률은 `null`·`model_not_found`, 위험·적합도 초안은 별도 제공됐다.
 - 신규 공개 API의 형식·불가 사유·검증 전 DB 미조회·게시 요약본 미준비 503과 분기 경계를 웹 계층 테스트에서 확인했다. Docker가 실행 중이 아니어서 실제 MySQL Testcontainers 통합 테스트는 이번 실행에 포함되지 않았다.
+
+### T32 서울 원천 표본 실연동 검증
+
+격리 MySQL에 청운효자동의 테스트용 전국 기본 현황과 서울 원천 표본을 준비한다. 서울 원천 행은 개발 DB의 게시 배치와 대조했다. 테스트의 승인 기록은 격리 환경에만 생성한다.
+
+| AI 입력 | 기준 시점 | 원천 값 |
+| --- | --- | ---: |
+| 전년 동기 매출 | 2025Q2 | 4,603,714,789원 |
+| 기준 매출 | 2026Q2 | 4,403,365,282원 |
+| 전체 점포 수 | 2026Q2 | 124개 |
+| 폐업 수 | 2026Q2 | 7개 |
+
+공개 v2에 `1111051500 × I21201`을 요청하고 Spring이 `11110515 × CS100010`과 위 값을 FastAPI에 전달하는지 대조한다. 정상 응답의 위험 지수는 `2026Q2` 기준 27.52이며 실제 분석 범위는 커피 전문점이다. 지표 승인 누락은 `SKIPPED`, AI 연결 실패는 `FAILED`로 반환한다. AI 연결 실패가 나도 기본 현황은 정상 응답과 동일하다. 이 표본은 승인된 면적과 연속 5개 분기 매출을 채우지 않아 적합도와 성장 예측은 제공하지 않는다.
+
+기본 FastAPI를 로컬에서 내부 키 검증을 켜고 실행한다. Spring 테스트 환경에 `PICKPLACE_TEST_FASTAPI_URL`과 같은 서버의 `PICKPLACE_TEST_FASTAPI_KEY`를 설정한 뒤 Docker 엔진이 켜진 환경에서 다음을 실행한다.
+
+```cmd
+gradlew.bat test --tests "*AnalysisApiTests.approvedPublishedRiskSampleReachesFastApiAndSurvivesAnOutage"
+```
+
+이 기록은 로컬 HTTP·값 전달 검증이다. 운영 AI 모델·승인된 운영 자료·배포된 FE까지의 통합 검수는 별도로 확인한다.
