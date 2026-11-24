@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodySubscribers;
 import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CodingErrorAction;
@@ -21,7 +22,9 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -36,6 +39,7 @@ import static com.pickplace.backend.ai.AiPredictionResult.Status;
 public class AiPredictClient {
     private static final int MAX_RESPONSE_BYTES = 1_000_000;
     private final JsonMapper mapper;
+    private final ObjectReader responseReader;
     private final boolean enabled;
     private final URI endpoint;
     private final String apiKey;
@@ -55,6 +59,8 @@ public class AiPredictClient {
             @Value("${PICKPLACE_AI_CONNECT_TIMEOUT_MS:1000}") String connectTimeout,
             @Value("${PICKPLACE_AI_REQUEST_TIMEOUT_MS:3000}") String requestTimeout) {
         this.mapper = mapper;
+        this.responseReader = mapper.reader().with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY,
+                DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
         this.enabled = enabled;
         // AI 연동은 기본 비활성이다. 설정이 없어도 일반 BE 기동에 영향을 주지 않는다.
         if (!enabled) {
@@ -96,21 +102,28 @@ public class AiPredictClient {
                 .header("X-API-Key", apiKey)
                 .POST(HttpRequest.BodyPublishers.ofByteArray(mapper.writeValueAsBytes(payload(request))))
                 .build();
-        CompletableFuture<HttpResponse<byte[]>> pending = http.sendAsync(outbound, ignored -> new LimitedBody(MAX_RESPONSE_BYTES));
-        try {
-            // HttpRequest.timeout만으로 본문 수신 완료까지 제한하지 못할 수 있어 전체 대기 시간을 따로 제한한다.
-            HttpResponse<byte[]> response = pending.get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+        CompletableFuture<AiPredictionResult> upstreamError = new CompletableFuture<>();
+        CompletableFuture<HttpResponse<byte[]>> pending = http.sendAsync(outbound, response -> {
             int code = response.statusCode();
-            if (code == 401 || code == 403) return fail(Status.AUTH_FAILURE, "ai_authentication_failed");
-            if (code == 422 || code == 400) return fail(Status.INVALID_AI_REQUEST, "ai_request_rejected");
-            if (code == 408 || code == 504) return fail(Status.TIMEOUT, "ai_timeout");
-            if (code >= 500) return fail(Status.UPSTREAM_UNAVAILABLE, "ai_server_unavailable");
-            if (code != 200) return fail(Status.INVALID_RESPONSE, "ai_unexpected_status");
+            if (code == 200) return new LimitedBody(MAX_RESPONSE_BYTES);
+            // 오류 상태를 먼저 확정한 뒤 본문 수신을 취소한다.
+            upstreamError.complete(httpError(code));
+            return BodySubscribers.replacing(new byte[0]);
+        });
+        try {
+            // 정상 응답에는 본문까지 제한 시간을 적용한다. 오류 응답은 헤더만으로 분류한다.
+            CompletableFuture.anyOf(upstreamError, pending).get(requestTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            var error = upstreamError.getNow(null);
+            if (error != null) {
+                pending.cancel(true);
+                return error;
+            }
+            HttpResponse<byte[]> response = pending.join();
             String contentType = response.headers().firstValue("Content-Type").orElse("").split(";", 2)[0].trim();
             if (!"application/json".equalsIgnoreCase(contentType)) return fail(Status.INVALID_RESPONSE, "ai_response_content_type");
             String raw = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(response.body())).toString();
-            JsonNode tree = mapper.readTree(raw);
+            JsonNode tree = responseReader.readTree(raw);
             if (!validResponse(tree, request)) return fail(Status.INVALID_RESPONSE, "ai_response_invalid");
             ObjectNode clean = safeResponse(tree);
             if (containsSecret(clean, apiKey)) return fail(Status.INVALID_RESPONSE, "ai_response_invalid");
@@ -131,6 +144,14 @@ public class AiPredictClient {
         } catch (RuntimeException ex) {
             return fail(Status.INVALID_RESPONSE, "ai_response_invalid");
         }
+    }
+
+    private static AiPredictionResult httpError(int code) {
+        if (code == 401 || code == 403) return fail(Status.AUTH_FAILURE, "ai_authentication_failed");
+        if (code == 422 || code == 400) return fail(Status.INVALID_AI_REQUEST, "ai_request_rejected");
+        if (code == 408 || code == 504) return fail(Status.TIMEOUT, "ai_timeout");
+        if (code >= 500) return fail(Status.UPSTREAM_UNAVAILABLE, "ai_server_unavailable");
+        return fail(Status.INVALID_RESPONSE, "ai_unexpected_status");
     }
 
     private ObjectNode payload(AiPredictionRequest request) {
@@ -156,13 +177,13 @@ public class AiPredictClient {
 
     // JSON 형식이 맞아도 요청 지역·업종 또는 분석일과 다르면 응답을 거부한다.
     private boolean validResponse(JsonNode node, AiPredictionRequest input) {
-        if (node == null || !node.isObject() || !"1.0".equals(node.path("schema_version").asText())
-                || !input.regionCode().equals(node.path("region_code").asText())
-                || !input.regionCodeSystem().equals(node.path("region_code_system").asText())
-                || !input.industryCode().equals(node.path("industry_code").asText())
-                || !input.basePeriod().equals(node.path("base_period").asText())
-                || !input.asOf().toString().equals(node.path("as_of").asText())
-                || !"official".equals(node.path("source_kind").asText())
+        if (node == null || !node.isObject() || !hasTextValue(node.path("schema_version"), "1.0")
+                || !hasTextValue(node.path("region_code"), input.regionCode())
+                || !hasTextValue(node.path("region_code_system"), input.regionCodeSystem())
+                || !hasTextValue(node.path("industry_code"), input.industryCode())
+                || !hasTextValue(node.path("base_period"), input.basePeriod())
+                || !hasTextValue(node.path("as_of"), input.asOf().toString())
+                || !hasTextValue(node.path("source_kind"), "official")
                 || !node.path("warnings").isArray() || !safeText(node.path("policy_version"), 120)
                 || !optionalText(node.get("model_version"), 120)) return false;
         JsonNode growth = node.path("growth"), risk = node.path("risk"), fit = node.path("fit");
@@ -174,6 +195,10 @@ public class AiPredictClient {
                 || !validComponents(risk.path("components")) || !validComponents(fit.path("components"))) return false;
         if (node.path("warnings").size() > 32) return false;
         for (JsonNode warning : node.path("warnings")) if (!safeText(warning, 300)) return false;
+        // FastAPI는 같은 모델 버전을 두 곳에 담는다. 성장 예측값은 모델 버전으로 추적할 수 있어야 한다.
+        JsonNode modelVersion = node.get("model_version");
+        if (!modelVersion.equals(growth.get("model_version"))
+                || ("available".equals(growth.path("status").asText()) && modelVersion.isNull())) return false;
         return validIndicator(growth, "estimated_yoy_growth", false)
                 && validIndicator(risk, "score", true) && validIndicator(fit, "score", true);
     }
@@ -213,6 +238,10 @@ public class AiPredictClient {
                     || !finite(item.path("value")) || !finite(item.path("contribution_points"))) return false;
         }
         return true;
+    }
+
+    private static boolean hasTextValue(JsonNode node, String expected) {
+        return node.isString() && expected.equals(node.asText());
     }
 
     private static boolean finite(JsonNode node) { return node.isNumber() && Double.isFinite(node.asDouble()); }

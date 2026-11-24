@@ -4,9 +4,12 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -116,13 +119,18 @@ class AiPredictClientTests {
             assertThat(sent.has("scopeAndSourceVerified")).isFalse();
         }
     }
-    @Test void validActualPredictionRetainsUnitsAndDraftScoring() throws Exception {
-        String available = BODY.replace("\"status\":\"unavailable\",\"reason\":\"model_not_found\",\"estimated_yoy_growth\":null",
+    private static String availableGrowthResponse() {
+        return BODY.replace("\"status\":\"unavailable\",\"reason\":\"model_not_found\",\"estimated_yoy_growth\":null",
                 "\"status\":\"available\",\"reason\":null,\"estimated_yoy_growth\":0.15");
+    }
+
+    @Test void validActualPredictionRetainsUnitsAndDraftScoring() throws Exception {
+        String available = availableGrowthResponse().replace("\"model_version\":null", "\"model_version\":\"growth-v1\"");
         try (var fake = server(200, available)) {
             var result = fake.client(2000).predict(request());
             assertThat(result.status()).isEqualTo(Status.AVAILABLE);
             assertThat(result.response().path("growth").path("estimated_yoy_growth").asDouble()).isEqualTo(0.15);
+            assertThat(result.response().path("growth").path("model_version").asText()).isEqualTo("growth-v1");
         }
     }
     @Test void availableDraftScoresAndComponentsSurviveSanitizing() throws Exception {
@@ -149,9 +157,95 @@ class AiPredictClientTests {
                 assertThat(result.status()).isEqualTo(expected);
                 assertThat(result.response()).isNull();
                 assertThat(result.toString()).doesNotContain("secret upstream payload", "test-key");
+                assertThat(fake.count.get()).isEqualTo(1);
             }
         }
     }
+    @Test void largeErrorBodyDoesNotMaskUpstreamStatus() throws Exception {
+        try (var fake = server(503, "x".repeat(1_000_001))) {
+            var result = fake.client(3000).predict(request());
+            assertThat(result.status()).isEqualTo(Status.UPSTREAM_UNAVAILABLE);
+            assertThat(result.reason()).isEqualTo("ai_server_unavailable");
+            assertThat(result.response()).isNull();
+            assertThat(fake.count.get()).isEqualTo(1);
+        }
+    }
+
+    @Test void connectionRefusedIsAnUpstreamFailure() throws Exception {
+        try (var socket = new Socket()) {
+            // 포트는 점유하되 연결을 받지 않아 외부 네트워크 없이 연결 실패를 재현한다.
+            socket.bind(new InetSocketAddress("127.0.0.1", 0));
+            String url = "http://127.0.0.1:" + socket.getLocalPort();
+            var result = new AiPredictClient(JSON, true, url, "test-key", 500, 3000).predict(request());
+            assertThat(result.status()).isEqualTo(Status.UPSTREAM_UNAVAILABLE);
+            assertThat(result.reason()).isEqualTo("ai_transport_failure");
+            assertThat(result.response()).isNull();
+        }
+    }
+
+    @Test void rejectsMissingOrInconsistentVersionsAndOutOfRangeScores() throws Exception {
+        String inconsistentVersions = availableGrowthResponse()
+                .replace("\"base_period\":\"2025Q4\",\"model_version\":null",
+                        "\"base_period\":\"2025Q4\",\"model_version\":\"growth-v1\"")
+                .replace("\"comparison_period\":\"2025Q1\",\"model_version\":null",
+                        "\"comparison_period\":\"2025Q1\",\"model_version\":\"growth-v2\"");
+        String invalidScore = BODY.replace("\"status\":\"unavailable\",\"reason\":\"missing_risk_indicators\",\"score\":null",
+                "\"status\":\"available\",\"reason\":null,\"score\":100.01");
+        for (String invalid : List.of(
+                BODY.replace("\"schema_version\":\"1.0\"", "\"schema_version\":1.0"),
+                BODY.replace("\"policy_version\":\"draft-v0.1\",", ""),
+                availableGrowthResponse(), inconsistentVersions, invalidScore)) {
+            try (var fake = server(200, invalid)) {
+                var result = fake.client(2000).predict(request());
+                assertThat(result.status()).isEqualTo(Status.INVALID_RESPONSE);
+                assertThat(result.response()).isNull();
+            }
+        }
+    }
+
+    @Test void slowErrorBodyDoesNotMaskUpstreamStatus() throws Exception {
+        var releaseBody = new CountDownLatch(1);
+        var fake = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        fake.createContext("/predict", exchange -> {
+            try {
+                exchange.getRequestBody().readAllBytes();
+                exchange.sendResponseHeaders(503, 8);
+                // 헤더와 본문의 시작만 보낸 뒤 클라이언트가 상태를 처리할 때까지 기다린다.
+                exchange.getResponseBody().write(1);
+                exchange.getResponseBody().flush();
+                if (releaseBody.await(5, TimeUnit.SECONDS)) {
+                    exchange.getResponseBody().write(new byte[7]);
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            } catch (IOException ignored) { /* The client closes the unused body. */ }
+            finally { exchange.close(); }
+        });
+        fake.start();
+        try {
+            var client = new AiPredictClient(JSON, true, "http://127.0.0.1:" + fake.getAddress().getPort(),
+                    "test-key", 500, 1500);
+            var result = client.predict(request());
+            assertThat(result.status()).isEqualTo(Status.UPSTREAM_UNAVAILABLE);
+            assertThat(result.reason()).isEqualTo("ai_server_unavailable");
+            assertThat(result.response()).isNull();
+        } finally {
+            releaseBody.countDown();
+            fake.stop(0);
+        }
+    }
+
+    @Test void rejectsAmbiguousJsonAndNumericRegionCodes() throws Exception {
+        for (String bad : List.of(
+                BODY.replace("\"policy_version\":\"draft-v0.1\"", "\"policy_version\":\"v0\",\"policy_version\":\"draft-v0.1\""),
+                BODY + "{}",
+                BODY.replace("\"region_code\":\"11110515\"", "\"region_code\":11110515"))) {
+            try (var fake = server(200, bad)) {
+                assertThat(fake.client(2000).predict(request()).status()).isEqualTo(Status.INVALID_RESPONSE);
+            }
+        }
+    }
+
     @Test void redirectsAreNotFollowed() throws Exception {
         try (var target = server(200, BODY); var redirect = new Fake(302, "", 0, target.url() + "/predict", "application/json")) {
             var result = redirect.client(2000).predict(request());
